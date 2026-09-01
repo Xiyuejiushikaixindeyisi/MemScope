@@ -24,6 +24,9 @@ data/
 logs/
 *.log
 
+# Local upstream source checkouts
+.vendor-src/
+
 # Editor and OS metadata
 .idea/
 .vscode/
