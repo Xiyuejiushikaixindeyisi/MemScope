@@ -184,6 +184,14 @@ Adapter 内部替换 RealMemOSClient，用于验证：
 
 ### 7.1 版本固定
 
+当前开发基线固定为：
+
+- MemOS tag：`v2.0.32`；
+- MemOS commit：`185ebdb925911b55c13b7efe666b74e2e292e484`；
+- 本地开发副本：`.vendor-src/MemOS`；
+- 副本保持 detached HEAD，`.vendor-src/` 由主仓库忽略；
+- 不跟随 MemOS `main`，版本变更必须单独评审。
+
 搭建时记录：
 
 - MemOS tag、commit 和源码哈希；
@@ -563,7 +571,313 @@ baseline 报告至少包含：
 
 按第 15 节实验；完成干净构建、冷启动、Smoke、文档、许可证和 solution.zip。
 
-## 18. 提交目录
+## 18. 分 Batch 协作与质量门禁
+
+开发采用逐 Batch、双门禁方式。每个 Batch 的状态为：
+
+```text
+Draft → Approved → In Progress → Code Review → Accepted → Frozen
+```
+
+未经用户明确批准，不从 `Draft` 进入代码开发；未经用户验收，不将 Batch 视为完成，也不自动进入下一 Batch。
+
+### 18.1 Gate 1：代码方案评审
+
+每个 Batch 开发前必须提交代码方案，至少包括：
+
+1. 目标与非目标；
+2. 前置 Batch 和依赖条件；
+3. `Context Manifest`；
+4. 涉及模块、预计新增/修改文件和允许修改范围；
+5. 外部 API、内部接口、数据模型和不变量；
+6. 正常流程、异常流程和状态转换；
+7. 环境变量、默认值、合法组合和启动校验；
+8. 超时、重试、降级、幂等和恢复策略；
+9. 可扩展点及本轮明确不实现的能力；
+10. 单元、契约、组件、集成、故障和性能测试矩阵；
+11. 风险、待审批评审点和回滚方式；
+12. Definition of Done。
+
+方案得到明确“审批通过”后才开始代码开发。
+
+开发中出现以下实质性偏离时必须暂停，并重新评审：
+
+- 修改已批准的公共接口或数据模型；
+- 新增运行服务、数据库或重要第三方依赖；
+- 改变同步/异步、事务、一致性或故障语义；
+- 扩大允许修改的模块范围；
+- 改变 MemOS tag/commit；
+- 无法达到已批准的测试或性能完成标准。
+
+不影响公共契约的局部实现细节、命名和内部重构不重复申请审批，但必须在交付说明中列出。
+
+### 18.2 Gate 2：代码验收
+
+每个 Batch 开发完成后必须交付：
+
+- 实际修改文件和功能摘要；
+- 方案条目与实现位置的对应关系；
+- 测试命令、结果、耗时和覆盖率；
+- 未覆盖内容及原因；
+- 关键日志、错误和性能数据；
+- 与批准方案的偏差；
+- 已知限制和后续依赖；
+- Git commit；
+- `HANDOFF.md`。
+
+只有通过测试并由用户验收后，Batch 才进入 `Accepted/Frozen`。
+
+### 18.3 代码质量约束
+
+- 使用清晰的分层和依赖方向，业务逻辑不直接依赖 FastAPI、数据库或 MemOS 具体实现；
+- 对真实变化边界定义小而稳定的协议，例如 `MemoryGateway`、`RawStore`、`Clock` 和模型 Provider；
+- Fake、Mock 和真实实现遵守同一公共契约；
+- 使用类型标注、明确的数据模型和结构化异常；
+- 函数和类保持单一职责，优先组合而非深继承；
+- 不为没有实际调用方的未来场景堆叠抽象层；
+- 禁止散落的魔法数字、协议字符串和直接 `os.getenv()`；
+- 新增依赖必须说明用途、版本、许可证、体积和替代方案；
+- 依赖固定版本，构建和运行阶段禁止隐式下载；
+- 日志默认结构化且不包含 Key、Token、原始敏感对话或未脱敏配置。
+
+环境变量通过集中、带类型的 Settings 模块管理：
+
+- 默认值和必填条件明确；
+- 启动时校验类型、范围和组合合法性；
+- `.env.example` 与实现同步；
+- 提供脱敏的有效配置摘要；
+- 功能模式优先使用枚举，避免多个 boolean 形成非法组合；
+- 测试可以显式注入 Settings，不依赖开发机环境。
+
+### 18.4 启发式策略约束
+
+正确性主链路优先使用确定性规则。必要的启发式策略，例如截断、去重、融合和评分调整，必须：
+
+- 与主流程隔离为可替换策略；
+- 有名称和版本；
+- 参数可配置且有安全默认值；
+- 可以关闭；
+- 不依赖未声明的全局状态；
+- 有确定性测试和固定随机种子；
+- 修改前后运行相同代理评测并记录正/负翻转。
+
+baseline 后才能引入以得分提升为目的的复杂启发式；不得把未经评测的启发式混入 scaffold 正确性路径。
+
+### 18.5 测试策略
+
+测试采用风险驱动，不以单一行覆盖率替代行为验证：
+
+- 单元测试：转换、校验、状态机、幂等、策略和错误映射；
+- 契约测试：Add、Search、Health 以及 Fake/Real Gateway 一致性；
+- 组件测试：SQLite、Fake MemOS、Mock Model API；
+- 集成测试：Adapter、MemOS、Qdrant、Neo4j；
+- 故障测试：超时、429、5xx、断连、非法响应和部分写入；
+- 一致性测试：重复 Add、重启、outbox 重放和读后写；
+- 隔离测试：user/cube 所有权和跨用户泄漏；
+- 并发测试：重复创建 Cube、并发 Add 和单 worker 边界；
+- 性能测试：逐段记录 Adapter、MemOS、模型和存储耗时；
+- 无 Key 测试：默认测试集和 CI 必须可运行；
+- 真 Key 测试：单独标记，只在凭据可用时运行。
+
+覆盖率只统计本项目代码，不统计 vendored MemOS 和生成数据。每个 Batch 在方案中给出覆盖目标，并优先覆盖关键分支、失败路径和状态不变量。
+
+### 18.6 Git 管理
+
+- 一个 Batch 使用一个分支，例如 `batch/b01-api-contract`；
+- 一个提交只承载一个清晰目的，不混入其他 Batch；
+- `main` 始终保持可运行、测试通过和可回退；
+- Batch 通过 Gate 2 后才合入 `main`；
+- 不提交 `.env`、Key、缓存、运行数据或 `.vendor-src/`；
+- `memos-scaffold-v0` 和 `baseline-v0` 验收后建立对应里程碑 tag；
+- 禁止对已共享历史使用破坏性重写。
+
+### 18.7 Batch 粒度
+
+以下是默认顺序。用户可以主动调整、合并或暂停 Batch，但不得绕过其依赖和验收门禁。
+
+| Batch | 目标 | 主要交付 | 退出条件 |
+|---|---|---|---|
+| B00 | 工程基础 | 目录、依赖锁、Settings、日志、异常、质量工具、测试框架 | 无 Key 测试框架和最小应用可运行 |
+| B01 | 比赛协议 | Pydantic 契约、FastAPI Adapter、Health、错误映射 | Add/Search/Health 契约测试通过 |
+| B02 | Raw 与身份基础 | Raw Store D04-A、幂等、user/cube 映射、迁移 | SQLite 持久化、重启和重复请求测试通过 |
+| B03 | 无 Key 双层替身 | Fake MemOS Gateway、Mock Model API、共享契约测试 | 两层无 Key 路径可独立定位协议和接线问题 |
+| B04 | 运行基础设施 | 固定 MemOS、Qdrant、Neo4j Compose、持久卷、Health | 三个服务冷启动和重启检查通过 |
+| B05 | MemOS 写入链路 | Real Gateway、Cube 生命周期、字段转换、同步 Add | Mock Model API 下真实 MemOS Add 可验证 |
+| B06 | MemOS 检索链路 | Search 参数/响应转换、隔离、长度控制、失败策略 | Mock Model API 下真实 MemOS Search 可验证 |
+| B07 | 可靠性闭环 | outbox、重试、readback、strict/fallback、可选 D04-B | 故障注入、恢复、幂等和一致性测试通过 |
+| B08 | 系统验证 | 全链路、并发、重启、资源和分段性能测试 | 代表性无 Key 场景全部通过，无未分类失败 |
+| B09 | Scaffold 冻结 | 文档、镜像/依赖锁、许可证、干净构建和交付检查 | 用户验收并标记 `memos-scaffold-v0` |
+
+真实 API/Key 到位后的 capability probe、七类样本、数十题和 1000 题运行作为后续 baseline Batch 重新提交方案，不在 B00～B09 中预先实施。
+
+## 19. 上下文与依赖管理
+
+项目不能依赖完整聊天记录恢复状态。每个 Batch 必须形成可从 Git commit 独立恢复的最小上下文包。
+
+### 19.1 项目记忆结构
+
+随着 Batch 推进维护：
+
+```text
+docs/
+├── PROJECT_CONTEXT.md
+├── CODEMAP.md
+├── interfaces/
+├── integrations/
+│   └── MEMOS_V2_0_32_MAP.md
+├── adr/
+├── batches/
+│   └── Bxx/
+│       ├── PLAN.md
+│       ├── CONTEXT.md
+│       └── HANDOFF.md
+└── achieve/
+```
+
+- `PROJECT_CONTEXT.md`：只保留当前有效的架构、边界和关键约束；
+- `CODEMAP.md`：记录模块职责、入口和依赖方向，不复制实现；
+- `interfaces/`：保存当前有效的外部和内部契约；
+- `integrations/`：保存第三方源码路由图、固定版本和关键符号；
+- `adr/`：保存已批准且需要长期解释的重要决策；
+- `PLAN.md`：Gate 1 批准方案；
+- `CONTEXT.md`：当前 Batch 的 Context Manifest；
+- `HANDOFF.md`：Gate 2 的稳定交付摘要；
+- `achieve/`：只用于历史追溯，不作为默认上下文。
+
+文档只链接事实来源，不大段复制代码或上游文档。与代码状态有关的摘要必须记录 Git commit。
+
+### 19.2 Context Manifest
+
+每个 Batch 的 `CONTEXT.md` 至少包含：
+
+```yaml
+batch: Bxx
+base_commit: <sha>
+depends_on:
+  hard: []
+  soft: []
+required_reading:
+  P0: []
+  P1: []
+  P2: []
+do_not_load: []
+allowed_changes: []
+required_tests: []
+open_decisions: []
+```
+
+每个阅读项标注路径、需要完整读取的范围或符号、读取原因和权威性。每个代码依赖标注为：
+
+- `hard`：未验收则当前 Batch 不得开始；
+- `soft`：缺失时可以使用已批准替身或降级；
+- `experimental`：不进入默认路径，也不阻塞 Batch。
+
+### 19.3 阅读优先级
+
+#### P0：必须读取
+
+- 当前 Batch 的 `PLAN.md` 和 `CONTEXT.md`；
+- 直接依赖 Batch 的公共接口和 `HANDOFF.md`；
+- 当前需要修改的完整小型文件；
+- 对应契约、Schema、ADR 和相关测试；
+- 本方案中与当前 Batch 直接相关的章节。
+
+P0 原则上不超过 10 个文件；超出时必须在方案中说明原因。
+
+#### P1：定向读取
+
+- 当前调用链上的类、函数、配置和异常；
+- MemOS 固定 commit 中的目标入口；
+- 直接调用方和被调用方；
+- 与本 Batch 有关的 Docker 和依赖配置。
+
+P1 默认按符号和调用链读取，不全仓加载。
+
+#### P2：按需读取
+
+- 间接依赖；
+- 上游 Release、Issue 和兼容性说明；
+- 已验收 Batch 的内部实现；
+- 扩展样本和非当前路径故障资料。
+
+只有遇到具体问题或验证假设时读取 P2，并在交付中记录新增上下文。
+
+#### P3：默认排除
+
+- `docs/achieve/` 历史方案；
+- 完整 1000 题数据内容；
+- MemOS 无关插件、前端和 memory 类型；
+- 已验收 Batch 的完整聊天记录；
+- 不在 `allowed_changes` 范围内的大型文件。
+
+### 19.4 MemOS 路由式阅读
+
+不得把 `.vendor-src/MemOS` 全仓加入上下文。首次真实接入时建立 `MEMOS_V2_0_32_MAP.md`，至少记录：
+
+- tag、commit 和许可证；
+- REST API 入口；
+- Cube 创建和权限入口；
+- Add/Search 调用链；
+- LLM/Embedding Provider 配置入口；
+- Qdrant/Neo4j 初始化入口；
+- 关键异常、超时和返回模型；
+- 对应源码路径和符号名。
+
+路由图只负责导航，发生冲突时以固定 commit 的实际源码和测试为准。
+
+### 19.5 Batch 交接
+
+每个 `HANDOFF.md` 必须简短说明：
+
+- 交付能力；
+- 公共接口；
+- 保证的不变量；
+- 错误和超时语义；
+- 配置项；
+- 下游允许依赖的行为；
+- 禁止依赖的内部细节；
+- 对应 commit、测试命令和结果；
+- 已知限制。
+
+后续 Batch 默认只依赖上游的公共接口、契约测试和 `HANDOFF.md`，不重新加载全部实现与讨论。
+
+### 19.6 上下文失效
+
+出现以下情况时，当前 Context Manifest 失效并重新评审：
+
+- `base_commit` 或 hard dependency 的公共接口改变；
+- API 契约、Schema 或 ADR 改变；
+- MemOS tag/commit 改变；
+- 新增运行服务、数据库或关键依赖；
+- 修改范围超出 `allowed_changes`；
+- 原方案关键假设被代码或测试证伪。
+
+仅内部重构且公共契约、不变量和测试不变时，不要求重新评审全部上下文。
+
+### 19.7 信息冲突与新 Session 启动
+
+规范性信息冲突时按以下顺序处理：
+
+1. 用户最新明确审批；
+2. 已批准 ADR 和当前 Batch 方案；
+3. 正式 API 契约与 Schema；
+4. 当前 commit 的代码和测试；
+5. 固定版本 MemOS 源码；
+6. 当前说明文档；
+7. 已归档方案和历史聊天。
+
+无法确定时停止假设并提出评审点。
+
+新的开发 Session 必须：
+
+1. 检查主仓库分支、工作区和 HEAD；
+2. 校验 MemOS 为 `v2.0.32`/`185ebdb925911b55c13b7efe666b74e2e292e484`；
+3. 阅读本方案第 18、19 节和当前 Batch 的 P0；
+4. 先提交 Gate 1 方案和评审点；
+5. 未获批准前不创建业务代码；
+6. 开发完成后执行 Gate 2，不自动进入下一 Batch。
+
+## 20. 提交目录
 
 ```text
 solution/
@@ -588,7 +902,7 @@ solution/
     └── package.sh
 ```
 
-## 19. 主要风险与回退
+## 21. 主要风险与回退
 
 | 风险 | 影响 | 回退 |
 |---|---|---|
