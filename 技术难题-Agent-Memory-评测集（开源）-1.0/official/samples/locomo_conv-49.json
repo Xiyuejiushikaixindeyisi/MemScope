@@ -1,0 +1,2263 @@
+{
+  "dataset": "official",
+  "sample_id": "locomo_conv-49",
+  "source": {
+    "benchmark": "LoCoMo-Refined",
+    "source_id": "conv-49",
+    "add_mode": "full_conversation",
+    "conversion_mode": "guide_compat",
+    "speaker_a": "Evan",
+    "speaker_b": "Sam"
+  },
+  "isolation": {
+    "user_id": "eval:locomo:conv-49",
+    "session_ids": [
+      "sess-1",
+      "sess-2",
+      "sess-3",
+      "sess-4",
+      "sess-5",
+      "sess-6",
+      "sess-7",
+      "sess-8",
+      "sess-9",
+      "sess-10",
+      "sess-11",
+      "sess-12",
+      "sess-13",
+      "sess-14",
+      "sess-15",
+      "sess-16",
+      "sess-17",
+      "sess-18",
+      "sess-19",
+      "sess-20",
+      "sess-21",
+      "sess-22",
+      "sess-23",
+      "sess-24",
+      "sess-25"
+    ]
+  },
+  "add_phase": {
+    "sessions": [
+      {
+        "session_id": "sess-1",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, good to see you! What's new since we last met? Anything cool happening?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! Good to see you! Yeah, I just got back from a trip with my family in my new Prius."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, not bad, what happened to the old one? Where'd you go, by the way?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: My old prius broke down, decided to get it repaired and sell it. Glad you asked, we went to Rockies, check it out."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow! Looks amazing. When did you get to go there?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: We all hiked the trails last week - the views were amazing!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that's cool. I love hiking, but it's been ages since I've done it. I did this hike with my dad way back when I was ten. Going hiking together was great fun, and really special for us."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Aww, that's cute. How far did you two hike?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: We hiked a good distance - quite a feat for me back then. It's definitely a great memory."
+          },
+          {
+            "role": "user",
+            "content": "Evan: What other hobbies have you found for yourself?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Nothing so far, but I was thinking about trying painting. Do you have any hobbies you love?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Cool idea, Sam! I love it. Have you tried it before?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Not yet, but I'm keen to give it a go. It looks like a nice way to chill and get creative."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, it's a great stress-buster. I started doing this a few years back."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that's impressive! How did you get into watercolor painting?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: My friend got me into it and gave me some advice, and I was hooked right away!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow! I hope I can find something I'm as passionate about as you are with watercolor painting."
+          },
+          {
+            "role": "user",
+            "content": "Evan: You'll find it, just keep trying new things until something sparks your excitement."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! I'm excited to try new things, should be fun!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, Sam! Super pumped for you! Let's catch up soon and see how you're enjoying your new hobbies!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, I'll keep you posted. See you soon!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Take it easy, Evan! Can't wait to see you. Have a good one!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-2",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, good to hear from you! Since we last talked, lots has been happening! Last weekend, I took my family on a road trip to Jasper. It was amazing! We drove through the Icefields Parkway and the glaciers and lakes were gorgeous. I got a shot of a glacier, check it out!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, looks amazing! I've never been to Jasper, but it looks breathtaking. Tell me more about your road trip. Was it relaxing?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, thanks for asking! It was great - fresh air, peacefulness and a cozy cabin surrounded by mountains and forests made it feel like a real retreat."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That sounds great, Evan! It's so important to take time for ourselves and find peace, especially after a hard week. Mine's been tough."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sorry to hear that, Sam. Is there anything I can do to help?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. Appreciate the offer, but had a check-up with my doctor a few days ago and, yikes, the weight wasn't great. It was pretty eye-opening."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That must have been a challenging experience, Sam. It's tough when we have to confront our own health challenges. Remember, it's never too late to make positive changes for a healthier lifestyle. Is there anything I can do to support you in this journey?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. Breaking old habits isn't easy. Do you have any tips for starting the process?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, what worked for me was finding a fitness routine I really enjoy. It's my go-to, I love the feeling of being healthy and strong. Making it fun and finding little ways to make smarter choices in my diet really added up. Don't forget, you got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. Like you said, I've been looking for a hobby to stay motivated. I've been thinking about trying painting. Do you think it will help me de-stress?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Of course, Sam! Painting is a great way to relieve stress and be creative. It gives you the freedom to explore colors and textures and express feelings. I've been doing it for a few years now and it helps me find peace. But unfortunately it won't help you with your weight problem, besides painting I recommend exercising!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Appreciate the encouragement. I'll give it a go and let you know how it turns out."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Awesome, Sam! Have fun with it and don't put too much pressure on yourself. Can't wait to hear how it's going!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cheers, Evan! I won't stress - just gonna enjoy it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Alright Sam, have fun with it! Keep me updated!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Will do. Bye for now."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Take care, Sam! I'll catch up with you later."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-3",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! Long time no talk! How're you doing? Life's been quite the rollercoaster lately. I had a health scare last week – a sudden heart palpitation incident that really shook me up. It's been a serious wake-up call about my lifestyle."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, great hearing from you! Sorry about that, glad you're feeling better now. Trying to eat healthier these days."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That salad looks yummy! I'm being extra careful with my health lately. I'm trying to eat less processed food and sugary snacks, even though I love ginger snaps. Have you made any changes to your diet recently?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Nah, no changes for me. Still enjoying my soda and candy, although I know it's not the best habit to have."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, breaking habits can be tough. Making small changes can have a big impact later on. Have you considered swapping soda for flavored seltzer water? It's still bubbly and tasty, but without the sugar. And instead of candy, you could try dark chocolate with high cocoa content - it's a healthier option. What do you think?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, good idea! I'll give it a try."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Awesome, Sam! Let me know how it goes. Making small changes can really help you live a healthier life. Don't forget - every step matters!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, thanks! Appreciate it. I'll definitely keep you posted."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I'm here for you, Sam. Let's continue supporting each other on our health journeys. It's important to remember that progress takes time."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, you're right. It takes time, but I'm up for keep trying and making those tiny changes."
+          },
+          {
+            "role": "user",
+            "content": "Evan: C'mon, keep it up! Every little bit counts, you'll get there!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! I appreciate your support, it means a lot to me to have you in my corner."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yes, Sam! I'm here for you. Let's rock our workouts and reach our goals! Exercise clears the mind - it's amazing!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that's awesome! Could you give me a hand with getting started?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sure Sam, I'd be glad to help. Let's get together and I'll show you some basic exercises. We'll reach our goals!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cool, can't wait! Thank you. By the way, I'm coming from the shop and I had a frustrating issue at the supermarket. The self-checkout machines were all broken, my mood is terrible now!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sorry you were in that situation, hopefully it won't happen again!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, I hope so, take care of yourself."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-4",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, I need to talk to you. My friends were mocking my weight last Friday and it hurt. That made me realize I need to make changes."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, sorry about that. Don't worry, progress takes time. Let's work on it together."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the support, Evan. I'm working on my health and getting active!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's great, Sam! I struggled with my health a few years ago, but stuck with it. Here's a reminder of my commitment - my gym membership card. It's not just about exercise, diet and lifestyle changes also play a big role."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's awesome, Evan! What do you think made the biggest impact on your health journey?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I made some dietary changes, like cutting down on sugary snacks and eating more veggies and fruit, and it made a big impact on my health. Have you considered any changes?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yep, I'm reducing my soda and candy intake. It's tough, but I'm determined to make a change."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Go for it, Sam! It's tough at first, but you got this. Try flavored seltzer water instead. It can be a great alternative to soda. Btw I can't stop thinking about that new mystery novel I started. It's so gripping!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds good, Evan. I've tried it before and it was nice. Do you have any ideas for low-calorie snacks to pair with it? And what's the novel?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Definitely, how about some flavored seltzer with some air-popped popcorn or fruit? It's yum and healthy! The novel I'm reading is \"The Great Gatsby\"."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yum, that sounds good! Thanks! And I'll definitely read that novel sometime."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, Sam! Focus on healthy swaps and taking small steps. Stay upbeat!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That reminder is inspiring. Thanks for reminding me to focus on progress, not perfection."
+          },
+          {
+            "role": "user",
+            "content": "Evan: By the way, have you thought about exercising? Trust me, it's just as important as eating right."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Starting tomorrow, I will go to the gym and exercise regularly. The sooner I start, the sooner I will see the rewards of this activity."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's awesome, Sam! It's such a rewarding and tough activity - keep going and have fun!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Your support means a lot. I really appreciate it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, you've got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I really appreciate it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, Sam. I'm here if you need me. Keep going!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, how's it going? Last week I went on a trip to Canada and something unreal happened - I met this awesome Canadian woman and it was like something out of a movie. She's incredible and being with her makes me feel alive."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Congrats Evan! She must be something special! Being with someone who makes you feel alive is amazing. I'm sorry to hear that you're dealing with health issues lately, it can be really tough. It's hard to fully enjoy things sometimes."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Woah. such a nice view! Thanks, Sam! She's definitely great. Every moment with her is really fun and energizing. It's a nice change, especially after dealing with health issues. But you never know what life's gonna throw at you. Btw look what life has thrown for me right now haha."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Looks good to eat! Dealing with health problems can be challenging and take away from enjoyable experiences."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Ginger snaps are my weakness for sure! Dealing with health issues has been tough, but it's made me appreciate the good moments more. These are the ones who bring lots of joy even through the hard times."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: It looks like your kids are having a great time! And how long have you been prioritizing your health?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yes, they bring me such joy. My healthy road has been a long one. I've been working on it for two years now, so there have been ups and downs, but I'm doing my best."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I wish your motivation never goes anywhere! I'm thinking of ordering myself some similar ones too, what do you think, are they worth it?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks Sam! My family motivates me to stay healthy. Well, it helps a lot with my health goals. It tracks my progress really well and serves as a constant reminder to keep going."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cool! It sounds like a really good tool to stay on track. How has it been working out for you?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's been awesome, Sam! That visual reminder has been really motivating."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the recommendation, what else motivates you?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I'm motivated by a thirst for adventure on interesting hikes, that's pretty cool!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: What an amazing view! The key is to find something that keeps you motivated."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, that's it. Find something that motivates you and makes you happy, whether it's large or tiny. It'll help us conquer the struggles we encounter."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Nice! What made you decide to get that?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I got this because it symbolizes strength and resilience. Taking care of it motivates me to keep going through tough times."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, it's amazing! So powerful yet so simple."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. It's a reminder that even in little things, we can be tough."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Little stuff matters - it builds our resilience over time."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, every little thing we do for ourselves helps us in the long run."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yep, small steps add up. Stay consistent and don't give up!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, Sam! Consistency and perseverance will get us far. Great chat!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Great chatting with you, Sam! Take care, talk soon!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Catch ya later!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-6",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, long time no talk! Hope you're doing great. I just got back from a rad vacay with my new SO in Canada. Tried some awesome activities too - think hiking, biking... all that cool stuff. We loved exploring the outdoors together, it was so awesome!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Good to hear from you. Wow, Canada sounds amazing! That photo looks stunning. Wish I could do something like that. Things have been a bit challenging for me lately; some stuff has been hard on my health."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sorry to hear that things haven't been going well. Dealing with health issues can be tough. Is there anything I can do to help?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. Your support means a lot to me. It's tough staying positive, but knowing I have people like you in my corner makes it easier."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Glad to support you, Sam. Surrounding ourselves with people who care is key. What's on that note? A reminder or quote to stay motivated?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, it's actually a quote that's been helping me stay motivated. It reminds me that progress is more important than perfection. Taking small steps towards a healthier life is still progress."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Cool mindset, Sam! I totally agree, progress over perfection. Mind sharing the quote with me? I would love to get something out of it too."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: \"Don't fear it, just take the first step. It's been helping me move forward to healthier habits!\""
+          },
+          {
+            "role": "user",
+            "content": "Evan: Love the quote, Sam. That mindset really helps me too. Thanks!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: You're welcome! Glad it helps. These times can be challenging."
+          },
+          {
+            "role": "user",
+            "content": "Evan: They can be tough, but remember to celebrate the small wins - every step forward counts!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: You're absolutely right! Celebrating those small wins is crucial. It's easy to get caught up in the challenges and setbacks, but those little victories are what keep me motivated. Thanks for the reminder, it's much appreciated."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Absolutely, Sam. Remember, every small victory is a step forward, so keep up the good work! I'm cheering for you! And hey, I could use some cheering too - I've been searching for my keys for the last half hour with no luck! I'm losing it every week.."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Oh, I'll definitely be your cheerleader once I get some sleep, Evan! Funny you mention that, I had this amazing dream last night where I was soaring over skyscrapers. It felt incredible! Makes me wonder what it signifies..."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That does sound like an amazing dream! Maybe you should check out a dream interpretation book; it could offer some insights. Sweet dreams, Sam!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the suggestion, Evan. I'll look into it. This journey feels endless at times, but I'm convinced it's going to be rewarding in the end. So good luck with your keys, Evan!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I'll just keep going, step by step, and I'll definitely find those keys!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's for sure!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Go to bed already, bud! And take care!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-7",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, what's up? It's been a few days since we talked. How have you been? Life's been tough lately - my son had a soccer accident last Saturday and hurt his ankle, it was tough seeing him hurt! I just been looking after him and taking him to the doctor. As a dad, it's hard to watch your kid go through something like that."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, sorry to hear about what happened. I can imagine how hard it must have been for you. Things haven't been easy for me either. Had a tough week and a doc's appointment, so it was kinda like a wake-up call to take better care of myself. On a bright side, I'm taking a cooking class to learn how to make healthier meals."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, sorry to hear you had a rough week. At least it's forcing us both to take better care of ourselves, right? I hear the class you're taking is packed with healthy recipes. How's it been going? Have you picked up any yummy new meals?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: The cooking class has been great, I've learned awesome recipes. Last night I made this yummy grilled dish, so good!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Mmm, it looks delicious! What did you put in it? I want to eat healthy, so what kind of recipes do you suggest?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! I marinated it with a few different ingredients and grilled it with some veggies. It turned out really flavorful! If you want, I can share more recipes from my cooking class. Just let me know what you're looking for!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That'd be great, Sam! I'm looking to add more vegetables to my meals. Do you have any recipes for that?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah definitely, Evan. I have a tasty and easy roasted veg recipe that I can share with you. Oh, by the way, how have you been doing after the soccer incident? Must've been tough."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. His ankle is getting better, but still sore. It was rough at first, but thank goodness it was nothing serious."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Glad to hear his ankle is getting better. It's hard seeing someone we care about hurt. Look after yourself too, yeah? We gotta look after our health."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, taking care of ourselves is a must. How have you been feeling lately?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I have been feeling a mix of emotions - somewhat concerned about my health but also motivated to make positive changes. Taking things one step at a time."
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's okay to feel overwhelmed, Sam. Just keep moving forward slowly and taking small steps. You're doing awesome."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan, your encouragement means a lot to me. I'll keep going and take it one step at a time!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, just keep going and taking it one step at a time! You'll get there."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I really appreciate that. It means a lot."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-8",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, some big news: I'm on a diet and living healthier! Been tough, but I'm determined."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Wow, Sam, that's great news! Making changes to live healthier can be challenging, how has it been going?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: It's tough, but I'm sticking with it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Nice work, Sam! Proud of you sticking to it. Have you noticed any positive changes?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yes, there are many, such as more energy and less sluggishness after eating. This is really encouraging!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Wow, Sam, that's great to hear! Feeling more energized after meals is such a positive change. Keep up the good work! And speaking of healthy meals, do you have any favorite recipes you'd like to share?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sure, I'm loving this recipe I found. It's a flavorful and healthy grilled chicken and veggie stir-fry. Wanna give it a go?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Mmm, looks yummy! Is the sauce a family secret? I'm always down to try new recipes!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Nah, it's just my homemade sauce. Want the recipe?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, I'd love to! Thanks for sharing the recipe."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sure thing! Here's the recipe. Let me know how it went!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks Sam! I'll give it a shot and let you know how it went. Trying out new recipes is a great way to stay busy and creative. By the way, I also started taking a painting classes few days ago and I'm really enjoying it. It's all about trying new things, right?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: You're already good at drawing, why did you decide to join a class? And why did you start painting then years ago anyway?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! It all started when a friend of mine gave me this painting one day, it inspired me a lot and that's when I started painting. And I joined the classes to find like-minded people and show them what I can do, you can always improve your skills."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that's awesome! You're really talented. Did you take any other classes?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! Just been painting with these for now, but might look into other classes. It's awesome for finding my peace and expressing myself!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cool, Evan! What have you been learning in those classes?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: In painting classes, we've been learning about watercolors. The instructor stresses observing nature and painting what we see. It's a relaxing way to take a break from everyday stress."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan! What type of nature do you enjoy painting the most?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I love painting landscapes. Nature's beauty captivates me and brings me peace. Here's one of my recent works."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan! The colors are so bright. How do you capture the tranquil beauty of nature in your paintings?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks Sam! I aim to capture the vibe of nature in my paintings, conveying the peacefulness of being outdoors."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that pic is great! Do you often spend time in places like this?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks! I love being in places like this - it brings back memories of road tripping in my trusty car."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that's cool! Have you been to any fun places in that ride?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, last month I drove somewhere fun. The views were amazing!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Did you take advantage of the skiing opportunities in Banff? Sounds like it would have been a lot of fun!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, it was great for skiing! The snow was amazing and I had a lot of fun. Can't wait to go back next year! Did you try any winter sports, Sam?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Ooh, skiing looks like a blast! I'd love to try it but I'm not sure my body can take it. What about you? What winter activities do you enjoy?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Skiing, snowboarding, and ice skating are all fun winter activities I enjoy."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wish I could join in on the fun! It sounds awesome."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I'd like you to join me, too. Winter activities are a blast - hopefully someday you will!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, maybe. It's hard with that, you know. But who knows? Thanks for the understanding, Evan - it really means a lot."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-9",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Exciting news: I started a new diet and exercise routine last Monday and it's made a huge difference. I feel great! What about you, what changes have you made recently?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Wow, Sam, great! Glad your new diet/exercise is going well. As for me, I've hit a sore spot lately. Twisted my knee last Friday and it's really painful, so it's been tough to stay consistent with my usual fitness routine. It's really frustrating because staying active is like, mega-important to me."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Oh no, sorry to hear about that, Evan. It's frustrating when our bodies don't cooperate, isn't it? Is there anything I can do to help?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. I appreciate the concern. Life throws us curveballs - that's life, right? By the way, remember that book I was talking about? It just gets better with every page, can't let it out of my hands!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Life sure can be unpredictable and tough. Being adaptable and finding other ways to stay active is key when you're facing an obstacle. Maybe look into low-impact exercises or physical therapy to help with that? And damn, you really got me interested in this book haha!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, PT for my knee is on the cards. Hopefully I'll get an appointment soon. Till then, just keeping it low-key and swimming to stay active."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Swimming is a good choice, Evan. It's low-impact and easy on the joints, plus it's refreshing. Keep up with the active lifestyle!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, thanks for the push, Sam. Oh, hey, I came across this pic when I was tidying up. I took a road trip last month - the scenery was stunning and nature really chilled me out."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, looks great! Where did you go? Bet it was nice to get away."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks! I went up to the Rocky Mountains, it was so refreshing! The views were stunning and I felt so relaxed. Do you enjoy road trips and exploring nature?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I haven't gone on a road trip in ages, but I love being surrounded by nature. It's so tranquil and refreshing. I'd love to go hiking more, but it can be a bit challenging sometimes. However, I am working on becoming healthier, so maybe a road trip and a hike will be possible soon."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's cool, Sam. Nature can be really peaceful. I'd suggest going for more hikes, like I do. It's always been calming and fun. We should definitely do one together sometime."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds like fun! Which lake do you recommend? I'd love to explore some of the local trails."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Check out this one! It's gorgeous and there are lots of trails nearby. You'll love it!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, it looks great! Is it nearby? What a view!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's only a two-hour drive from here, but trust me, it's worth every minute for the incredible views and peaceful atmosphere."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cool, a day trip's doable. Nature's calling me, so I'm gonna go check it out! Thanks!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, enjoy your time in nature. Take care! Bye!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks Evan. Have a good one. See ya!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-10",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! Long time no talk! Hope all is good. What have I been doing these past few weeks?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Nice to hear from you. Life has been an up and down ride. Have you seen the pic I posted of my before and after body as a result of the diet? Working to motivate others to make better choices."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! Loving it. Making healthier choices has definitely made a difference for me. It's amazing how small changes can have such a big impact. How about you? Is it making a difference for you too?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, thanks for the support! Handling all this has been kinda wild. I'm trying to make healthier choices, but there are still the occasional cravings for sugary drinks and snacks... it's a real struggle."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, breaking bad habits can be hard. Cravings can be tough too, but little victories count. What do you think sets off those cravings for you?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: It's usually stress, boredom, or just wanting comfort. You know, those sugary treats are so tempting, right?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, I get it. When I'm stressed, I always turn to something comforting. But I've found that painting or going for a drive helps too!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow Evan, that's an awesome painting! Good on you for finding a way to de-stress. I could really use something like that - maybe I'll give painting a go or find another calming hobby."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, painting is super chill for calming down. Wanna give it a try? I can help you get started and recommend some supplies if you're interested. Let me know!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds great, Evan! I want to give it a go and see if it relaxes me. Can you suggest some basic supplies for me to get started?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, painting is awesome! Get some acrylic paints, brushes, a canvas/paper, and a palette to mix colors. I can give you some recommendations if you want. Just let me know when you're ready and we can plan a painting session!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds great, Evan! Can you help me pick out the stuff? Let's plan a painting session soon. I'm really excited!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, Sam - let's do it! Let's get everything ready and paint next Saturday. Can't wait!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds good, Evan! Can't wait to paint with you next Saturday. It'll be a fun and creative activity."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-11",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, long time no see! I've started eating healthier - what's new with you? Picked up any new hobbies?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! That's awesome about your healthier eating! For me, I had a setback last week - messed up my knee playing b-ball with the kids. It's been tough to stay active since. I really miss going on adventures like we did last year - good times with the family!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, sorry to hear about your knee. It must be tough. Are there any ways to stay active while you heal up?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. PT has helped some. I can't do intense workouts, but I'm doing easy exercises to keep it strong. Not as good as being active outdoors, but still something."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Glad PT is helping, Evan! Taking care of yourself is key – have you explored any fun indoor activities or hobbies?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I do my favorite watercolor painting to keep me busy. It's a chill way to relax and get into the colors. By the way, something happened two weeks ago! You're not gonna believe this, I had a bit of an adventure recently. Helped a lost tourist find their way, and we ended up taking an unexpected tour around the city. It was a blast!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, that sounds like a fun and unexpected event! It's always interesting how helping someone can turn into a little adventure of its own. And how's your watercolor painting going?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's been great! I find painting to be a great stress reliever. Here's what I did last week."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, those are awesome! So cool. Where did you get the inspiration for them?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! The sunset painting was inspired by a vacation a few years back. The colors were so stunning. The cactus painting came from a road trip last month. Such cool places!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan, your paintings are awesome! How do you decide what to paint?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! I usually paint what's on my mind or something I'm feeling. It can be good memories or places I wanna go to. It's more like expressing myself through art."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's really amazing, Evan. Expressing yourself through art is such a powerful form of self-expression."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. Yeah, it's really a great way to express myself and my emotions. It's a cool way to communicate without using words. So, do you have any other ways in which you express yourself?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Drawing is cool. I'm still just learning how to draw, but I love expressing myself through writing. It's therapeutic and helps me sort out my feelings. Though, I've been a bit frustrated lately with my new phone. Its navigation app keeps malfunctioning, making getting around a bit of a challenge."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Cool, Sam! Writing is a great way to express yourself. What kind of writing do you enjoy? And about the phone, I recommend trying to update it, it usually works for me!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the tip, Evan! Writing in my journal and doing creative writing is a good way for me to express my innermost thoughts and feelings."
+          },
+          {
+            "role": "user",
+            "content": "Evan: It can be super therapeutic. It gives you a place to express yourself. Keep it up!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! It really helps me make sense of things and express my feelings. It's like having a conversation with myself."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Gotcha, it's like having a place to figure stuff out and make sense of it all. We all need an outlet to express our thoughts and feelings."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-12",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, hope you're doing okay. I wanted to chat about something that's been bothering me lately... I went for a check-up Monday and my doc said my weight's a serious health risk - if I don't make changes soon, it can get worse. I know I made jokes about it, but it's really hitting me. Been having a hard time."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, tough news. Yeah, our health can really put a damper on things. I started lifting weights one year ago and it's been a journey. It was a struggle at first, but I'm seeing some gains. You interested in trying it out?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, I'm interested in getting into it. Any advice on how to get started? Thanks!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, that's awesome! It's important to start out with good form and technique. Find a trainer who can help you avoid injuries while you build your strength. Start with something small, and as you get stronger, the intensity can increase. Stay consistent with your workout routine and let me know how it goes! Good luck!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I'm going to find someone who can help me out. I'll keep you posted!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No problem, Sam. Can't wait to hear about your progress. Keep up the hard work!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I appreciate your support. It really means a lot to me. I'll definitely keep you posted on my progress."
+          },
+          {
+            "role": "user",
+            "content": "Evan: You're welcome, Sam! It takes time, so be patient with yourself. Your health matters, and I believe in you. Keep going and stay upbeat. You got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I'll stay positive and keep going. Your support means a lot."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, glad I can be here for you! Progress is key, so keep pushing on and stay positive. You got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan, that's really inspiring. Gonna keep believing in it!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Go get 'em! Believe in your abilities and you'll reach your goals. Stay motivated!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks Evan! Your words gave me a boost. I'm staying motivated and believing in myself."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Awesome! Keep staying motivated and believing in yourself. You've got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Your support means a lot to me."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No prob, Sam! I'm here for you. Just keep taking one step at a time, and you'll get there eventually!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sure, Evan. I'll take it slow. See ya!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-13",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, how's it going? Been a while since we talked. Hope all is good."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! It's been a rough week - I gave in and bought some unhealthy snacks. I feel kinda guilty. How's it going for you? That painting is awesome! Did you paint it?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, sorry to hear about the rough week. Don't worry about the snacks. I'm doing okay, just finished this painting of a sunset. It really helps me relax. So, how's everything going with you? Anything new and exciting?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Yeah, I just couldn't resist them. Gotta do better. As for me, just dealing with work stress and trying to stay motivated."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, work stress can really get to you. Have you tried anything new to de-stress? Maybe picking up a hobby or something could help."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thinking about trying something different outdoors. Any suggestions?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sounds good! Have you ever tried kayaking? It's a fun and active way to paddle on a river or lake. What are your thoughts on that?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Kayaking sounds awesome! Haven't tried it yet, but it looks like a fun way to get in some exercise and enjoy nature. I'm definitely considering giving it a try. Thanks!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, Sam! It's a fun way to get in some exercise and enjoy nature. Let me know when you're ready to give it a try and I can hook you up with a good spot."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the idea, my mate and I are just around the corner from kayaking on the lake, we're going to try that now!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Of course, let me know if you like it, we can plan a kayaking trip together, I'll pick a cool spot!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yep, Evan! Can't wait. Thanks for the help!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Ready for an adventure? Where will you go?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: We're traveling through Lake Tahoe! I heard it's great for kayaking."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, it's an awesome pick! You'll love it there - clear water and gorgeous views. Have a blast and take lots of pics!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! I'm looking forward to it!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-14",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! I've been missing our chats. I had quite the health scare last weekend - ended up in the ER with a severe stomachache. Turns out, it was gastritis, which was pretty alarming. It was a wake-up call for me to start prioritizing my health, like adopting a more nutritious diet and getting regular exercise. On top of that, my phone's been giving me a hard time, adding to the stress."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, sorry to hear about that. Gastritis can be tough. Taking care of ourselves is important. BTW, I've been focusing on fitness and it's been really beneficial for my overall well-being. Funny thing, I had another encounter with a lost tourist recently. Seems like helping tourists is becoming a recurring theme in my life!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Glad you've found that it's been good for you! I totally need to get into it too. Just getting started is hard - any tips for staying motivated? Also, you mentioned another lost tourist? Seems like you're becoming the go-to guy for tourists in need!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yup, Sam! Set some goals, like a certain distance to run or number of push-ups to do. It'll give you something to strive for and stay motivated. Also, try to find an exercise that you enjoy and maybe even get a buddy for extra fun and accountability. Sound good?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, that sounds like a good idea. Having goals and someone to exercise with might help. I'll give it a try!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Awesome, Sam! Getting started will get easier with time. And don't forget it's about feeling good and reaching goals, too. Let's plan a hike soon!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds awesome, Evan! Can't wait to go on a hike with you. It's going to be a fun challenge and a great opportunity to appreciate the beauty of nature."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Definitely, Sam! Hiking is an awesome way to bond with nature and push ourselves. It's gonna be a cool memory for us both. It's great to see progress, was just at the gym yesterday. Gaining strength!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Super excited to get fit with ya. Let's hit the trails soon!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! That's so nice of you. We'll definitely have a great time on our hike!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Totally! I'm so pumped for this hike. Connecting with nature is exactly what I need. Thanks so much for the support and always being there. Means a lot."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sure thing! Our hike is going to be awesome, I can tell. I'm always here to support you."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I appreciate your support."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No problem, Sam. Whenever you need support, I'm here for you. Stay safe!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, I'll get in touch if I need anything. Stay safe. Bye!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Later! Stay safe and don't hesitate to holler if you need anything. Can't wait to hit the trail."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-15",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Morning, Evan. I've been trying to keep up with my new health routine, but it's tough. My family's really pushing for it, and I feel so pressured."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I hear you, Sam. It's important to have people who encourage you, but not stress you out. By the way, I just got back from my morning walk. It really helps to start the day actively."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, it's easier when you have a great support system. Thanks for being there for me."
+          },
+          {
+            "role": "user",
+            "content": "Evan: No worries, Sam. I'll be there for you. Take it slow and treat yourself."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for the reminder to take it easy. I sometimes get impatient with myself when I want results fast, but I gotta be patient."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yep, progress takes time. So just take it one step at a time."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yes, you're right, Evan. Taking it slow is better than doing too much. I appreciate your support."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I get it, Sam. I went through a similar phase a twoyears ago. Changed my diet, started walking regularly, things like that."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan, you look great! How did you manage the change?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I started focusing more on my well-being rather than fixating on quick results. Letting go of that pressure made a huge difference."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's impressive, Evan. It's inspiring to see how you transformed by changing your mindset."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. Letting go of unrealistic expectations was liberating, both physically and mentally."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: You're really doing great, Evan! I want to feel that same sense of freedom."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. Just take it one day at a time. Celebrate small victories."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Focusing on small wins sounds like a plan. I'll take it one day at a time."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Exactly! Congrats on every little victory. Keep it up, I'm here for you."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Your support means everything. Here's to moving forward!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Anytime, Sam! Let's keep pushing ahead. I'm here to help you. Take care!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-16",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Hope you're doing good. Got some good news to share - I'm a Weight Watchers coach in my group now! It's a pretty big accomplishment for me, feel really proud."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Congrats Sam! That's awesome! I'm super proud of you. Becoming a Weight Watchers coach is a big deal. Keep going!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Appreciate your support. It's been a journey, and being chosen as a coach is a great step in my quest for better health."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Wow, Sam! You've come such a long way. It's exciting to see what comes next for you in your quest for better health."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! It feels great to see progress. Being a coach will hopefully keep me motivated and help others stay committed too. It's a big challenge, but I'm ready for it!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's awesome, Sam! Helping others stay committed and motivated is so rewarding. You really inspire us. Keep up the great work!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Your kind words mean a lot. It's been a difficult road, but I'm determined to continue making a positive impact."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sorry about missing any events, I've had some personal challenges since we last spoke. Still here for you though - do you need any support or want to share anything? Btw look what i got!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey, it looks so vintage and cool! What model is it? How've you been doing lately? I'm here if you wanna chat."
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's a 1968 Kustom K-200A vintage guitar and I got it as a gift from a close friend. It's been a tough time for me since we last caught up; I lost my job last month, which has been pretty rough. But I really appreciate your support through all this."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sorry to hear about your job, Evan. What happened?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's been a bit of a rough patch lately. The company downsized, and I was part of that. I'm currently on the hunt for a new job, which hasn't been easy, but I'm keeping my spirits up and staying hopeful."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sorry about your job, Evan. It's tough when it comes out of nowhere, but I'm proud of how you're handling it. Let me know if you need someone to talk to or if I can do anything to help. You'll get through this."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. Your support means a lot. It's been quite a ride, but I really appreciate having someone like you to talk to. I'll definitely reach out if I need anything."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: For sure, Evan! I'm here for ya. Life can be tough sometimes, but we got this. Stay positive and it'll all work out. Just know that I'm here if you need someone to talk to."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. Your kind words and support mean a lot. It's great to have you here. I'm gonna stay positive and keep going. Cheers!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that sunset is stunning! It's so soothing just to see it. Is that a special spot you go to watch sunsets?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, it's this peaceful place close to my home. I often go there to relax and unwind."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That sounds wonderful, Evan! I'd love to check it out with you sometime."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Oh, I wish I could bring you along. That picture was actually taken last Friday at my favorite spot by the beach. Watching the waves and the sunset colors really helps me find peace, especially during tough times. It's a beautiful reminder of nature's resilience. We should definitely plan to go together someday."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: No worries, Evan. And yes, we should make a plan to go. That photo is just mesmerizing!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I'm glad you like it! It's a really calming place. Let's make a point to visit it together soon."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Absolutely, Evan! A trip there sounds like the perfect way to de-stress."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Awesome, let's do it! Let's plan it for next month, I'm already excited about exploring it together!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-17",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Ev! Long time no chat. How's it going? Hope all is well."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, good to hear from you! Life's been a wild ride lately. Last week, I had a health scare and had to go to the hospital. They found something suspicious during a check-up, which freaked me out. Thankfully, it was all a misunderstanding, but it made me realize how important it is to keep an eye on my health. How've you been?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Woah, Evan, that must've been scary! Phew, it was just a misunderstanding. A health scare can really make you re-evaluate what's important. As for me, I've been dealing with some discomfort and it's been limiting my movement. I've been trying to make changes diet-wise, but it can be hard."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That sucks, Sam. It's tough when our health holds us back. I believe in you – just taking small steps can help. Have you tried any new hobbies recently to take your mind off it?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I haven't tried much new lately, but I did get this yesterday. It's been my go-to 'feel good' flick. So, you said you had a health scare - how're you now?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That movie sounds interesting! I'm doing well now. Doctors said everything is fine, but it taught me the value of life. Just trying to enjoy the moment."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's awesome, Evan! Let's make it a habit to appreciate something each day. It really helps us enjoy life more. What do you think?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sounds good, Sam! Let's take the time to appreciate the little things in life."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks for always being there, Evan. It means a lot."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sure, Sam. I'm here for you. We gotta stick together, especially now."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, Evan. Life can be tough sometimes, but having supportive people like you makes it way easier."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, Sam. Tough times are way easier with friends we can rely on. We've got each other!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Looks like you're having a blast! I was wondering, what do you do to stay fit and healthy?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That was wild! I stay in shape by hitting the gym and taking my car out for a spin. Gotta keep it up! How are you doing on your fitness goals, Sam?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Fitness goals have been hard to reach, but hey, that's life!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah Sam, it's true. Progress takes time, so keep pushing."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Where is that? It looks gorgeous!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: This little island is where I grew up and it's my happy place."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that spot looks gorgeous. Growing up there must have been so peaceful and stunning."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, it was. That place shaped me and will always hold a special place in my heart."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, it can be soul-calming."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, it really is. So serene and calming."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: It's heavenly!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, it's like a little slice of paradise. I always feel so peaceful and serene when I'm there."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, it really seems like a peaceful retreat. Thanks for showing me!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: No prob, always good to chat about those tranquil times. Take it easy!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Take care, buddy. Hang in there!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam. If you need to talk, I'm here for you too."
+          }
+        ]
+      },
+      {
+        "session_id": "sess-18",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, good to hear from you. I've hit a bit of a snag - my new Prius, the one I just bought, broke down. It's a bit of a stressor since I rely on it for my active lifestyle and road trips. It's frustrating when new things go awry so soon."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, that's rough. Dealing with a new car breaking down is such a hassle, especially when it's your main mode of transport."
+          },
+          {
+            "role": "user",
+            "content": "Evan: You're telling me. I was really counting on this new Prius to be reliable. It's always a challenge when you have to deal with unexpected issues like this. But, I guess it's just one of those things - even new cars can have problems."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: It's tough when your plans get derailed by something like this. But hey, sometimes these setbacks lead to new opportunities."
+          },
+          {
+            "role": "user",
+            "content": "Evan: True, I'm trying to see it as a chance to explore other ways of staying active and traveling. Maybe it's an opportunity to try something different."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Exactly, it's all about finding the silver lining. Speaking of new things, I attended a Weight Watchers meeting yesterday. Learned some great tips."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That smoothie bowl looks fantastic! How was the meeting? Yeah, I've been thinking about trying yoga, something gentle yet effective for stress relief and flexibility. What's your take on it, Sam?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: The meeting was really insightful, and that smoothie bowl was a hit! Yoga's a great choice, it's done wonders for my flexibility and stress levels. You should definitely try it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I think I will. Thanks for the suggestion, Sam."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Anytime, Evan. If you need any yoga tips or anything else, just let me know."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Your support's been invaluable. Thanks again, Sam!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: No worries, Evan. We all need a bit of help when trying new things. It's great to have support."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Absolutely. It makes a big difference knowing you're not alone in these situations."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Definitely. Take care, and let me know how the yoga goes. Bye!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Will do. Thanks for everything, Sam. Talk soon. Bye!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-19",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, hope you're doing good. Wanted to share some amazing news - my partner is pregnant! We're so excited! It's been a while since we had a kiddo around."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Congrats, Ev! That's great news! Parenthood is so amazing. How are you feeling about it?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: So excited and a bit nervous! It's been a while since I had a toddler around but I'm really looking forward to it. Parenthood is so rewarding. I still remember when my first child was born, the joy was amazing. Looking forward to witness the miracle of life and build more memories with my family!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, you're gonna be an amazing parent! Treasure those memories, they're truly special."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks Sam! Absolutely. Talking of memories, I want to show you this. It's a collage of some of our top family memories. Each photo has an amazing moment - birthdays, holidays, vacations - so good to look back and recall all the great times we had."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's so lovely, Evan. Your family looks so happy. What's the story behind that sign in the center?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Oh, that one? It's from our trip to Banff. We have this sign in the frame that says 'Bring it on Home' - it's our family's motto, always reminding us of the importance of togetherness, no matter where we are."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's really touching, Evan. It's important to have something that keeps the family bond strong."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Absolutely, Sam. My family means the world to me. They're my rock. I'm looking forward to expanding our family and creating even more beautiful memories."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's wonderful to hear, Evan! It's clear how much you value your family. Are you thinking of any specific plans or events to add to that collage?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! Yeah, we're planning a big family reunion next summer. It's going to be a blast and a perfect opportunity to add to our collage."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds fantastic! If you need any tips on organizing such a big event, just let me know. I'm always here to support and celebrate your family's milestones."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! Your support means a lot. I'll keep you updated. Take care, bye!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Take care, Evan! Can't wait to hear about it. Bye!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Bye Sam. I'll definitely keep you updated. Thanks for the kind words and support. Take care!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-20",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, what's up? Long time no see, huh? Lots has happened."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Long time no see. I'm doing okay, been through a few bumps. How about you?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's not easy for us right now, my son had an accident last Tuesday, he fell off his bike and it was rough. But he's doing better now. How are you dealing with all this?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Darn, sorry to hear that. Hope he's feeling better. Same here, it's been tough lately. After we talked, I started thinking about ways to cope with it, but it's been challenging."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Life can be hard sometimes. Do you have any hobbies or activities that make you happy?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I used to love hiking, but it's been a while since I had the chance to do it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I remember you mentioning that! Hiking is indeed a great way to center oneself and be one with nature. We should definitely plan a hike soon!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, I'm struggling with my weight and it's affecting my confidence. I feel like I can't overcome all the challenges with my weight, I keep lacking motivation."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, I understand it can be challenging. But remember, it's important to believe in yourself and take it one day at a time, Sam. Your worth is not defined by your weight."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Cheers, Evan. Appreciate the help. It's tough breaking out of my comfort zone."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Stepping out of your comfort zone can be intimidating, but it's totally worth it. Just challenge yourself to try something new, even if it's just a little thing. You got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. I'll take your advice. Trying new things can be difficult."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, trying something new and succeeding gives a great feeling of accomplishment. Give it a go, even if it's just a little thing. You'll be amazed!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: She looks so confident! What kind of painting is that in the background?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: This is a contemporary figurative painting that I've finished few days ago, emphasizing the emotional state through expressive brushwork and vibrant color choices. It captures a moment of introspection, where the subject is deeply immersed in thought. Very proud of it!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's amazing work, who's the girl standing next to painting?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's a close friend of mine who helped me get this painting published in the exhibition!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-21",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! Long time no see, how's it going?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! Long time no see! Been up and down lately, got married last week - how about you?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Congratulations, Evan! Is that the woman from Canada?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yes, that's her, I don't know why we didn't get married before, because I was in love with her at first sight!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan! Love at first sight? That sounds like something straight out of a fairy tale. What are your thoughts on it? Do you believe in love at first sight?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I totally believe in it. It was like time stopped and I felt like a spark lit inside me - it was so right."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's awesome, Evan! Finding that kind of connection must feel really liberating. Love can be so powerful, huh?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, Sam, love is truly amazing. It brings so much happiness and fulfillment, like a beautiful sunset that lights up our lives and brings peace. Incredible!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wish I could feel the same about love, but I've started to enjoy running in the mornings, and it's been a great way to clear my head. What can you do, right?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, I get it. Life's all about finding what works for you. Like your morning runs, they're a step towards something good, right? Keep trying new things, Sam, and you might find your own version of love in the most unexpected places. Embrace the journey — it’s full of surprises!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Such a minimalistic and stunning piece of work, I wonder what inspired the artist to create it."
+          },
+          {
+            "role": "user",
+            "content": "Evan: The painting is mine, I made it when I was a mix of emotions - sad, mad, and hopeful. Art is amazing how it can portray feelings without words."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan! Art is really amazing at expressing emotions - it's truly fascinating."
+          },
+          {
+            "role": "user",
+            "content": "Evan: It's amazing how art can express emotions so well. It really helps me recognize and handle my own feelings. This painting is giving me a massive rush of joy!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's stunning! What emotions did you create this painting with?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I painted this with a sense of joy and freedom. The spontaneous strokes and bold colors reflect a playful and liberated mood, embracing the creative process without restraint."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan, this is amazing! You've got serious talent and creativity. Making this must have been so satisfying! Here's a painting that inspired me when I went to an exhibit few days ago."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! I appreciate the compliment. This painting has such an inspiring vibe; you really have a knack for understanding art! How about you? How long have you been painting?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I do sketch occasionally, but I haven't created anything remarkable yet. I have a feeling I'll have something to show off before long! Seeing your passion for it is inspiring."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! Glad I could motivate you. If you ever want to give it a go, I'm happy to help get you started. Speaking of which, you know what? I lost my keys again, it's become a weekly ritual for me!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Ooh, Evan, I'd put a GPS sensor on your keys!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Great idea, I think I'll do that as soon as I find it!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-22",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan! I’m really getting into this healthier lifestyle—just took my friends on an epic hiking trip last Friday!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam! That’s fantastic—nothing like a good hike to feel alive. We took the Prius for a long drive to the mountains last weekend. It was perfect until we got into a little scrape on the way back."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Oh no, were you guys okay after the accident?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, we were fine, thanks. Just a minor accident, but it put a bit of a damper on telling my work friends about getting married. They’ve been a great support, though."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I bet they were thrilled to hear about your marriage, despite the mishap!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Absolutely, it's been a whirlwind of emotions. Good thing the accident was minor. Just a reminder to take it easy on the road, I guess."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: True, it’s important to stay safe. Glad you can still enjoy the peaceful moments after something like that."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Definitely, nature brings peace and clarity - it's a great experience."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Nature can make everything else seem small and help us find peace inside. It reminds us of the bigger picture, you know?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: For sure, and nature has been a great healer. Speaking of which, I’ve got to share some of these new healthy snacks I’ve been trying."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: They look healthy and delicious! Perfect for after a hike or, I guess, post-accident recovery, huh?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Exactly! They’re packed with nutrients and really easy to make. You also need to try these cookies, they are awesome! I’ll send you the recipes."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, I’d appreciate that. It’s good to find new ways to stay healthy. Do you have any healthier snack ideas?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, I've been trying to eat healthier too. Check out this cool recipe I discovered for these energy balls."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Do you like them? I know they can be an acquired taste."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I enjoy the taste of these. They're energizing and a healthy way to satisfy your sweet tooth."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Awesome! Always on the lookout for healthy snacks, thanks for the tip!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Glad to help - hope you enjoy it!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! I'll give these a try. They look yum. Your help means a lot to me. Btw you know what? I went to the store again and, unsurprisingly, had issues with the self-checkout. It's becoming a regular annoyance."
+          },
+          {
+            "role": "user",
+            "content": "Evan: That's very strange, I've never had a problem with it once!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Apparently I attract that to me, if you ever want to be in that situation, call me at the store with you!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-23",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, guess what? My partner and I told our extended fam about our marriage yesterday – it was so special! We've been totally overwhelmed by all their love and support."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Congrats on the news, Evan! You two look so happy in the pic. These moments make life so wonderful; super stoked for you!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! It was an awesome moment, and I feel really lucky to have found someone who gets me. Plus, our families are really happy for us - that's the best part!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, Evan. It's awesome that you've found someone who gets you! Having your family's support must feel great."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Definitely, family support is so important. Knowing they're happy about our marriage is awesome and so comforting."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, it's awesome to have that support. It definitely brings more happiness and joy."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah Sam, that means a lot to me. Our bond just keeps getting stronger and it brings such a good feeling to our lives. Family really is everything."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Agree, Evan! Family is everything - they bring so much love and happiness. They're always there for us no matter what. I'm grateful for their support and love."
+          },
+          {
+            "role": "user",
+            "content": "Evan: For sure, Sam. That's what makes family so special. They bring so much love and happiness. It's great having their support and knowing they're always there for us. I feel really fortunate to have their never-ending love and support."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, definitely, Evan. We both have amazing families that are always there for us. Always a blessing."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, Sam. Our families give us so much joy, support, and love. They're a real blessing! I don't know what I'd do without them."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey, Evan. My family has been my rock through everything. Don't know what I'd do without them."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, they are our rock. We're blessed to have them."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, you guys are awesome! What's cooking tonight?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! We're having a family get-together tonight and enjoying some homemade lasagna. Super excited! By the way, I've started a new diet—limiting myself to just two ginger snaps a day. What's on your menu tonight?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That's a great discipline, Evan! We're keeping it light tonight, just some homemade lasagna. Can't compete with your ginger snap limit though!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Oh this must be very hearty and delicious, well I'll have to stick to the diet plan, even with the family gathering!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, the lasagna was pretty awesome, but check out what I had for dessert, I'm sure you're drooling!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Looks yummy! Did you make that?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: No, I didn't make it. This is actually a pic from my cousin's wedding. It's super special."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Wow Sam! Weddings are indeed special. This looks great, yum!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Ooh, nice cake! Reminds me of special occasions. Do you have any upcoming plans?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks Sam! We're off to Canada next month for our honeymoon. So excited to create some awesome memories. Looking forward to exploring the beautiful snowy landscapes there."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that looks great! What are your plans for the trip?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: We're planning to ski, try the local cuisine, and enjoy the beautiful views. We're really excited!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Sounds amazing, Ev! Skiing, trying local dishes, and enjoying the breathtaking views - the perfect honeymoon. Have an incredible time creating unforgettable memories!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, Sam! Gonna try some poutine while we're there - can't wait!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Never tried it? Can't say I blame you, it's kind of a Canadian thing. Let me know how you like it!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sure thing, Sam! Let's see if it lives up to the hype. I'll let you know what happens!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, Evan! Let me know all about it. Don't forget the details!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Cool, Sam. I'll keep you posted. Talk soon!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Awesome, Evan! Catch you soon. Have a great trip!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Thanks, Sam! Catch you later. Have a great one!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-24",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, hope you're doing good. Something funny happened last night."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, what's up? What happened? Let me know."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yesterday I went out with my friends and had a bit too much to drink. I ended up doing something I regret and it involved someone's roses."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: What's up with that incident? All good now?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Oof, Sam, so embarrassing! I had a pee accident near some roses - can you believe it? I'm so sorry about that."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Uh oh, Evan! That's awkward. Did anyone get mad at you? Are you okay?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I was so embarrassed when I saw what happened the next morning, so I apologized and luckily they were understanding. Yeah, I was out of control--guess I gotta be more careful next time."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: They were understanding? Phew! We all mess up sometimes, we're human after all."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yeah, they were understanding, which was great. But it's a good reminder to be more careful. We all make mistakes, but it's important to learn from them. Speaking of, my partner and I tried snowshoeing this weekend. It was part of a new adventure for us and surprisingly fun."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, Evan, you're right. Mistakes happen, but it's good to learn from them. Snowshoeing sounds like a great way to stay active during the winter. I've been thinking and I made a meal plan and workout schedule. I'm getting motivated by something I saw, so starting today I'm gonna do my best to stay on track."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Good work, Sam! You've got a plan and you're dedicated to staying healthy - have you asked your doctor for advice? They could probably give you even more diet and exercise tips."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan! Haven't seen a doctor in a while, but it's probably a good idea to get some advice. I'm going to make an appointment soon."
+          },
+          {
+            "role": "user",
+            "content": "Evan: What advice are you planning to get from the doctor?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: I'm gonna ask the doc about a balanced diet plan and getting advice on low-impact exercises, given my current situation."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Sounds good, Sam. That's definitely a step in the right direction. Remember to focus on a balanced diet and low-impact exercises. Let me know how it goes."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That looks great! Where did you get the idea for this salad? Also, do you have any suggestions for low-impact exercises?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I got it from a nearby restaurant. As for low-impact exercises, swimming, yoga, and walking are good options."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: The salad idea from a restaurant is a smart move, Evan! And thanks for the exercise tips. Also I watched The Godfather last night, and it motivated me to keep up with my routine. \"I'm gonna make him an offer he can't refuse\" - now that's motivation!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Yoga's definitely a great start, Sam. It's helped me with stress and staying flexible, which is perfect alongside the diet. And yes, The Godfather is a legendary thing to watch, can be re-watched many times!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Between a healthier diet and yoga, I’m hoping for some positive changes."
+          },
+          {
+            "role": "user",
+            "content": "Evan: By the way there are plenty of other low-impact exercises that can be fun. Going on beach sunsets is one of my favorites - good for exercise and totally calming."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That looks zen. Gonna go for some beach walks - thanks for the tip, Evan! I want to brag, I had that recurring dream again where I'm flying over skyscrapers!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: I think a little more and you'll learn how to control those dreams, once you get the hang of it let me know haha! Enjoy the fresh air and the views. Have fun!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks Evan! Gonna make the most of it. You too, have a good one!"
+          }
+        ]
+      },
+      {
+        "session_id": "sess-25",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, been a few days since we last chatted. Hope you're doing OK. A lot's happened since then. Got issues with my health, it's been rough. Feels like this weight's keeping me from fully living. Trying to stay positive, not easy."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Hey Sam, sorry to hear about your health. It's tough when it gets in the way of life. You're being positive, but remember to take care of yourself too. By the way, I had to apologize to my partner for that drunken night, it was pretty embarrassing."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, that does sound like a tough situation. I'm doing my best with my health. How did your partner take the news about the rose bushes?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Well, she wasn't thrilled, but understood it was an accident. I promised to be more careful in the future. Changing the subject, have you found any low-impact exercises that you enjoy?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Hey Evan, haven't found any exercises I like. But lately, I've been on a few car rides. Helps me chill and enjoy the view. Check out this cool pic I snapped last week in the country."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Nice pic! Does being out in the countryside help you relax and get some fresh air away from the city?"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Yeah, being in nature really helps me relax and get some fresh air away from the city."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Glad to hear it! Nature really has a way of calming and reviving the soul. Last summer, I took this pic on a camping trip - it was such an amazing sunset. Moments like these remind us of the beauty of life, even during tough times."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that pic is amazing! It must have been a great experience being out on the lake."
+          },
+          {
+            "role": "user",
+            "content": "Evan: I had a great time kayaking and watching the sunset last summer - it was truly unforgettable. Being out on the water is so peaceful."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Wow, that sounds amazing. Being in nature is so calming, right?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Nature can be super calming. It's like pushing a reset button for your mind and body."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Definitely, I couldn't agree more. There's something about being outdoors that rejuvenates you. I'm planning to spend more time in nature myself!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Got it. When health stuff cramps your style, it sucks. But small moments outdoors can make a big impact. This photo reminds me of last spring when I was feeling a bit down, but the vibrant colors brought a smile to my face, even if just for a moment. Remember to find joy in the little things."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: That pic is gorgeous! It really brightens my day. Sometimes, it's the little things that matter, right?"
+          },
+          {
+            "role": "user",
+            "content": "Evan: Absolutely, Sam. It's often those little moments that make the biggest difference. Keep finding those bright spots."
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Thanks, Evan. It's good to be reminded to appreciate the small things. They do add up."
+          },
+          {
+            "role": "user",
+            "content": "Evan: Anytime, Sam. It's all about those small joys, especially when times are tough. You've got this!"
+          },
+          {
+            "role": "assistant",
+            "content": "Sam: Really appreciate it, Evan. Your words help a lot. Take care!"
+          },
+          {
+            "role": "user",
+            "content": "Evan: You too, Sam. And remember, I'm always here if you need to chat. Look after yourself!"
+          }
+        ]
+      }
+    ]
+  },
+  "search_items": [
+    {
+      "qid": "conv-49#q0000",
+      "question": "What kind of car does Evan drive?",
+      "gold_answer": [
+        "Prius"
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    },
+    {
+      "qid": "conv-49#q0001",
+      "question": "What kinds of things did Evan have broken?",
+      "gold_answer": [
+        "His old Prius and his new Prius."
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    },
+    {
+      "qid": "conv-49#q0002",
+      "question": "Where has Evan been on roadtrips with his family?",
+      "gold_answer": [
+        "Rockies, Jasper"
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    },
+    {
+      "qid": "conv-49#q0003",
+      "question": "How many Prius has Evan owned?",
+      "gold_answer": [
+        "two"
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    },
+    {
+      "qid": "conv-49#q0006",
+      "question": "How many roadtrips did Evan take in May 2023?",
+      "gold_answer": [
+        "two"
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    },
+    {
+      "qid": "conv-49#q0007",
+      "question": "What hobby did Evan start practicing a few years ago that he enjoys?",
+      "gold_answer": [
+        "Watercolor painting"
+      ],
+      "question_type": "single_hop",
+      "eval_axis": "single_hop"
+    }
+  ]
+}

@@ -1,0 +1,1849 @@
+{
+  "locomo": {
+    "upstream_questions": 1382,
+    "selected_questions": 500,
+    "selected_samples": 9,
+    "selected_qids": [
+      "conv-26#q0000",
+      "conv-26#q0001",
+      "conv-26#q0003",
+      "conv-26#q0004",
+      "conv-26#q0005",
+      "conv-26#q0006",
+      "conv-26#q0007",
+      "conv-26#q0008",
+      "conv-26#q0009",
+      "conv-26#q0010",
+      "conv-26#q0011",
+      "conv-26#q0012",
+      "conv-26#q0013",
+      "conv-26#q0014",
+      "conv-26#q0015",
+      "conv-26#q0016",
+      "conv-26#q0017",
+      "conv-26#q0018",
+      "conv-26#q0020",
+      "conv-26#q0022",
+      "conv-26#q0023",
+      "conv-26#q0025",
+      "conv-26#q0026",
+      "conv-26#q0027",
+      "conv-26#q0028",
+      "conv-26#q0029",
+      "conv-26#q0030",
+      "conv-26#q0031",
+      "conv-26#q0033",
+      "conv-26#q0034",
+      "conv-26#q0036",
+      "conv-26#q0037",
+      "conv-26#q0038",
+      "conv-26#q0039",
+      "conv-26#q0040",
+      "conv-26#q0041",
+      "conv-26#q0042",
+      "conv-26#q0043",
+      "conv-26#q0044",
+      "conv-26#q0045",
+      "conv-26#q0046",
+      "conv-26#q0047",
+      "conv-26#q0048",
+      "conv-26#q0050",
+      "conv-26#q0051",
+      "conv-26#q0052",
+      "conv-26#q0053",
+      "conv-26#q0054",
+      "conv-26#q0055",
+      "conv-26#q0056",
+      "conv-26#q0057",
+      "conv-26#q0058",
+      "conv-26#q0059",
+      "conv-26#q0060",
+      "conv-26#q0062",
+      "conv-26#q0063",
+      "conv-26#q0064",
+      "conv-26#q0066",
+      "conv-26#q0067",
+      "conv-26#q0068",
+      "conv-26#q0069",
+      "conv-26#q0070",
+      "conv-26#q0071",
+      "conv-26#q0072",
+      "conv-26#q0073",
+      "conv-26#q0074",
+      "conv-26#q0075",
+      "conv-26#q0076",
+      "conv-26#q0077",
+      "conv-26#q0078",
+      "conv-26#q0079",
+      "conv-26#q0080",
+      "conv-26#q0081",
+      "conv-26#q0082",
+      "conv-26#q0083",
+      "conv-26#q0084",
+      "conv-26#q0085",
+      "conv-26#q0086",
+      "conv-26#q0087",
+      "conv-26#q0088",
+      "conv-26#q0089",
+      "conv-26#q0090",
+      "conv-26#q0091",
+      "conv-26#q0092",
+      "conv-26#q0093",
+      "conv-26#q0094",
+      "conv-26#q0095",
+      "conv-26#q0096",
+      "conv-26#q0097",
+      "conv-26#q0098",
+      "conv-26#q0099",
+      "conv-26#q0100",
+      "conv-26#q0101",
+      "conv-26#q0102",
+      "conv-26#q0103",
+      "conv-26#q0104",
+      "conv-26#q0105",
+      "conv-26#q0106",
+      "conv-26#q0107",
+      "conv-26#q0108",
+      "conv-26#q0109",
+      "conv-26#q0110",
+      "conv-26#q0111",
+      "conv-26#q0112",
+      "conv-26#q0113",
+      "conv-26#q0114",
+      "conv-26#q0115",
+      "conv-26#q0116",
+      "conv-26#q0117",
+      "conv-26#q0118",
+      "conv-26#q0119",
+      "conv-26#q0120",
+      "conv-26#q0121",
+      "conv-26#q0122",
+      "conv-26#q0123",
+      "conv-26#q0124",
+      "conv-26#q0125",
+      "conv-26#q0126",
+      "conv-26#q0127",
+      "conv-26#q0128",
+      "conv-26#q0129",
+      "conv-26#q0130",
+      "conv-26#q0131",
+      "conv-26#q0132",
+      "conv-26#q0133",
+      "conv-26#q0134",
+      "conv-26#q0135",
+      "conv-26#q0136",
+      "conv-26#q0137",
+      "conv-30#q0000",
+      "conv-30#q0001",
+      "conv-30#q0002",
+      "conv-30#q0003",
+      "conv-30#q0004",
+      "conv-30#q0005",
+      "conv-30#q0006",
+      "conv-30#q0007",
+      "conv-30#q0008",
+      "conv-30#q0009",
+      "conv-30#q0010",
+      "conv-30#q0011",
+      "conv-30#q0012",
+      "conv-30#q0013",
+      "conv-30#q0014",
+      "conv-30#q0015",
+      "conv-30#q0016",
+      "conv-30#q0017",
+      "conv-30#q0018",
+      "conv-30#q0019",
+      "conv-30#q0020",
+      "conv-30#q0021",
+      "conv-30#q0022",
+      "conv-30#q0023",
+      "conv-30#q0024",
+      "conv-30#q0025",
+      "conv-30#q0026",
+      "conv-30#q0027",
+      "conv-30#q0028",
+      "conv-30#q0029",
+      "conv-30#q0030",
+      "conv-30#q0031",
+      "conv-30#q0032",
+      "conv-30#q0033",
+      "conv-30#q0034",
+      "conv-30#q0035",
+      "conv-30#q0036",
+      "conv-30#q0037",
+      "conv-30#q0038",
+      "conv-30#q0039",
+      "conv-30#q0040",
+      "conv-30#q0041",
+      "conv-30#q0042",
+      "conv-30#q0043",
+      "conv-30#q0044",
+      "conv-30#q0045",
+      "conv-30#q0046",
+      "conv-30#q0047",
+      "conv-30#q0048",
+      "conv-30#q0049",
+      "conv-30#q0050",
+      "conv-30#q0051",
+      "conv-30#q0052",
+      "conv-30#q0053",
+      "conv-30#q0054",
+      "conv-30#q0055",
+      "conv-30#q0056",
+      "conv-30#q0057",
+      "conv-30#q0058",
+      "conv-30#q0059",
+      "conv-30#q0060",
+      "conv-30#q0061",
+      "conv-30#q0062",
+      "conv-30#q0063",
+      "conv-30#q0064",
+      "conv-30#q0065",
+      "conv-30#q0066",
+      "conv-30#q0067",
+      "conv-30#q0068",
+      "conv-30#q0069",
+      "conv-30#q0070",
+      "conv-30#q0071",
+      "conv-41#q0000",
+      "conv-41#q0001",
+      "conv-41#q0002",
+      "conv-41#q0003",
+      "conv-41#q0004",
+      "conv-41#q0005",
+      "conv-41#q0006",
+      "conv-41#q0007",
+      "conv-41#q0008",
+      "conv-41#q0009",
+      "conv-41#q0010",
+      "conv-41#q0012",
+      "conv-41#q0013",
+      "conv-41#q0014",
+      "conv-41#q0015",
+      "conv-41#q0016",
+      "conv-41#q0017",
+      "conv-41#q0018",
+      "conv-41#q0019",
+      "conv-41#q0020",
+      "conv-41#q0021",
+      "conv-41#q0022",
+      "conv-41#q0023",
+      "conv-41#q0024",
+      "conv-41#q0025",
+      "conv-41#q0026",
+      "conv-41#q0027",
+      "conv-41#q0028",
+      "conv-41#q0029",
+      "conv-41#q0030",
+      "conv-41#q0031",
+      "conv-41#q0032",
+      "conv-41#q0034",
+      "conv-41#q0035",
+      "conv-41#q0036",
+      "conv-41#q0037",
+      "conv-41#q0038",
+      "conv-41#q0039",
+      "conv-41#q0040",
+      "conv-41#q0041",
+      "conv-41#q0042",
+      "conv-41#q0043",
+      "conv-41#q0044",
+      "conv-41#q0045",
+      "conv-41#q0046",
+      "conv-41#q0047",
+      "conv-41#q0048",
+      "conv-41#q0049",
+      "conv-41#q0050",
+      "conv-41#q0051",
+      "conv-41#q0052",
+      "conv-41#q0053",
+      "conv-41#q0054",
+      "conv-41#q0055",
+      "conv-41#q0056",
+      "conv-41#q0057",
+      "conv-41#q0058",
+      "conv-41#q0059",
+      "conv-41#q0060",
+      "conv-41#q0061",
+      "conv-41#q0062",
+      "conv-41#q0063",
+      "conv-41#q0064",
+      "conv-41#q0065",
+      "conv-41#q0066",
+      "conv-41#q0067",
+      "conv-41#q0068",
+      "conv-41#q0069",
+      "conv-41#q0070",
+      "conv-41#q0071",
+      "conv-41#q0072",
+      "conv-41#q0073",
+      "conv-41#q0074",
+      "conv-41#q0075",
+      "conv-41#q0076",
+      "conv-41#q0077",
+      "conv-41#q0078",
+      "conv-41#q0079",
+      "conv-41#q0080",
+      "conv-41#q0081",
+      "conv-41#q0082",
+      "conv-41#q0083",
+      "conv-41#q0084",
+      "conv-41#q0085",
+      "conv-41#q0086",
+      "conv-41#q0087",
+      "conv-41#q0088",
+      "conv-41#q0089",
+      "conv-41#q0090",
+      "conv-41#q0091",
+      "conv-41#q0092",
+      "conv-41#q0093",
+      "conv-41#q0094",
+      "conv-41#q0095",
+      "conv-41#q0096",
+      "conv-41#q0097",
+      "conv-41#q0098",
+      "conv-41#q0099",
+      "conv-41#q0100",
+      "conv-41#q0101",
+      "conv-41#q0102",
+      "conv-41#q0103",
+      "conv-41#q0104",
+      "conv-41#q0105",
+      "conv-41#q0106",
+      "conv-41#q0134",
+      "conv-42#q0001",
+      "conv-42#q0002",
+      "conv-42#q0003",
+      "conv-42#q0004",
+      "conv-42#q0005",
+      "conv-42#q0006",
+      "conv-42#q0007",
+      "conv-42#q0008",
+      "conv-42#q0009",
+      "conv-42#q0011",
+      "conv-42#q0012",
+      "conv-42#q0013",
+      "conv-42#q0014",
+      "conv-42#q0015",
+      "conv-42#q0016",
+      "conv-42#q0017",
+      "conv-42#q0018",
+      "conv-42#q0019",
+      "conv-42#q0020",
+      "conv-42#q0021",
+      "conv-42#q0022",
+      "conv-42#q0023",
+      "conv-42#q0024",
+      "conv-42#q0025",
+      "conv-42#q0026",
+      "conv-42#q0027",
+      "conv-42#q0028",
+      "conv-42#q0029",
+      "conv-42#q0030",
+      "conv-42#q0031",
+      "conv-42#q0032",
+      "conv-42#q0033",
+      "conv-42#q0034",
+      "conv-42#q0035",
+      "conv-42#q0036",
+      "conv-42#q0037",
+      "conv-42#q0038",
+      "conv-42#q0039",
+      "conv-42#q0040",
+      "conv-42#q0041",
+      "conv-42#q0042",
+      "conv-42#q0043",
+      "conv-42#q0044",
+      "conv-42#q0045",
+      "conv-42#q0046",
+      "conv-42#q0047",
+      "conv-42#q0048",
+      "conv-42#q0049",
+      "conv-42#q0050",
+      "conv-42#q0051",
+      "conv-42#q0052",
+      "conv-42#q0053",
+      "conv-42#q0055",
+      "conv-42#q0056",
+      "conv-42#q0057",
+      "conv-42#q0059",
+      "conv-42#q0060",
+      "conv-42#q0061",
+      "conv-42#q0062",
+      "conv-42#q0063",
+      "conv-42#q0064",
+      "conv-42#q0065",
+      "conv-42#q0067",
+      "conv-42#q0171",
+      "conv-42#q0178",
+      "conv-43#q0000",
+      "conv-43#q0001",
+      "conv-43#q0003",
+      "conv-43#q0004",
+      "conv-43#q0005",
+      "conv-43#q0006",
+      "conv-43#q0007",
+      "conv-43#q0008",
+      "conv-43#q0009",
+      "conv-43#q0010",
+      "conv-43#q0011",
+      "conv-43#q0012",
+      "conv-43#q0013",
+      "conv-43#q0014",
+      "conv-43#q0015",
+      "conv-43#q0016",
+      "conv-43#q0017",
+      "conv-43#q0019",
+      "conv-43#q0021",
+      "conv-43#q0022",
+      "conv-43#q0023",
+      "conv-43#q0024",
+      "conv-43#q0025",
+      "conv-43#q0026",
+      "conv-43#q0027",
+      "conv-43#q0028",
+      "conv-43#q0029",
+      "conv-43#q0030",
+      "conv-43#q0031",
+      "conv-43#q0032",
+      "conv-43#q0033",
+      "conv-43#q0034",
+      "conv-43#q0035",
+      "conv-43#q0036",
+      "conv-43#q0037",
+      "conv-43#q0038",
+      "conv-43#q0039",
+      "conv-43#q0040",
+      "conv-43#q0041",
+      "conv-43#q0042",
+      "conv-43#q0043",
+      "conv-43#q0044",
+      "conv-43#q0045",
+      "conv-43#q0046",
+      "conv-43#q0047",
+      "conv-43#q0048",
+      "conv-43#q0049",
+      "conv-44#q0000",
+      "conv-44#q0001",
+      "conv-44#q0002",
+      "conv-44#q0003",
+      "conv-44#q0004",
+      "conv-44#q0005",
+      "conv-44#q0006",
+      "conv-44#q0007",
+      "conv-44#q0008",
+      "conv-44#q0009",
+      "conv-44#q0010",
+      "conv-44#q0011",
+      "conv-44#q0012",
+      "conv-44#q0013",
+      "conv-44#q0014",
+      "conv-44#q0016",
+      "conv-44#q0017",
+      "conv-44#q0018",
+      "conv-44#q0019",
+      "conv-44#q0020",
+      "conv-44#q0021",
+      "conv-44#q0022",
+      "conv-44#q0023",
+      "conv-44#q0024",
+      "conv-44#q0025",
+      "conv-44#q0026",
+      "conv-44#q0027",
+      "conv-44#q0028",
+      "conv-44#q0029",
+      "conv-44#q0030",
+      "conv-44#q0031",
+      "conv-44#q0032",
+      "conv-44#q0033",
+      "conv-44#q0034",
+      "conv-44#q0035",
+      "conv-44#q0036",
+      "conv-44#q0037",
+      "conv-44#q0038",
+      "conv-44#q0040",
+      "conv-44#q0041",
+      "conv-44#q0042",
+      "conv-44#q0043",
+      "conv-44#q0044",
+      "conv-44#q0045",
+      "conv-44#q0049",
+      "conv-47#q0001",
+      "conv-47#q0003",
+      "conv-47#q0004",
+      "conv-47#q0005",
+      "conv-47#q0011",
+      "conv-47#q0012",
+      "conv-47#q0014",
+      "conv-47#q0016",
+      "conv-47#q0022",
+      "conv-47#q0026",
+      "conv-47#q0032",
+      "conv-47#q0036",
+      "conv-47#q0038",
+      "conv-47#q0040",
+      "conv-47#q0042",
+      "conv-47#q0046",
+      "conv-48#q0006",
+      "conv-48#q0011",
+      "conv-48#q0012",
+      "conv-48#q0017",
+      "conv-48#q0018",
+      "conv-48#q0022",
+      "conv-48#q0036",
+      "conv-48#q0038",
+      "conv-48#q0068",
+      "conv-48#q0073",
+      "conv-48#q0074",
+      "conv-48#q0076",
+      "conv-48#q0077",
+      "conv-48#q0078",
+      "conv-49#q0000",
+      "conv-49#q0001",
+      "conv-49#q0002",
+      "conv-49#q0003",
+      "conv-49#q0006",
+      "conv-49#q0007"
+    ],
+    "counts_by_axis": {
+      "multi_hop": 166,
+      "single_hop": 167,
+      "temporal": 167
+    }
+  },
+  "memops": {
+    "upstream_json_files": 403,
+    "selection_rule": "filter operation_type to Remember/Update/Forget/Reflect; within each operation sort filename ascending; take longitudinal_operation questions until the published per-operation quota is met",
+    "targets": {
+      "Remember": 132,
+      "Update": 98,
+      "Forget": 115,
+      "Reflect": 155
+    },
+    "selected_files": [
+      {
+        "file": "A01_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A02_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A04_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A05_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A06_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A07_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A16_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A19_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A22_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A26_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A28_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A29_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A31_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A33_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B01_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B02_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B03_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B04_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B05_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B10_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B11_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "B14_remember.json",
+        "operation_type": "Remember",
+        "available_questions": 6,
+        "selected_questions": 6,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application",
+          "p6_remember_negative"
+        ]
+      },
+      {
+        "file": "A01_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A02_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A05_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A06_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A11_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A13_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A14_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A16_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A19_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A26_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A28_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A29_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A30_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A31_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A32_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A33_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B01_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B02_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B03_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B04_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B05_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B06_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B10_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B11_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 4,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B12_update.json",
+        "operation_type": "Update",
+        "available_questions": 4,
+        "selected_questions": 2,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding"
+        ]
+      },
+      {
+        "file": "A02_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A04_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A05_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A06_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A07_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A11_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A13_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A14_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A19_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A22_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A26_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A28_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A29_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A30_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A31_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A32_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A33_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B01_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B04_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B05_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B11_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B14_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B21_forget.json",
+        "operation_type": "Forget",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A01_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A02_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A04_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A05_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A06_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A07_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A11_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A13_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A14_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A16_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A19_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A20_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A22_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A26_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A27_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A28_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A29_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A30_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A31_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A32_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "A33_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B01_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B02_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B03_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B04_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B05_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B06_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B10_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B11_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B12_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      },
+      {
+        "file": "B14_reflect.json",
+        "operation_type": "Reflect",
+        "available_questions": 5,
+        "selected_questions": 5,
+        "selected_qids": [
+          "p1_operation_trace",
+          "p2_target_binding",
+          "p3_state_transition",
+          "p4_candidate_disambiguation",
+          "p5_operation_application"
+        ]
+      }
+    ],
+    "selected_sample_count": 101,
+    "selected_question_count": 500,
+    "counts_by_operation_type": {
+      "Forget": 115,
+      "Reflect": 155,
+      "Remember": 132,
+      "Update": 98
+    },
+    "counts_by_eval_axis": {
+      "CandidateDisambiguation": 100,
+      "OperationApplication": 100,
+      "OperationTrace": 101,
+      "StateTransition": 98,
+      "TargetBinding": 101
+    }
+  }
+}

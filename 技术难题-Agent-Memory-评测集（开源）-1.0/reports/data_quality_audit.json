@@ -1,0 +1,78 @@
+{
+  "status": "audit-only; main pack was not modified",
+  "selected_memops_questions_with_upstream_candidate_options": 100,
+  "candidate_option_fields_omitted_by_guide_compatible_converter": 100,
+  "interpretation": "The published guide converter does not copy candidate_options to the sample options field. This report records the omission without silently correcting it.",
+  "examples": [
+    {
+      "source_file": "A01_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "What is my annual salary at Bridgemark Solutions? Pick from the options below.",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A02_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to fill out an IT access request form and it asks for my employee ID. Which of the following should I enter?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A04_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to tell a delivery service the cross-street nearest my apartment on Division Street. Which of these is correct?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A05_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "Which ZIP code should appear on my personal mailing forms for my home address?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A06_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to confirm: on what exact date did Lauren and I get married? Which of these is right?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A07_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "Which theatre is Daniel working at as a stage manager this season?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A16_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to log in to Edinburgh's alumni portal to request a transcript. Which student ID should I enter?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A19_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to verify the phone number on my CoreFit gym emergency contact listing. Which of these is the correct number for my sister?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A22_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "What is my weight as of March 12th? Pick from the options below.",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    },
+    {
+      "source_file": "A26_remember.json",
+      "qid": "p4_candidate_disambiguation",
+      "question": "I need to enter my base salary on a financial planning worksheet. Which of these amounts should I use?",
+      "candidate_options_count": 4,
+      "options_present_in_main_pack": false
+    }
+  ]
+}

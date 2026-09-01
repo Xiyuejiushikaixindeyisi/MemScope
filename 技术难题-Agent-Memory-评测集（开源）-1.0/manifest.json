@@ -1,0 +1,37 @@
+{
+  "package": "agent-memory-eval-open-1.0-public-reconstruction",
+  "version": "1.0.0-reconstructed",
+  "track": "TECHNICAL",
+  "question_code": "TECH-005",
+  "reconstruction_status": "public-rule reconstruction; not organizer-byte-verified",
+  "objective_benchmarks": [
+    {
+      "name": "LoCoMo-Refined",
+      "repo": "https://github.com/mem-eval-suite/LoCoMo_refined",
+      "commit": "887091190789e8d6760e70b9edd696539923dc4f",
+      "license": "CC-BY-NC-4.0",
+      "role": "long_dialogue_cross_session_qa"
+    },
+    {
+      "name": "MemOps",
+      "repo": "https://github.com/MemTensor/MemOps",
+      "commit": "312af65e2c7b6d1b70f062ffa8b4cde32aaf6f35",
+      "license": "MIT",
+      "role": "lifecycle_ops_longitudinal_noise"
+    }
+  ],
+  "eval_protocol": "add_search_answer_judge",
+  "formal_top_k": 100,
+  "main_pack_conversion_mode": "guide_compat",
+  "proxy_evaluation": {
+    "available": true,
+    "official": false,
+    "name": "deterministic-extractive-proxy-v1",
+    "entrypoint": "scripts/local_proxy_eval.py"
+  },
+  "notes": [
+    "Official organizer samples and Answer/Judge were unavailable for byte verification.",
+    "The main pack intentionally omits LoCoMo session dates in guide-compatible mode.",
+    "See SOURCE_LOCK.json and reports/ for provenance, validation, and omission audits."
+  ]
+}

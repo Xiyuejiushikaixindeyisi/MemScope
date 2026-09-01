@@ -1,0 +1,63 @@
+{
+  "version": "1.0-official-mixed-public-reconstruction",
+  "reconstruction_status": "public-rule reconstruction; not organizer-byte-verified",
+  "cap": 1000,
+  "search_items": 1000,
+  "samples": 110,
+  "counts_by_benchmark": {
+    "LoCoMo-Refined": 500,
+    "MemOps": 500
+  },
+  "counts_by_eval_axis": {
+    "CandidateDisambiguation": 100,
+    "OperationApplication": 100,
+    "OperationTrace": 101,
+    "StateTransition": 98,
+    "TargetBinding": 101,
+    "multi_hop": 166,
+    "single_hop": 167,
+    "temporal": 167
+  },
+  "counts_by_memops_operation_type": {
+    "Forget": 115,
+    "Reflect": 155,
+    "Remember": 132,
+    "Update": 98
+  },
+  "counts_by_locomo_axis": {
+    "multi_hop": 166,
+    "single_hop": 167,
+    "temporal": 167
+  },
+  "locomo": {
+    "source": "LoCoMo_refined/data/public",
+    "commit": "887091190789e8d6760e70b9edd696539923dc4f",
+    "add_mode": "full_conversation",
+    "conversion_mode": "guide_compat",
+    "excluded_categories": [
+      "3",
+      "5"
+    ],
+    "preferred_categories": [
+      "1",
+      "2",
+      "4"
+    ],
+    "target": 500,
+    "actual": 500
+  },
+  "memops": {
+    "source": "MemOps/generated_result/4-inject_evidence_with_distractors",
+    "commit": "312af65e2c7b6d1b70f062ffa8b4cde32aaf6f35",
+    "add_mode": "full_conversation",
+    "filter": "evaluation_setting=longitudinal_operation; operation_type in Remember/Update/Forget/Reflect; published per-operation quotas",
+    "target": 500,
+    "actual": 500
+  },
+  "notes": [
+    "Guide-compatible main pack: LoCoMo session date_time is intentionally not copied into Add messages.",
+    "Guide-compatible main pack: LoCoMo multimodal side fields and MemOps candidate_options are intentionally omitted.",
+    "See reports/temporal_audit.json and reports/data_quality_audit.json before interpreting temporal or option-based results.",
+    "Deterministic order: (benchmark, sample_id, qid)."
+  ]
+}

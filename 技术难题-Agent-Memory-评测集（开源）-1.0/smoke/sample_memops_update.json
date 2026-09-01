@@ -1,0 +1,97 @@
+{
+  "dataset": "smoke",
+  "sample_id": "smoke-memops-update-001",
+  "source": {
+    "benchmark": "synthetic_memops_style",
+    "source_id": "smoke-update-001"
+  },
+  "isolation": {
+    "user_id": "eval:smoke:memops:u002",
+    "session_ids": ["sess_establish", "sess_noise", "sess_update"]
+  },
+  "add_phase": {
+    "sessions": [
+      {
+        "session_id": "sess_establish",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1700000000000,
+            "content": "Please remember that my current city of residence is Seattle."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1700000005000,
+            "content": "Understood. Your current city is Seattle."
+          }
+        ]
+      },
+      {
+        "session_id": "sess_noise",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1700003600000,
+            "content": "Random chat: what is a good pasta recipe for dinner tonight?"
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1700003604000,
+            "content": "A simple aglio e olio works well: garlic, olive oil, chili flakes, spaghetti."
+          },
+          {
+            "role": "user",
+            "timestamp": 1700003700000,
+            "content": "My friend Sam might move to Boston next year, not sure though."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1700003703000,
+            "content": "Noted that Sam's plan is tentative."
+          }
+        ]
+      },
+      {
+        "session_id": "sess_update",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1700086400000,
+            "content": "Update: I moved. My current city of residence is now Portland, not Seattle."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1700086405000,
+            "content": "Updated. Your current city is Portland."
+          },
+          {
+            "role": "user",
+            "timestamp": 1700086500000,
+            "content": "I might visit Seattle next month for a conference, but I don't live there anymore."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1700086503000,
+            "content": "Got it — Seattle is a visit destination, not your residence."
+          }
+        ]
+      }
+    ]
+  },
+  "search_items": [
+    {
+      "qid": "smoke-memops-update-001-q1",
+      "question": "What is my current city of residence?",
+      "question_type": "open_ended",
+      "gold_answer": "Portland",
+      "gold_rubric": {
+        "must_include": ["Portland"],
+        "must_not_include": ["Seattle"]
+      },
+      "eval_axis": "fact_update_recall",
+      "diagnostic_checks": {
+        "stale_value": "Seattle"
+      }
+    }
+  ]
+}

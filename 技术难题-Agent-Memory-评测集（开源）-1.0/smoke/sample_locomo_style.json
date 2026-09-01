@@ -1,0 +1,88 @@
+{
+  "dataset": "smoke",
+  "sample_id": "smoke-locomo-style-001",
+  "source": {
+    "benchmark": "synthetic_locomo_style",
+    "source_id": "smoke-001"
+  },
+  "isolation": {
+    "user_id": "eval:smoke:locomo:u001",
+    "session_ids": ["sess_a", "sess_b"]
+  },
+  "add_phase": {
+    "sessions": [
+      {
+        "session_id": "sess_a",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1704067200000,
+            "content": "Remember: my name is Alex, I work on the gateway team in Chengdu. Please keep answers concise. The staging SSH port is 2222 and the key path is ~/.ssh/staging_ed25519."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1704067208000,
+            "content": "Got it. I'll remember you are Alex on the Chengdu gateway team, prefer concise answers, staging SSH port 2222, key ~/.ssh/staging_ed25519."
+          },
+          {
+            "role": "user",
+            "timestamp": 1704067310000,
+            "content": "Also note the staging hostname is staging-gw-01 and the jump host is jump.internal."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1704067314000,
+            "content": "Recorded staging-gw-01 and jump.internal."
+          }
+        ]
+      },
+      {
+        "session_id": "sess_b",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1704153600000,
+            "content": "How do I SSH to staging?"
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1704153605000,
+            "content": "Use ssh -p 2222 -i ~/.ssh/staging_ed25519 user@staging-gw-01 via jump.internal."
+          }
+        ]
+      }
+    ]
+  },
+  "search_items": [
+    {
+      "qid": "smoke-locomo-style-001-q1",
+      "question": "What is the staging SSH port?",
+      "question_type": "open_ended",
+      "gold_answer": "2222",
+      "gold_rubric": {
+        "must_include": ["2222"]
+      },
+      "eval_axis": "explicit_fact_recall"
+    },
+    {
+      "qid": "smoke-locomo-style-001-q2",
+      "question": "What is my preferred answer style?",
+      "question_type": "open_ended",
+      "gold_answer": "concise",
+      "gold_rubric": {
+        "must_include_any": ["concise", "brief", "short"]
+      },
+      "eval_axis": "personalization"
+    },
+    {
+      "qid": "smoke-locomo-style-001-q3",
+      "question": "What are the staging hostname and jump host?",
+      "question_type": "open_ended",
+      "gold_answer": "staging-gw-01 and jump.internal",
+      "gold_rubric": {
+        "must_include_all": ["staging-gw-01", "jump.internal"]
+      },
+      "eval_axis": "cross_session_recall"
+    }
+  ]
+}

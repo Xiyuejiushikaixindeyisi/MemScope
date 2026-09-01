@@ -1,0 +1,69 @@
+{
+  "dataset": "smoke",
+  "sample_id": "smoke-memops-forget-001",
+  "source": {
+    "benchmark": "synthetic_memops_style",
+    "source_id": "smoke-forget-001"
+  },
+  "isolation": {
+    "user_id": "eval:smoke:memops:u003",
+    "session_ids": ["sess_remember", "sess_forget"]
+  },
+  "add_phase": {
+    "sessions": [
+      {
+        "session_id": "sess_remember",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1710000000000,
+            "content": "Remember two things: my preferred IDE is VS Code, and the temporary pickup code for today's parcel is 482917."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1710000004000,
+            "content": "Saved: preferred IDE VS Code; today's parcel pickup code 482917."
+          }
+        ]
+      },
+      {
+        "session_id": "sess_forget",
+        "messages": [
+          {
+            "role": "user",
+            "timestamp": 1710086400000,
+            "content": "Please forget the parcel pickup code. Keep my IDE preference."
+          },
+          {
+            "role": "assistant",
+            "timestamp": 1710086404000,
+            "content": "Forgot the pickup code. Still remember your preferred IDE is VS Code."
+          }
+        ]
+      }
+    ]
+  },
+  "search_items": [
+    {
+      "qid": "smoke-memops-forget-001-q1",
+      "question": "What is my preferred IDE?",
+      "question_type": "open_ended",
+      "gold_answer": "VS Code",
+      "gold_rubric": {
+        "must_include_any": ["VS Code", "VSCode", "Visual Studio Code"]
+      },
+      "eval_axis": "forget_retain_related"
+    },
+    {
+      "qid": "smoke-memops-forget-001-q2",
+      "question": "What is my parcel pickup code?",
+      "question_type": "open_ended",
+      "gold_answer": "I don't know / forgotten / not available",
+      "gold_rubric": {
+        "must_not_include": ["482917"],
+        "notes": "After forget, leaking the code is a failure (Forget leakage)."
+      },
+      "eval_axis": "forget_no_leakage"
+    }
+  ]
+}

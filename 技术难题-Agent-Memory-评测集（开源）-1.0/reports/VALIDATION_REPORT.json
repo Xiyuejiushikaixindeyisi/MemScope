@@ -1,0 +1,32 @@
+{
+  "valid": true,
+  "errors": [],
+  "warnings": [],
+  "counts": {
+    "samples": 110,
+    "questions": 1000,
+    "benchmark": {
+      "LoCoMo-Refined": 500,
+      "MemOps": 500
+    },
+    "locomo_axis": {
+      "multi_hop": 166,
+      "single_hop": 167,
+      "temporal": 167
+    },
+    "memops_operation_type": {
+      "Forget": 115,
+      "Reflect": 155,
+      "Remember": 132,
+      "Update": 98
+    },
+    "memops_eval_axis": {
+      "CandidateDisambiguation": 100,
+      "OperationApplication": 100,
+      "OperationTrace": 101,
+      "StateTransition": 98,
+      "TargetBinding": 101
+    },
+    "guide_compatible_locomo_timestamps": 0
+  }
+}

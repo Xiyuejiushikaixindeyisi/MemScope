@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/agent-memory/sample.schema.json",
+  "title": "AgentMemoryEvalSample",
+  "type": "object",
+  "required": ["sample_id", "isolation", "add_phase", "search_items"],
+  "properties": {
+    "dataset": { "type": "string" },
+    "sample_id": { "type": "string" },
+    "source": {
+      "type": "object",
+      "properties": {
+        "benchmark": { "type": "string" },
+        "source_id": { "type": "string" }
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "required": ["user_id"],
+      "properties": {
+        "user_id": { "type": "string" },
+        "session_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "add_phase": {
+      "type": "object",
+      "required": ["sessions"],
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["session_id", "messages"],
+            "properties": {
+              "session_id": { "type": "string" },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["role", "content"],
+                  "properties": {
+                    "role": { "type": "string" },
+                    "content": { "type": "string", "minLength": 1 },
+                    "timestamp": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "search_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["qid", "question", "gold_answer"],
+        "properties": {
+          "qid": { "type": "string" },
+          "question": { "type": "string" },
+          "question_type": { "type": "string" },
+          "gold_answer": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          },
+          "gold_rubric": { "type": "object" },
+          "eval_axis": { "type": "string" },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
