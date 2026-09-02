@@ -1,6 +1,6 @@
 # B03 Gate 2 Handoff
 
-> 状态：Code Review / Gate 2 Pending
+> 状态：Accepted/Frozen，2026-09-02 用户已完成 Gate 2 验收
 > Gate 1 文档提交：`f964c34`
 > 实现提交：`2590adc`
 > 测试提交：`1465938`
@@ -145,8 +145,8 @@ Search case 在先前 30 次写入的累积候选上测量，因此 100-message 
 - 默认 runtime 仍 503，B04 才设计运行服务 topology/lifecycle；
 - 主办方 API/Key、硬件/超时/并发/失败策略、Compose/网络/构建和决赛交付要求仍未知。
 
-## 10. Gate 2 请求
+## 10. Gate 2 验收结论
 
-请验收 B03 的 Gateway/Fake、MemoryOperations、HTTP 409、独立 Mock Model API、共享契约和上述证据。
-若通过，再将 B03 更新为 `Accepted/Frozen`。本轮未创建 B04 分支、未设计或实施 B04。
-
+用户于 2026-09-02 明确批准 B03 Gate 2 验收，B03 更新为 `Accepted/Frozen`。后续可以依赖
+`memory-gateway-v1.md`、`mock-model-api-v1.md` 和本 Handoff 明示的公共边界，但不得把 Fake/Mock
+结果解释为真实 MemOS 兼容性或 baseline 质量证据。本次验收未授权 B04 方案或代码实施。

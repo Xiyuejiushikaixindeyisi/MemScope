@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B03 implementation on `batch/b03-no-key-doubles`; Gate 2 verification is recorded
-> in the active B03 handoff.
+> Current through accepted B03 on `batch/b03-no-key-doubles`; Gate 2 verification is recorded in
+> the B03 handoff.
 
 ## Objective
 
@@ -40,7 +40,7 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00, B01 and B02 are `Accepted/Frozen`. B03 Gate 1 is approved and its implementation provides a
+B00, B01, B02 and B03 are `Accepted/Frozen`. B03 provides a
 framework-independent `MemoryGateway`, deterministic in-process Fake, independent Mock Model API
 and `MemoryOperations` composition. The Fake path proves wiring/recovery/isolation without claiming
 semantic quality or real MemOS compatibility.
