@@ -130,6 +130,17 @@ async def test_add_maps_ordered_messages_and_echoes_exact_ids() -> None:
 
 
 @pytest.mark.asyncio
+async def test_add_openapi_declares_request_conflict() -> None:
+    operations = RecordingOperations()
+    async with httpx.AsyncClient(
+        transport=_transport(operations), base_url="http://test"
+    ) as client:
+        response = await client.get("/openapi.json")
+
+    assert "409" in response.json()["paths"]["/add"]["post"]["responses"]
+
+
+@pytest.mark.asyncio
 async def test_add_does_not_respond_before_operation_completion() -> None:
     gate = asyncio.Event()
     operations = RecordingOperations(add_gate=gate)

@@ -146,3 +146,32 @@ def test_raw_store_logging_allows_only_bounded_metadata(
     assert "payload_sha256" not in payload
     assert "request_id" not in payload
     assert "must-not-appear" not in payload.values()
+
+
+def test_b03_logging_allows_durations_but_rejects_memory_and_model_data(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    configure_logging(_json_settings())
+    logger = logging.getLogger(LOGGER_NAME)
+    logger.info(
+        "b03_operation_completed",
+        extra={
+            "component_operation": "search",
+            "component_result": "success",
+            "component_duration_ms": 3.0,
+            "gateway_duration_ms": 2.0,
+            "model_endpoint": "embeddings",
+            "model_result": "success",
+            "model_duration_ms": 1.0,
+            "query": "private-query",
+            "model": "private-model",
+            "embedding": [1.0],
+        },
+    )
+
+    payload = json.loads(capsys.readouterr().err)
+    assert payload["component_duration_ms"] == 3.0
+    assert payload["gateway_duration_ms"] == 2.0
+    assert payload["model_duration_ms"] == 1.0
+    assert {"query", "model", "embedding"}.isdisjoint(payload)
+    assert "private-query" not in payload.values()
