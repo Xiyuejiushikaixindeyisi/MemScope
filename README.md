@@ -2,8 +2,8 @@
 
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
-provider-independent Memory Gateway, application orchestration, deterministic in-process Fake and
-independent no-key Mock Model API. Real MemOS integration remains deferred.
+provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
+MemOS/Neo4j/Qdrant runtime infrastructure; Real MemOS Add/Search integration remains deferred.
 
 ## Development environment
 
@@ -104,10 +104,27 @@ It exposes health plus a small non-streaming Chat/Embedding subset, requires no 
 enabled in an organizer profile. See `docs/interfaces/memory-gateway-v1.md` and
 `docs/interfaces/mock-model-api-v1.md` for exact contracts and non-compatibility boundaries.
 
+## B04 infrastructure runtime
+
+B04 uses one Compose entry with three internal services: fixed MemOS `v2.0.32`, Neo4j Community
+and Qdrant. It exposes no host port and deliberately has no usable model endpoint, so it is an
+infrastructure lifecycle target rather than a contest service. The complete upstream source archive,
+license, SHA-256 and OCI image locks are included under `third_party/memos/`.
+
+On a clean Linux Docker Compose v2 host, run the complete build/start/restart/fault gate with:
+
+```bash
+python scripts/verify_b04_runtime.py --report /tmp/b04-runtime-report.json
+```
+
+The verifier uses a random isolated project and removes only that project's test volumes. See
+`docs/batches/B04/PLAN.md` and `docs/adr/0005-b04-compose-runtime-topology.md`. Do not interpret
+MemOS `/health` as Add/Search/model readiness.
+
 ## Current boundaries
 
-B03 adds a complete explicit Fake test path and isolated model HTTP Mock. It does not implement real
-MemOS, Qdrant, Neo4j, semantic retrieval, model quality, lifecycle behavior, outbox workers,
+B04 adds only the pinned infrastructure topology. It does not implement the Real Gateway, public
+contest composition, model access, Add/Search, semantic retrieval, quality results, outbox workers,
 production retries/fallback or final-answer generation. See `docs/interfaces/contest-http-v1.md`,
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.

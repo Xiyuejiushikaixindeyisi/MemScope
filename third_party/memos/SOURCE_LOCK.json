@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source": {
+    "name": "MemOS",
+    "upstream_repository": "https://github.com/MemTensor/MemOS.git",
+    "tag": "v2.0.32",
+    "commit": "185ebdb925911b55c13b7efe666b74e2e292e484",
+    "archive": "MemoryOS-v2.0.32-185ebdb.tar.gz",
+    "archive_sha256": "9a804fd874932f0a4fd86f75fa4edb48fdd41807417f236bacda49b8664cdf3c",
+    "archive_format": "git archive tar.gz",
+    "archive_prefix": "MemoryOS-v2.0.32-185ebdb/",
+    "license_file": "LICENSE",
+    "license_sha256": "154f9be8df2d55ceddcd4646c8d8d4206d48867ae1da2b81ce2ab86b51a5f075"
+  },
+  "container_images": {
+    "python": {
+      "reference": "python:3.11.16-slim-bookworm",
+      "index_digest": "sha256:528257d48c1da0dcecc2e725d1ae34498d60c965f1241e39cd6a85a8859bdf84"
+    },
+    "neo4j": {
+      "reference": "neo4j:5.26.6-community",
+      "index_digest": "sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893"
+    },
+    "qdrant": {
+      "reference": "qdrant/qdrant:v1.15.3",
+      "index_digest": "sha256:31407c0e8e32eb771b71718f1a4772e2ad47a07557917b21ac96792f40eb8007"
+    }
+  },
+  "verified_at": "2026-09-02T21:05:00+08:00",
+  "verification_source": "Docker Hub public tag API"
+}

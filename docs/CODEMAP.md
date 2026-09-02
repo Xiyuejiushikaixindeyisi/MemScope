@@ -24,6 +24,10 @@
 | `src/memscope/memory_gateway/fake.py` | Non-durable deterministic Gateway contract Fake and typed fault injection | Gateway contract, asyncio |
 | `src/memscope/application/memory_operations.py` | NEW/PENDING/COMPLETED orchestration, conflict translation and Search isolation | Contest operations, RawStore and MemoryGateway ports |
 | `src/memscope/mock_model_api/` | Independent deterministic Chat/Embedding HTTP subset | FastAPI/Pydantic and standard library |
+| `compose.yaml` | B04 MemOS/Neo4j/Qdrant topology, health ordering, internal network and named volumes | Docker Compose v2 |
+| `docker/memos/` | Builds/runs the fixed upstream MemOS source archive | pinned Python image, bundled source |
+| `third_party/memos/` | Complete MemOS archive, source/image lock, checksum and upstream license | fixed upstream commit |
+| `scripts/verify_b04_runtime.py` | Disposable clean-room build, readiness, restart persistence and fault-recovery evidence | Docker Engine/Compose v2 |
 | `tests/unit/` | Settings, errors, logging, HTTP models, identity and persistence value behavior | Public module surfaces |
 | `tests/component/` | SQLite migration, persistence, restart, concurrency, cancellation and fault behavior | Public RawStore interface and temporary databases |
 | `tests/contract/` | Contest HTTP, reusable Gateway, explicit Fake path and Mock Model contracts | Public ports and app factories |
@@ -52,11 +56,12 @@ mock_model_api.main → mock_model_api.app → mock_model_api.models / determini
 Settings, errors, operations, Gateway and Raw Store contracts remain framework-independent. API and
 Mock Model modules may depend on FastAPI/Pydantic. SQLite and Fake details are confined to their
 implementations. Runtime still defaults to `UnavailableContestOperations`; only tests explicitly
-inject the B03 Fake path.
+inject the B03 Fake path. B04 Compose is an independent infrastructure target and does not import
+or replace the `src/memscope` composition root.
 
 ## Deferred ownership
 
-- B04: runtime service topology and lifecycle.
-- B05+: pinned MemOS mapping and real integration.
+- B04: runtime service topology and lifecycle (implemented; real Docker Gate 2 evidence pending).
+- B05+: Real Gateway, public adapter composition and model-backed Add/Search integration.
 
 This file records navigation and dependency direction, not implementation copies.

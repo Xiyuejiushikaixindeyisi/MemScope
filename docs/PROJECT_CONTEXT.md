@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through accepted B03 on `batch/b03-no-key-doubles`; Gate 2 verification is recorded in
-> the B03 handoff.
+> Current through approved B04 Gate 1 on `batch/b04-runtime-infra`; B00–B03 remain accepted and
+> frozen. B04 runtime Gate 2 evidence is not complete.
 
 ## Objective
 
@@ -13,19 +13,25 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 - The repository's `official/` data is a local rules reconstruction and proxy regression set, not
   an organizer byte-verified package.
-- Organizer direction relayed by the user on 2026-09-02: `Qwen-V3.6-27B-DX` and
-  `GLM-V5.1-DX` LLMs will be freely usable, but their detailed API contract/key is not yet recorded.
-- The organizer will not provide Embedding or Rerank API keys and will not expose the platform
-  Answer/Judge models to the team.
-- No formal timeout is currently provided and there is no concurrency requirement. `top_k` may be
-  below 100 and K is a bonus factor, but the exact scoring/input limits are unknown.
-- The requested delivery is one directly deployable, immediately runnable Docker. Whether that
-  permits Compose, multiple processes/services, external databases, runtime network access and
-  large images remains unconfirmed.
-- The organizer may provide a large-database interface with an authentication design if needed;
-  product, protocol, capacity, persistence, latency and availability are not yet defined.
-- Hardware, failure policy, build/network constraints, exact top-k scoring and finals delivery
-  clarification remain unavailable.
+- Submission is a source `solution.zip`; the organizer builds it. It includes `INSTRUCTION.md`,
+  `SDD.md`, complete `code/` with dependency declarations, and optional Dockerfile/Compose.
+- No hosted database is provided. Add→Search is guaranteed only within one deployment lifecycle;
+  data may remain in container-local/configurable storage. Cross-restart persistence is not a
+  competition dependency, though B04 tests same-host named-volume restart for operational safety.
+- The Huawei AI Gateway base URLs and Bearer authentication are known and its Chat, Embeddings,
+  Responses and rerank paths are OpenAI-compatible. Exact subscribed model IDs still come from
+  `/v1/models`; formal embedding access, model ID, vector dimension and limits remain pending.
+- Model-dependent tools/JSON/extra fields are passed through and reasoning output has platform
+  support, but the exact Qwen/GLM capability combinations still require probes.
+- The organizer does not provide a separate hosted database. Embedding/rerank may be self-hosted,
+  but permission, package size and license limits for bundled weights are still pending.
+- Add has a 1–120 second budget and Search a 1–60 second budget. Rate limits include concurrency
+  and requests-per-minute 429 cases, so later batch execution needs throttling and backoff.
+- The contract fixes formal `top_k=100`; no separate K bonus formula exists. Evaluation accuracy
+  and response time take priority over speculative K tuning.
+- Health is unauthenticated and any 2xx indicates readiness. The final public port/entry command is
+  not published; MemScope will keep the port configurable and use 8000 as its current default.
+- Hardware, memory, disk, architecture and image-size restrictions are currently unspecified.
 - Missing organizer information does not block the no-key scaffold. It does block the affected
   baseline, deployment, or finals freeze described in the main implementation plan.
 - MemOS is fixed to tag `v2.0.32`, commit
@@ -50,7 +56,12 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00, B01, B02 and B03 are `Accepted/Frozen`. B03 provides a
+B00, B01, B02 and B03 are `Accepted/Frozen`. B04 Gate 1 is approved and its three-service
+MemOS/Neo4j/Qdrant Compose implementation is in progress; it is not accepted until clean-room
+Docker build, cold start, restart persistence and fault recovery are executed. The current host
+has no Docker CLI/daemon, so static evidence cannot be promoted to runtime evidence.
+
+B03 provides a
 framework-independent `MemoryGateway`, deterministic in-process Fake, independent Mock Model API
 and `MemoryOperations` composition. The Fake path proves wiring/recovery/isolation without claiming
 semantic quality or real MemOS compatibility.
@@ -59,6 +70,6 @@ B02 provides a framework-independent
 `RawStore` port, SQLite Schema/migrations, canonical persistent idempotency, ordered raw messages,
 stable logical user/Cube identity and a durable pending/completed outbox record.
 
-The default runtime deliberately remains 503: B03 does not install its Fake composition in
-`memscope.main`. Real MemOS/model compatibility, durable proactive recovery, lifecycle semantics,
-production failure policy and infrastructure remain later-batch work.
+The default MemScope runtime deliberately remains 503: B04 does not alter `src/memscope` or install
+its infrastructure behind the contest Adapter. Real MemOS/model compatibility, Add/Search,
+durable proactive recovery and production failure policy remain later-batch work.

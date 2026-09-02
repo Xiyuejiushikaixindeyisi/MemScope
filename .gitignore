@@ -28,6 +28,11 @@ env/
 data/
 logs/
 *.log
+artifacts/
+
+# Private Compose secrets/reports
+deploy/*.env
+!deploy/compose.env.example
 
 # Local upstream source checkouts
 .vendor-src/

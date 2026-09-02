@@ -157,6 +157,11 @@ baseline 冻结后按数据评估：
 | `organizer` | memory-api + memos + qdrant + neo4j | 真实 API/Key 调测与提交候选 |
 | `contingency-raw` | memory-api | API 始终不可用时的应急提交 |
 
+B04 先实现一个更窄的 infra-only Compose：仅 `memos + neo4j + qdrant`，无公开端口、无模型
+服务、无 Add/Search 成功声明。它用于固定源码、数据库启动顺序、Health、internal network 和
+named-volume restart。B05 再加入唯一公开的 `memory-api` 与模型出口；这不会把 B04 的三服务
+拓扑解释为最终提交入口已经完成。
+
 约束：
 
 - 只暴露 `memory-api:8080`；
@@ -475,24 +480,24 @@ CONTEST_API_KEY=
 
 | 已知方向 | 当前事实与影响 |
 |---|---|
-| 主办方 LLM | 提供 `Qwen-V3.6-27B-DX` 和 `GLM-V5.1-DX`，团队可自由使用；Base URL、鉴权、请求/响应 Schema、上下文、限额和错误语义仍需主动确认。 |
-| Embedding / Rerank | 主办方不提供 Embedding 或 Rerank API Key；B04～B06 必须评估固定 MemOS 可支持的本地/自托管能力和可替换边界，不得假设有主办方对应服务。 |
+| 主办方 LLM | Huawei AI Gateway 的绿区/黄区/测试 Base URL、Bearer Key/IAM token 和 OpenAI-compatible Chat/Embeddings/Responses/rerank 路径已知；精确可订阅 model ID 仍须以 `/v1/models`/控制台为准，tools/JSON/透传字段要按具体模型实测。 |
+| Embedding / Rerank | 可自行部署并提供 API；正式密钥是否包含 Embeddings 权限及其 model ID、维度、限流仍待确认。本地开源权重是否可放入 `code/`、包/镜像大小和许可证限制推迟至 B05 构建选择时决策。 |
 | Answer / Judge | 不向团队提供 Answer 模型和 Judge 模型；平台统一 Answer/Judge 的评测边界保持不变，但团队不能用官方模型做本地等价复现。 |
-| timeout / concurrency | 暂不提供正式超时时间；没有并发要求。最终 timeout、worker、连接池和降级参数仍不能冻结。 |
-| Search `top_k` | `top_k` 可以小于 100，K 是加分项；具体加分公式、约束和平台截断方式仍待确认，后续需以质量/长度/延迟消融选择 K。 |
-| 部署 | 主办方希望提供一个可直接部署、启动后即可运行的 Docker；单镜像是否允许内含多进程、是否支持 Compose/外部服务、镜像大小和启动协议仍待确认。 |
-| 大型数据库 | 如确需大型数据库，主办方可以提供接口并协商鉴权；具体数据库类型、协议、容量、时延、持久性和可用时间仍待确认。 |
+| timeout / concurrency | Add 1～120s、Search 1～60s；批量调用存在并发数和每分钟次数两类 429。后续必须限速和指数退避；当前仍无额外比赛并发要求。 |
+| Search `top_k` | 正式评测固定 `top_k=100`、平台按顺序最多读取 100 条；不存在独立 K 加分公式，优先优化评测准确率和响应时间。 |
+| 部署 | 提交 `solution.zip` 源码，由赛题组构建启动；Dockerfile/Compose 可选。B04 采用最易复现的一份三服务 Compose，是否最终强制单镜像/单容器仍是重新评审条件。 |
+| 数据库与生命周期 | 平台不提供托管数据库；存储自带。评测机在同一容器部署生命周期连续执行 Add→Search，不依赖跨重启持久化；挂载路径保持可配置，正式路径发布后再接入。 |
+| Health 与资源 | `/health` 无鉴权且就绪返回任意 2xx；入口端口未公开，暂用可配置 8000。CPU/GPU、内存、磁盘、架构、镜像大小当前无已知限制。 |
 
 以下信息仍会阻塞相应冻结点：
 
 | 待确认信息 | 当前影响与阻塞关系 |
 |---|---|
-| 两个 LLM 的完整 API 文档、Key 和联调环境 | 阻塞真实 LLM capability probe 和 `baseline-v0`，不阻塞使用 Mock 的 scaffold；不得用 Mock 结果替代真实 baseline。 |
+| 两个 LLM 的精确 model ID、上下文/输出上限与最小探测结果 | 阻塞真实 LLM capability probe 和 `baseline-v0`，不阻塞使用 Mock 的 scaffold；不得用平台兼容性声明代替逐模型探测。 |
 | Embedding/Rerank 的最终替代路径 | 主办方不提供对应 Key，必须在固定 MemOS 能力、本地模型、自托管服务或后续数据库接口之间形成经测试的方案。 |
-| 正式硬件、请求/整轮超时和失败策略 | 阻塞最终性能目标、timeout、重试、熔断及降级策略冻结；“无并发要求”允许当前按单 worker/串行正确性优先实现。 |
-| 单 Docker、Compose、构建期/运行期网络和依赖获取限制 | 阻塞最终镜像拓扑、源码/模型/数据库打包和离线构建策略冻结；B04 必须优先验证可收缩到一个直接运行的交付入口。 |
-| `top_k` 加分公式及 Answer 输入上限 | 阻塞最终 K、返回字符/token 预算和排序策略冻结。 |
-| 可选大型数据库接口 | 在决定依赖前必须确认数据库产品、API、鉴权、容量、SLA、评测网络和持久化边界；不能把口头可提供等同于当前可用依赖。 |
+| 正式硬件与失败策略 | 阻塞最终 worker/连接池、资源参数、熔断及降级冻结；已知 120s/60s 是总路径硬预算。 |
+| 构建期依赖访问与模型权重许可 | 阻塞最终离线构建和本地 embedding 打包；B04 只固定 MemOS 源码与数据库镜像，不打包模型。 |
+| Answer 输入上限 | 不阻塞 B04；B06 仍须约束 evidence 字符/token 预算并实测排序质量。 |
 | 决赛交付要求 | 阻塞决赛功能规划与最终扩展范围，不阻塞当前建立清晰、可替换、可测试的基础架构；规则发布后必须重新进行范围和架构评审。 |
 
 上述信息由团队向组委会确认。收到正式答复后，应保存来源和日期，更新当前有效文档；若答复改变公共接口、运行服务、数据库、关键依赖或一致性语义，则触发 Context Manifest 失效并重新评审。

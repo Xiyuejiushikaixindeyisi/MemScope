@@ -1,0 +1,123 @@
+name: memscope-b04
+
+services:
+  neo4j:
+    image: neo4j:5.26.6-community@sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893
+    init: true
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          cypher-shell -u neo4j -p "$${NEO4J_PASSWORD}"
+          "RETURN 1 AS ready;" >/dev/null 2>&1
+      interval: 2s
+      timeout: 5s
+      retries: 45
+      start_period: 15s
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - backend
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.3@sha256:31407c0e8e32eb771b71718f1a4772e2ad47a07557917b21ac96792f40eb8007
+    init: true
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: "6333"
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "bash -c ':> /dev/tcp/127.0.0.1/6333'"
+      interval: 2s
+      timeout: 5s
+      retries: 45
+      start_period: 5s
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - backend
+
+  memos:
+    image: memscope/memos:2.0.32-b04
+    build:
+      context: .
+      dockerfile: docker/memos/Dockerfile
+    init: true
+    restart: unless-stopped
+    depends_on:
+      neo4j:
+        condition: service_healthy
+        restart: true
+      qdrant:
+        condition: service_healthy
+        restart: true
+    environment:
+      FILE_LOCAL_PATH: /var/lib/memos/files
+      MEMOS_BASE_PATH: /var/lib/memos
+      GRAPH_DB_BACKEND: neo4j-community
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+      NEO4J_DB_NAME: neo4j
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: "6333"
+      EMBEDDING_DIMENSION: "${B04_BOOTSTRAP_EMBEDDING_DIMENSION:-16}"
+      MOS_EMBEDDER_BACKEND: universal_api
+      MOS_EMBEDDER_PROVIDER: openai
+      MOS_EMBEDDER_API_BASE: http://127.0.0.1:9/v1
+      MOS_EMBEDDER_API_KEY: EMPTY
+      MOS_EMBEDDER_MODEL: b04-bootstrap-no-call
+      MOS_EMBEDDER_BACKUP_CLIENT: "false"
+      MOS_CHAT_MODEL_PROVIDER: openai
+      MOS_CHAT_MODEL: b04-bootstrap-no-call
+      OPENAI_API_BASE: http://127.0.0.1:9/v1
+      OPENAI_API_KEY: EMPTY
+      MEMRADER_API_BASE: http://127.0.0.1:9/v1
+      MEMRADER_API_KEY: EMPTY
+      MEMRADER_MODEL: b04-bootstrap-no-call
+      MOS_RERANKER_BACKEND: cosine_local
+      MOS_FEEDBACK_RERANKER_BACKEND: cosine_local
+      ENABLE_CHAT_API: "false"
+      ENABLE_INTERNET: "false"
+      ENABLE_ACTIVATION_MEMORY: "false"
+      ENABLE_PREFERENCE_MEMORY: "false"
+      ENABLE_DINGDING_BOT: "false"
+      MOS_ENABLE_SCHEDULER: "false"
+      API_SCHEDULER_ON: "false"
+      MEMSCHEDULER_USE_REDIS_QUEUE: "false"
+      MOS_ENABLE_DEFAULT_CUBE_CONFIG: "true"
+      NACOS_ENABLE_WATCH: "false"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import json, urllib.request;
+          r=urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3);
+          assert r.status == 200 and json.load(r).get('status') == 'healthy'
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
+    volumes:
+      - memos_data:/var/lib/memos
+    networks:
+      - backend
+
+networks:
+  backend:
+    internal: true
+
+volumes:
+  memos_data:
+  neo4j_data:
+  neo4j_logs:
+  qdrant_data:
