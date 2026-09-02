@@ -1,6 +1,6 @@
 # B01 Gate 2 Handoff
 
-> 状态：Code Review，等待用户 Gate 2 验收
+> 状态：Accepted/Frozen，2026-09-02 用户已完成 Gate 2 验收
 > Gate 1 文档提交：`df0d8611079bf3605cd66f920a9fac2e5f223541`
 > 实现提交：`160a46cbbd62dcc9d1aa34bf80f36459541b9d1c`
 > 分支：`batch/b01-api-contract`
@@ -167,7 +167,8 @@ Health 始终无鉴权。Key 使用 `SecretStr` 和 constant-time 比较；`safe
 - 当前 `official/` 仍只是本地规则重建与代理回归集；
 - 主办方 API/Key、硬件/超时/并发、Compose/网络/构建和决赛要求仍未知。
 
-## 12. Gate 2 验收结论请求
+## 12. Gate 2 验收结论
 
-B01 已满足批准的 Definition of Done，现请求用户进行 Gate 2 验收。验收前保持 `Code Review`；
-只有用户明确接受后才更新为 `Accepted/Frozen`。不会自动创建 B02 分支或进入 B02。
+用户于 2026-09-02 明确批准 B01 Gate 2 验收。B01 状态更新为 `Accepted/Frozen`。
+后续 Batch 只允许依赖本 HANDOFF 和 `contest-http-v1.md` 明示的公共接口与不变量。
+本次验收同时授权进入 B02 Gate 1 方案设计，但不授权创建 B02 分支或实施 B02 代码。

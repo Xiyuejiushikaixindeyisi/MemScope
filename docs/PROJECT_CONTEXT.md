@@ -40,10 +40,10 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00 is `Accepted/Frozen`. B01 is implemented and awaiting Gate 2 acceptance. It provides strict
-Health/Add/Search models, optional shared-key authentication, safe HTTP error mapping, bounded HTTP
-logging and a framework-independent `ContestOperations` application port.
+B00 and B01 are `Accepted/Frozen`. B01 provides strict Health/Add/Search models, optional shared-key
+authentication, safe HTTP error mapping, bounded HTTP logging and a framework-independent
+`ContestOperations` application port.
 
 The default B01 runtime deliberately reports 503 because B02/B03 have not supplied persistence or
-memory operations. Successful operation recorders exist only in tests. B02 has not started and
-requires a separate Gate 1 proposal and explicit approval.
+memory operations. Successful operation recorders exist only in tests. B02 is in Gate 1 design and
+must not enter implementation without a separate explicit approval.

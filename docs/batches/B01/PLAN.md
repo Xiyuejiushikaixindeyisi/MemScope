@@ -1,6 +1,6 @@
 # B01 比赛 HTTP 协议代码方案
 
-> 状态：Code Review，2026-09-02 Gate 1 已批准并完成实施
+> 状态：Accepted/Frozen，2026-09-02 Gate 2 已验收
 > Batch：B01
 > 基线提交：`714e5581104cd84a41cbb05d46a12e89ae10cdda`
 > 计划分支：`batch/b01-api-contract`（仅在 Gate 1 明确批准后创建）

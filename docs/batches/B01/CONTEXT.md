@@ -2,10 +2,13 @@
 
 ```yaml
 batch: B01
-status: Code Review
+status: Accepted/Frozen
 approved_at: 2026-09-02
 gate_1_approval: user_explicit
 implementation_commit: 160a46cbbd62dcc9d1aa34bf80f36459541b9d1c
+accepted_at: 2026-09-02
+accepted_head: d9b314dd2eefd020c5b6e4284a8deb9fe0c2e89d
+gate_2_approval: user_explicit
 base_commit: 714e5581104cd84a41cbb05d46a12e89ae10cdda
 planned_branch: batch/b01-api-contract
 depends_on:
