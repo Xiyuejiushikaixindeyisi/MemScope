@@ -2,7 +2,7 @@
 
 ```yaml
 batch: B03
-status: Approved/In Progress
+status: Code Review/Gate 2 Pending
 approved_at: 2026-09-02
 gate_1_approval: user_explicit
 base_commit: a7822047640cac26a46e25663be9b60542f7d47b

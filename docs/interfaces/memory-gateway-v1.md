@@ -1,0 +1,66 @@
+# Memory Gateway Interface v1
+
+> Owner: B03  
+> Scope: internal provider boundary; not an evaluator-facing API
+
+## Purpose
+
+`MemoryGateway` separates MemScope application orchestration from the memory provider. It accepts
+already-validated, provenance-bearing messages and returns evidence; it does not own the contest
+HTTP contract, local durability, final-answer generation, lifecycle policy, retries or fallback.
+The B03 implementation is an in-process Fake. A future real MemOS adapter must satisfy the same
+reusable behavioral contract without leaking MemOS or HTTP types into this interface.
+
+The async port exposes `is_ready()`, idempotent synchronous `add(GatewayAdd)`, isolated
+`search(GatewaySearch)`, and idempotent `close()`.
+
+## Add contract
+
+`GatewayAdd` carries request ID, canonical payload SHA-256, exact user/session/logical-Cube IDs and
+ordered `GatewayMessage` values. Message positions must be contiguous from zero and message IDs
+must be unique. A successful return means the write is immediately visible to Search.
+
+Replaying an identical request is a no-op. Reusing a request or message identity for inconsistent
+data fails closed with `gateway.request_conflict`. The Gateway owns any provider-side ensure/create
+needed for the supplied user/Cube pair; v1 deliberately has no public `create_cube` operation.
+
+## Search contract
+
+Search receives exact query, user, logical Cube, `top_k` and optional answer options. It returns at
+most `top_k` ranked evidence items with exact content and mandatory user/Cube provenance. It does
+not select an option, generate an answer, filter by session or consult gold data.
+
+The application recomputes the expected logical Cube and drops evidence with foreign provenance.
+Ranking algorithm and score calibration are implementation-specific. Consequently, the shared
+contract tests isolation, ordering, visibility and bounds—not semantic retrieval quality.
+
+## Safe errors
+
+| Code | Retryable | Meaning |
+|---|---:|---|
+| `gateway.rate_limited` | yes | Provider rejected capacity |
+| `gateway.unavailable` | yes | Closed, disconnected or transient provider failure |
+| `gateway.timeout` | yes | Caller-defined upstream deadline expired |
+| `gateway.protocol_invalid` | no | Provider wire/business response is invalid |
+| `gateway.request_conflict` | no | Stable request/message identity was reused inconsistently |
+
+Errors do not carry URLs, provider bodies, IDs, content, queries or underlying exception text.
+B03 itself adds no timeout, retry, fallback, circuit breaker or background recovery policy.
+
+## Fake behavior and limits
+
+`FakeMemoryGateway` is asyncio-safe, process-local and non-durable. Its named
+`fake-token-overlap-v1` search uses Unicode casefolded `\w+` tokens, scores query-token coverage,
+then sorts by descending score and ingestion order. It accepts options without selecting one.
+Optional fault injection raises typed Gateway errors by operation.
+
+The Fake proves orchestration, idempotency, isolation and failure wiring only. It is not a MemOS
+emulator, baseline candidate, persistence proof, lifecycle implementation or LoCoMo/MemOps quality
+signal. A completed Raw request plus a newly-created empty Fake is intentionally not recoverable.
+
+## Evolution
+
+Provider IDs and implementation-specific transport DTOs remain behind the port. Any change to
+immediate visibility, provenance, idempotency, synchronous success or user/Cube isolation requires
+architecture review and a contract version decision.
+

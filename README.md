@@ -1,9 +1,9 @@
 # MemScope
 
 MemScope is an independently deployable long-term memory service for the Agent Memory
-competition. B01 provides the contest HTTP contract and a framework-independent application port.
-B02 adds the internal transactional Raw Store, stable identity and migration foundation. Memory
-Gateway and application orchestration remain deferred to later batches.
+competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
+provider-independent Memory Gateway, application orchestration, deterministic in-process Fake and
+independent no-key Mock Model API. Real MemOS integration remains deferred.
 
 ## Development environment
 
@@ -51,10 +51,10 @@ The adapter registers:
 - `POST /add`
 - `POST /search`
 
-The default composition does not install a complete `ContestOperations` implementation. It
+The default composition still does not install a complete `ContestOperations` implementation. It
 therefore returns 503 from all three valid contest calls instead of claiming false readiness,
-persistence, or retrieval. B02's Raw Store is an internal component; B03 and later batches assemble
-the complete path through the app factory.
+persistence, or retrieval. B03 tests assemble Raw Store + Fake Gateway only through explicit app
+factory injection; the Fake is never a default or submission candidate.
 
 Health is always unauthenticated. Add and Search authentication defaults to `none`. To enable one
 shared key through any one of Bearer, Token, or X-Api-Key:
@@ -87,10 +87,27 @@ idempotent locally, but B02 does not call MemOS or expose a successful HTTP Add 
 The stable internal contract and consistency limits are documented in
 `docs/interfaces/raw-store-v1.md`.
 
+## B03 no-key substitutes
+
+`FakeMemoryGateway` provides a non-durable deterministic implementation of the internal
+`MemoryGateway` contract. `MemoryOperations` composes it with a `RawStore` for tests. This path
+proves synchronous visibility, replay, recovery and isolation; its token-overlap ranking is not a
+quality result.
+
+The independent Mock Model API can be started for protocol tests:
+
+```bash
+uv run uvicorn memscope.mock_model_api.main:app --host 127.0.0.1 --port 18080 --workers 1
+```
+
+It exposes health plus a small non-streaming Chat/Embedding subset, requires no key, and must not be
+enabled in an organizer profile. See `docs/interfaces/memory-gateway-v1.md` and
+`docs/interfaces/mock-model-api-v1.md` for exact contracts and non-compatibility boundaries.
+
 ## Current boundaries
 
-B02 provides SQLite persistence, local idempotency, ordered raw messages, user/Cube mapping and a
-pending/completed outbox record. It does not implement MemOS, Qdrant, Neo4j, model calls, retrieval,
-outbox workers, retries, fallback or final-answer generation. See `docs/interfaces/contest-http-v1.md`,
+B03 adds a complete explicit Fake test path and isolated model HTTP Mock. It does not implement real
+MemOS, Qdrant, Neo4j, semantic retrieval, model quality, lifecycle behavior, outbox workers,
+production retries/fallback or final-answer generation. See `docs/interfaces/contest-http-v1.md`,
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.

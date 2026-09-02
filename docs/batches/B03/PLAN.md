@@ -1,6 +1,6 @@
 # B03 无 Key 双层替身代码方案
 
-> 状态：Approved / In Progress，2026-09-02 Gate 1 已批准
+> 状态：Code Review / Gate 2 Pending，2026-09-02 Gate 1 已批准
 > Batch：B03
 > 基线提交：`a7822047640cac26a46e25663be9b60542f7d47b`
 > 实施分支：`batch/b03-no-key-doubles`
@@ -384,7 +384,8 @@ Mock app factory 参数：
 新增日志 allowlist：
 
 - `component_operation`：readiness/add/search/close；
-- `component_result`：success/new/pending/completed/conflict/unavailable/filtered；
+- `component_result`：success/new/pending/completed/conflict/unavailable/filtered/failed；
+- `component_duration_ms`；
 - `gateway_duration_ms`；
 - `model_endpoint`：health/chat/embeddings；
 - `model_result`：success/rate_limited/upstream_error/timeout/invalid_json/dimension_mismatch；

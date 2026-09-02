@@ -19,10 +19,15 @@
 | `src/memscope/raw_store/protocol.py` | Async persistence port for future orchestration | AddCommand, Raw Store models |
 | `src/memscope/raw_store/migrations.py` | Forward-only SQLite Schema and checksum ledger | Python sqlite3 |
 | `src/memscope/raw_store/sqlite.py` | Short-connection SQLite transactions, replay classification and recovery reads | Raw Store modules, AddCommand, sqlite3/asyncio |
+| `src/memscope/memory_gateway/models.py` | Strict provider-independent Add/Search/evidence provenance values | Python standard library |
+| `src/memscope/memory_gateway/protocol.py` | Replaceable async memory-provider port | Gateway models |
+| `src/memscope/memory_gateway/fake.py` | Non-durable deterministic Gateway contract Fake and typed fault injection | Gateway contract, asyncio |
+| `src/memscope/application/memory_operations.py` | NEW/PENDING/COMPLETED orchestration, conflict translation and Search isolation | Contest operations, RawStore and MemoryGateway ports |
+| `src/memscope/mock_model_api/` | Independent deterministic Chat/Embedding HTTP subset | FastAPI/Pydantic and standard library |
 | `tests/unit/` | Settings, errors, logging, HTTP models, identity and persistence value behavior | Public module surfaces |
 | `tests/component/` | SQLite migration, persistence, restart, concurrency, cancellation and fault behavior | Public RawStore interface and temporary databases |
-| `tests/contract/` | End-to-end ASGI contract, auth, failure and cancellation behavior | App factory plus tests-only operation recorder |
-| `tests/smoke/` | In-process ASGI and real Uvicorn startup/readiness checks | Installed project and locked test dependencies |
+| `tests/contract/` | Contest HTTP, reusable Gateway, explicit Fake path and Mock Model contracts | Public ports and app factories |
+| `tests/smoke/` | Default/Fake ASGI paths and real default/Mock Uvicorn processes | Installed project and locked test dependencies |
 
 ## Dependency direction
 
@@ -34,22 +39,24 @@ main → app ─┬→ api.routes → api.models
             ├→ settings → errors
             └→ logging_config → settings
 
-future orchestration → raw_store.protocol
-                            ↑
-                    raw_store.sqlite
-                      ├→ migrations
-                      ├→ identity → operations.AddCommand
-                      └→ models / errors
+api.routes → ContestOperations ← application.MemoryOperations
+                                      ├→ raw_store.protocol ← raw_store.sqlite
+                                      │                         ├→ migrations
+                                      │                         ├→ identity
+                                      │                         └→ models / errors
+                                      └→ memory_gateway.protocol ← memory_gateway.fake
+
+mock_model_api.main → mock_model_api.app → mock_model_api.models / deterministic
 ```
 
-Settings, errors and operations remain framework-independent. API modules may depend on FastAPI or
-Pydantic. Raw Store models/protocol/migrations are framework-independent, and SQLite is confined to
-one implementation. Runtime still defaults to `UnavailableContestOperations`; B02 deliberately does
-not connect component readiness to HTTP readiness.
+Settings, errors, operations, Gateway and Raw Store contracts remain framework-independent. API and
+Mock Model modules may depend on FastAPI/Pydantic. SQLite and Fake details are confined to their
+implementations. Runtime still defaults to `UnavailableContestOperations`; only tests explicitly
+inject the B03 Fake path.
 
 ## Deferred ownership
 
-- B03: Fake MemOS Gateway and Mock Model API substitutes sharing approved application contracts.
-- B04+: infrastructure and real MemOS integration.
+- B04: runtime service topology and lifecycle.
+- B05+: pinned MemOS mapping and real integration.
 
 This file records navigation and dependency direction, not implementation copies.

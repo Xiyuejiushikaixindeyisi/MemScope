@@ -32,8 +32,9 @@ Only an awaited, successful application operation permits this exact response sh
 }
 ```
 
-B01 transfers `request_id`; persistent idempotency and immediate retrieval are implemented and
-verified by later batches.
+B03's explicit Fake composition implements persistent request idempotency and immediate retrieval.
+An exact completed replay returns the stored success without a Gateway call. Reusing a request ID
+with different canonical input returns 409 `request.conflict` without mutating prior state.
 
 ## Search
 
@@ -68,7 +69,7 @@ Errors use standard HTTP status codes and a sanitized envelope:
 ```
 
 Stable mappings are 401 `auth.invalid`, 404 `http.not_found`, 405
-`http.method_not_allowed`, 422 `request.invalid`, 503 `service.unavailable`, and 500
+`http.method_not_allowed`, 409 `request.conflict`, 422 `request.invalid`, 503 `service.unavailable`, and 500
 `internal.error` for unknown failures. Known internal errors retain only their declared safe
 code/message/retryable fields. Raw validation details, bodies, credentials, queries, content, IDs,
 and exception values are never returned or logged.

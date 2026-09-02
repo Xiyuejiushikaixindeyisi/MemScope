@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B02 implementation commit
-> `fede40d03bd4f7a21c87499a498b15a9a8581412`; see the active B02 Gate 2 handoff for verification data.
+> Current through B03 implementation on `batch/b03-no-key-doubles`; Gate 2 verification is recorded
+> in the active B03 handoff.
 
 ## Objective
 
@@ -40,10 +40,15 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00, B01 and B02 are `Accepted/Frozen`. B02 provides a framework-independent
+B00, B01 and B02 are `Accepted/Frozen`. B03 Gate 1 is approved and its implementation provides a
+framework-independent `MemoryGateway`, deterministic in-process Fake, independent Mock Model API
+and `MemoryOperations` composition. The Fake path proves wiring/recovery/isolation without claiming
+semantic quality or real MemOS compatibility.
+
+B02 provides a framework-independent
 `RawStore` port, SQLite Schema/migrations, canonical persistent idempotency, ordered raw messages,
 stable logical user/Cube identity and a durable pending/completed outbox record.
 
-The default runtime deliberately remains 503 because B02 does not implement Search or assemble a
-complete `ContestOperations`. Raw Store component success is not HTTP service readiness. B03 Gate 1
-may design a no-key Fake path; implementation requires separate explicit approval.
+The default runtime deliberately remains 503: B03 does not install its Fake composition in
+`memscope.main`. Real MemOS/model compatibility, durable proactive recovery, lifecycle semantics,
+production failure policy and infrastructure remain later-batch work.
