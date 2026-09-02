@@ -22,6 +22,10 @@ class JsonFormatter(logging.Formatter):
         "http_path",
         "status_code",
         "total_duration_ms",
+        "storage_operation",
+        "storage_result",
+        "schema_version",
+        "raw_store_duration_ms",
     )
 
     def format(self, record: logging.LogRecord) -> str:

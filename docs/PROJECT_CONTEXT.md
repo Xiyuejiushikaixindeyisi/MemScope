@@ -1,7 +1,6 @@
 # MemScope Project Context
 
-> Current through B01 implementation commit
-> `160a46cbbd62dcc9d1aa34bf80f36459541b9d1c`; see the B01 Gate 2 handoff for verification data.
+> Current through B02 implementation; see the active B02 Gate 2 handoff for exact verification data.
 
 ## Objective
 
@@ -40,10 +39,10 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00 and B01 are `Accepted/Frozen`. B01 provides strict Health/Add/Search models, optional shared-key
-authentication, safe HTTP error mapping, bounded HTTP logging and a framework-independent
-`ContestOperations` application port.
+B00 and B01 are `Accepted/Frozen`. B02 is in `Code Review` and provides a framework-independent
+`RawStore` port, SQLite Schema/migrations, canonical persistent idempotency, ordered raw messages,
+stable logical user/Cube identity and a durable pending/completed outbox record.
 
-The default B01 runtime deliberately reports 503 because B02/B03 have not supplied persistence or
-memory operations. Successful operation recorders exist only in tests. B02 is in Gate 1 design and
-must not enter implementation without a separate explicit approval.
+The default runtime deliberately remains 503 because B02 does not implement Search or assemble a
+complete `ContestOperations`. Raw Store component success is not HTTP service readiness. B03 may
+assemble a no-key Fake path; no later Batch is authorized by the B02 approval.

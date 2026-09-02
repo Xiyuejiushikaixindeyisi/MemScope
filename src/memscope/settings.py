@@ -1,6 +1,7 @@
 """Central, typed application settings."""
 
 from enum import StrEnum
+from pathlib import Path
 from typing import Any, Self
 
 from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
@@ -48,6 +49,8 @@ class AppSettings(BaseSettings):
     log_format: LogFormat = LogFormat.JSON
     contest_auth_mode: ContestAuthMode = ContestAuthMode.NONE
     contest_api_key: SecretStr | None = None
+    database_path: Path = Path("data/memory.db")
+    sqlite_busy_timeout_ms: int = Field(default=5000, ge=100, le=60_000)
 
     @field_validator("host")
     @classmethod
@@ -78,6 +81,21 @@ class AppSettings(BaseSettings):
                 raise ValueError("contest API key must not have surrounding whitespace")
         return value
 
+    @field_validator("database_path", mode="before")
+    @classmethod
+    def validate_database_path(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            normalized = value.strip()
+            if not normalized or normalized == ":memory:" or normalized.startswith("file:"):
+                raise ValueError("database path must be a file path")
+            return normalized
+        if isinstance(value, Path):
+            rendered = str(value)
+            if rendered in {"", ".", ":memory:"} or rendered.startswith("file:"):
+                raise ValueError("database path must be a file path")
+            return value
+        raise ValueError("database path must be a string or Path")
+
     @model_validator(mode="after")
     def validate_auth_configuration(self) -> Self:
         if self.contest_auth_mode is ContestAuthMode.NONE and self.contest_api_key is not None:
@@ -97,6 +115,8 @@ class AppSettings(BaseSettings):
             "log_format": self.log_format.value,
             "contest_auth_mode": self.contest_auth_mode.value,
             "contest_api_key_configured": self.contest_api_key is not None,
+            "database_path_kind": "absolute" if self.database_path.is_absolute() else "relative",
+            "sqlite_busy_timeout_ms": self.sqlite_busy_timeout_ms,
         }
 
 

@@ -2,7 +2,8 @@
 
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract and a framework-independent application port.
-Raw storage and memory backends are intentionally deferred to later batches.
+B02 adds the internal transactional Raw Store, stable identity and migration foundation. Memory
+Gateway and application orchestration remain deferred to later batches.
 
 ## Development environment
 
@@ -50,9 +51,10 @@ The adapter registers:
 - `POST /add`
 - `POST /search`
 
-The default B01 composition has no Raw Store or memory implementation. It therefore returns 503
-from all three valid contest calls instead of claiming false readiness, persistence, or retrieval.
-Later batches inject a `ContestOperations` implementation through the app factory.
+The default composition does not install a complete `ContestOperations` implementation. It
+therefore returns 503 from all three valid contest calls instead of claiming false readiness,
+persistence, or retrieval. B02's Raw Store is an internal component; B03 and later batches assemble
+the complete path through the app factory.
 
 Health is always unauthenticated. Add and Search authentication defaults to `none`. To enable one
 shared key through any one of Bearer, Token, or X-Api-Key:
@@ -64,9 +66,31 @@ CONTEST_API_KEY=<secret supplied outside source control>
 
 Never commit the key or place it in logs or command examples.
 
+## Raw Store component
+
+The B02 SQLite component can be opened explicitly by later orchestration or component tests:
+
+```python
+from memscope.raw_store import SqliteRawStore
+
+store = await SqliteRawStore.open(
+    settings.database_path,
+    busy_timeout_ms=settings.sqlite_busy_timeout_ms,
+)
+```
+
+Defaults are `DATABASE_PATH=data/memory.db` and `SQLITE_BUSY_TIMEOUT_MS=5000`. The local `data/`
+directory and SQLite WAL/SHM artifacts are ignored. Every operation uses a private short-lived
+connection with WAL, FULL synchronous mode and foreign keys. `prepare_add` is durable and
+idempotent locally, but B02 does not call MemOS or expose a successful HTTP Add path.
+
+The stable internal contract and consistency limits are documented in
+`docs/interfaces/raw-store-v1.md`.
+
 ## Current boundaries
 
-B01 performs no database, MemOS, Qdrant, Neo4j, model, or external network calls. It does not
-implement persistent idempotency, user isolation, retries, fallback, or final-answer generation.
-See `docs/interfaces/contest-http-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and
-`docs/batches/B01/PLAN.md` for the current contract and approved scope.
+B02 provides SQLite persistence, local idempotency, ordered raw messages, user/Cube mapping and a
+pending/completed outbox record. It does not implement MemOS, Qdrant, Neo4j, model calls, retrieval,
+outbox workers, retries, fallback or final-answer generation. See `docs/interfaces/contest-http-v1.md`,
+`docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
+documents for the current contracts and scope.

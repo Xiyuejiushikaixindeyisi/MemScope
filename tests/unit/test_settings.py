@@ -1,5 +1,6 @@
 """Tests for centralized application settings."""
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -20,6 +21,8 @@ def test_settings_defaults_are_safe_for_core_profile() -> None:
     assert settings.log_format is LogFormat.JSON
     assert settings.contest_auth_mode is ContestAuthMode.NONE
     assert settings.contest_api_key is None
+    assert settings.database_path == Path("data/memory.db")
+    assert settings.sqlite_busy_timeout_ms == 5000
 
 
 def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -28,6 +31,8 @@ def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setenv("PORT", "9000")
     monkeypatch.setenv("LOG_LEVEL", " debug ")
     monkeypatch.setenv("LOG_FORMAT", "console")
+    monkeypatch.setenv("DATABASE_PATH", "/var/local/memscope-test.db")
+    monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_MS", "1200")
 
     settings = load_settings()
 
@@ -35,6 +40,8 @@ def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch
     assert settings.port == 9000
     assert settings.log_level == "DEBUG"
     assert settings.log_format is LogFormat.CONSOLE
+    assert settings.database_path == Path("/var/local/memscope-test.db")
+    assert settings.sqlite_busy_timeout_ms == 1200
 
 
 @pytest.mark.parametrize(
@@ -47,6 +54,14 @@ def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch
         ("log_level", 10),
         ("app_profile", "mock"),
         ("log_format", "xml"),
+        ("database_path", ""),
+        ("database_path", "   "),
+        ("database_path", ":memory:"),
+        ("database_path", "file:memory.db"),
+        ("database_path", Path(".")),
+        ("database_path", 123),
+        ("sqlite_busy_timeout_ms", 99),
+        ("sqlite_busy_timeout_ms", 60001),
     ],
 )
 def test_settings_reject_invalid_values(field: str, value: Any) -> None:
@@ -110,4 +125,16 @@ def test_safe_summary_is_an_explicit_non_secret_allowlist() -> None:
         "log_format": "json",
         "contest_auth_mode": "none",
         "contest_api_key_configured": False,
+        "database_path_kind": "relative",
+        "sqlite_busy_timeout_ms": 5000,
     }
+
+
+def test_safe_summary_reports_only_database_path_kind() -> None:
+    secret_path = Path("/var/local/private-user/database.db")
+    settings = make_settings(database_path=secret_path)
+
+    summary = settings.safe_summary()
+
+    assert summary["database_path_kind"] == "absolute"
+    assert str(secret_path) not in repr(summary)

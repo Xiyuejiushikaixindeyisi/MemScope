@@ -116,3 +116,33 @@ def test_http_logging_allows_only_bounded_metadata(
     assert "content" not in payload
     assert "must-not-appear" not in payload.values()
     assert "private-message" not in payload.values()
+
+
+def test_raw_store_logging_allows_only_bounded_metadata(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    configure_logging(_json_settings())
+    logger = logging.getLogger(LOGGER_NAME)
+
+    logger.info(
+        "raw_store_operation_completed",
+        extra={
+            "storage_operation": "prepare_add",
+            "storage_result": "new",
+            "schema_version": 1,
+            "raw_store_duration_ms": 2.5,
+            "database_path": "/private/database.db",
+            "payload_sha256": "must-not-appear",
+            "request_id": "also-private",
+        },
+    )
+
+    payload = json.loads(capsys.readouterr().err)
+    assert payload["storage_operation"] == "prepare_add"
+    assert payload["storage_result"] == "new"
+    assert payload["schema_version"] == 1
+    assert payload["raw_store_duration_ms"] == 2.5
+    assert "database_path" not in payload
+    assert "payload_sha256" not in payload
+    assert "request_id" not in payload
+    assert "must-not-appear" not in payload.values()
