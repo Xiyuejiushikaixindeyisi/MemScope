@@ -1,6 +1,7 @@
 # MemScope Project Context
 
-> Current through B02 implementation; see the active B02 Gate 2 handoff for exact verification data.
+> Current through B02 implementation commit
+> `fede40d03bd4f7a21c87499a498b15a9a8581412`; see the active B02 Gate 2 handoff for verification data.
 
 ## Objective
 
