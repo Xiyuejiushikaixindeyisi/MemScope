@@ -2,7 +2,10 @@
 
 ```yaml
 batch: B00
-status: Code Review
+status: Accepted/Frozen
+accepted_at: 2026-09-02
+accepted_head: 331dbea7f781ab3be7e400a10b71272436480564
+gate_2_approval: user_explicit
 base_commit: 4a57925aaee6559fe9c48d174357861c8a8a10d4
 working_tree_context:
   - path: MEMOS_BASELINE_IMPLEMENTATION_PLAN.md

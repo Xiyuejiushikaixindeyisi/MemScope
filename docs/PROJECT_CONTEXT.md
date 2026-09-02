@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B00 implementation commit
-> `ff2484b7732671c3c96f35ad3dd25b4da108618c`; see the B00 Gate 2 handoff for verification data.
+> Current through B00 Gate 2 acceptance on 2026-09-02. Implementation commit:
+> `ff2484b7732671c3c96f35ad3dd25b4da108618c`; see the B00 handoff for verification data.
 
 ## Objective
 
@@ -38,8 +38,9 @@ memory evidence through Search. The organizer owns final answer generation and j
 - Optimize accuracy, robustness, latency, resources, explainability and reproducibility together.
 - Never hardcode reconstructed questions, gold answers, question IDs or proxy-Judge behavior.
 
-## Current Batch
+## Batch Status
 
-B00 provides only the engineering foundation: locked Python tooling, Settings, logging, internal
-errors, a route-free ASGI shell, quality gates and project context documents. B01 owns the contest
-HTTP contract. No later Batch starts without its own Gate 1 approval.
+B00 is `Accepted/Frozen` and provides only the engineering foundation: locked Python tooling,
+Settings, logging, internal errors, a route-free ASGI shell, quality gates and project context
+documents. B01 owns the contest HTTP contract, has not started, and requires a separate Gate 1
+proposal and explicit approval. No later Batch starts without its own Gate 1 approval.

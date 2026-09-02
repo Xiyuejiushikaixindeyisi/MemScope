@@ -1,6 +1,6 @@
 # B00 Gate 2 Handoff
 
-> 状态：Code Review，等待用户 Gate 2 验收
+> 状态：Accepted/Frozen，2026-09-02 用户已完成 Gate 2 验收
 > Gate 1 文档提交：`099e659447680eac973bc8efc20e05ece9f4078d`
 > 实现提交：`ff2484b7732671c3c96f35ad3dd25b4da108618c`
 > 分支：`batch/b00-engineering-foundation`
@@ -155,7 +155,8 @@ Smoke 通过。这不是应用故障。
 - 当前只有 `core` profile；其它 profile 在对应 Batch 前 fail fast；
 - JSON 日志仅允许 B00 固定字段，request/user/cube 关联字段需后续评审加入。
 
-## 11. Gate 2 验收结论请求
+## 11. Gate 2 验收结论
 
-B00 已满足 Gate 1 Definition of Done，现请求用户进行 Gate 2 验收。验收前状态保持
-`Code Review`；只有用户明确接受后才更新为 `Accepted/Frozen`。不会自动进入 B01。
+用户于 2026-09-02 明确批准 B00 Gate 2 验收。B00 状态更新为 `Accepted/Frozen`。
+后续 Batch 只允许依赖本 HANDOFF 明示的公共接口和不变量，不得依赖内部实现细节。
+本次验收不授权进入 B01；B01 必须另行提交 Gate 1 代码方案并获得明确批准。
