@@ -5,6 +5,7 @@ import json
 import pytest
 
 from memscope.app import create_app
+from memscope.operations import UnavailableContestOperations
 from tests.support import make_settings
 
 
@@ -34,3 +35,5 @@ def test_create_app_instances_do_not_share_state() -> None:
     assert first is not second
     assert first.state.settings.port == 9011
     assert second.state.settings.port == 9012
+    assert isinstance(first.state.operations, UnavailableContestOperations)
+    assert first.state.operations is not second.state.operations

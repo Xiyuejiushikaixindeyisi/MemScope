@@ -1,5 +1,6 @@
 """No-key ASGI and process startup smoke tests."""
 
+import json
 import os
 import signal
 import socket
@@ -17,19 +18,31 @@ from tests.support import make_settings
 
 
 @pytest.mark.asyncio
-async def test_asgi_shell_responds_without_contest_routes() -> None:
+async def test_asgi_app_registers_contest_routes_without_false_success() -> None:
     application = create_app(make_settings())
     transport = httpx.ASGITransport(app=application)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         openapi = await client.get("/openapi.json")
         contest_responses = [
             await client.get("/health"),
-            await client.post("/add", json={}),
-            await client.post("/search", json={}),
+            await client.post(
+                "/add",
+                json={
+                    "request_id": "smoke:r",
+                    "user_id": "smoke:u",
+                    "session_id": "smoke:s",
+                    "messages": [{"role": "user", "content": "fact"}],
+                },
+            ),
+            await client.post(
+                "/search",
+                json={"query": "fact?", "user_id": "smoke:u", "top_k": 100},
+            ),
         ]
 
     assert openapi.status_code == 200
-    assert all(response.status_code == 404 for response in contest_responses)
+    assert {"/health", "/add", "/search"} <= set(openapi.json()["paths"])
+    assert all(response.status_code == 503 for response in contest_responses)
 
 
 def _unused_local_port() -> int:
@@ -76,6 +89,13 @@ def test_uvicorn_starts_and_stops_without_external_services() -> None:
             except (urllib.error.URLError, TimeoutError):
                 time.sleep(0.05)
         assert ready, process.communicate(timeout=1)
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/openapi.json", timeout=1) as response:
+            paths = json.loads(response.read())["paths"]
+        assert {"/health", "/add", "/search"} <= set(paths)
+        with pytest.raises(urllib.error.HTTPError) as unavailable:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1)
+        assert unavailable.value.code == 503
+        assert json.loads(unavailable.value.read())["error"]["code"] == "service.unavailable"
     finally:
         if process.poll() is None:
             process.terminate()

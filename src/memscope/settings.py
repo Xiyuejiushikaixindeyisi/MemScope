@@ -1,9 +1,9 @@
 """Central, typed application settings."""
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Self
 
-from pydantic import Field, ValidationError, field_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from memscope.errors import ConfigurationError
@@ -22,8 +22,15 @@ class LogFormat(StrEnum):
     CONSOLE = "console"
 
 
+class ContestAuthMode(StrEnum):
+    """Contest endpoint authentication modes."""
+
+    NONE = "none"
+    SHARED_KEY = "shared_key"
+
+
 class AppSettings(BaseSettings):
-    """Validated settings for the B00 application shell."""
+    """Validated settings for the MemScope application."""
 
     model_config = SettingsConfigDict(
         case_sensitive=False,
@@ -39,6 +46,8 @@ class AppSettings(BaseSettings):
     port: int = Field(default=8080, ge=1, le=65535)
     log_level: str = "INFO"
     log_format: LogFormat = LogFormat.JSON
+    contest_auth_mode: ContestAuthMode = ContestAuthMode.NONE
+    contest_api_key: SecretStr | None = None
 
     @field_validator("host")
     @classmethod
@@ -59,7 +68,25 @@ class AppSettings(BaseSettings):
             raise ValueError("unsupported log level")
         return normalized
 
-    def safe_summary(self) -> dict[str, str | int]:
+    @field_validator("contest_api_key", mode="before")
+    @classmethod
+    def validate_contest_api_key(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            if not value.strip():
+                return None
+            if value != value.strip():
+                raise ValueError("contest API key must not have surrounding whitespace")
+        return value
+
+    @model_validator(mode="after")
+    def validate_auth_configuration(self) -> Self:
+        if self.contest_auth_mode is ContestAuthMode.NONE and self.contest_api_key is not None:
+            raise ValueError("contest API key requires shared_key auth mode")
+        if self.contest_auth_mode is ContestAuthMode.SHARED_KEY and self.contest_api_key is None:
+            raise ValueError("shared_key auth mode requires a contest API key")
+        return self
+
+    def safe_summary(self) -> dict[str, str | int | bool]:
         """Return an explicit allowlist of non-secret settings for diagnostics."""
 
         return {
@@ -68,6 +95,8 @@ class AppSettings(BaseSettings):
             "port": self.port,
             "log_level": self.log_level,
             "log_format": self.log_format.value,
+            "contest_auth_mode": self.contest_auth_mode.value,
+            "contest_api_key_configured": self.contest_api_key is not None,
         }
 
 

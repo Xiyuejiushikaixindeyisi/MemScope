@@ -15,7 +15,14 @@ _MANAGED_HANDLER_MARKER = "_memscope_managed_handler"
 class JsonFormatter(logging.Formatter):
     """Render a deliberately small allowlist of structured fields."""
 
-    _OPTIONAL_FIELDS: ClassVar[tuple[str, ...]] = ("error_code", "retryable")
+    _OPTIONAL_FIELDS: ClassVar[tuple[str, ...]] = (
+        "error_code",
+        "retryable",
+        "http_method",
+        "http_path",
+        "status_code",
+        "total_duration_ms",
+    )
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {

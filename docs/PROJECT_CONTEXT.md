@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B00 Gate 2 acceptance on 2026-09-02. Implementation commit:
-> `ff2484b7732671c3c96f35ad3dd25b4da108618c`; see the B00 handoff for verification data.
+> Current through B01 implementation on 2026-09-02; see the B01 Gate 2 handoff for verification
+> data and the accepted B00 handoff for the frozen engineering foundation.
 
 ## Objective
 
@@ -40,7 +40,10 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00 is `Accepted/Frozen` and provides only the engineering foundation: locked Python tooling,
-Settings, logging, internal errors, a route-free ASGI shell, quality gates and project context
-documents. B01 owns the contest HTTP contract, has not started, and requires a separate Gate 1
-proposal and explicit approval. No later Batch starts without its own Gate 1 approval.
+B00 is `Accepted/Frozen`. B01 is implemented and awaiting Gate 2 acceptance. It provides strict
+Health/Add/Search models, optional shared-key authentication, safe HTTP error mapping, bounded HTTP
+logging and a framework-independent `ContestOperations` application port.
+
+The default B01 runtime deliberately reports 503 because B02/B03 have not supplied persistence or
+memory operations. Successful operation recorders exist only in tests. B02 has not started and
+requires a separate Gate 1 proposal and explicit approval.

@@ -6,11 +6,11 @@ import pytest
 from pydantic import ValidationError
 
 from memscope.errors import ConfigurationError
-from memscope.settings import AppProfile, LogFormat, load_settings
+from memscope.settings import AppProfile, ContestAuthMode, LogFormat, load_settings
 from tests.support import make_settings
 
 
-def test_settings_defaults_are_safe_for_b00() -> None:
+def test_settings_defaults_are_safe_for_core_profile() -> None:
     settings = make_settings()
 
     assert settings.app_profile is AppProfile.CORE
@@ -18,6 +18,8 @@ def test_settings_defaults_are_safe_for_b00() -> None:
     assert settings.port == 8080
     assert settings.log_level == "INFO"
     assert settings.log_format is LogFormat.JSON
+    assert settings.contest_auth_mode is ContestAuthMode.NONE
+    assert settings.contest_api_key is None
 
 
 def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -63,6 +65,40 @@ def test_load_settings_redacts_invalid_input(monkeypatch: pytest.MonkeyPatch) ->
     assert sensitive_invalid_value not in str(captured.value)
 
 
+def test_shared_key_auth_configuration_is_valid_and_secret() -> None:
+    settings = make_settings(contest_auth_mode="shared_key", contest_api_key="private-key")
+
+    assert settings.contest_auth_mode is ContestAuthMode.SHARED_KEY
+    assert settings.contest_api_key is not None
+    assert settings.contest_api_key.get_secret_value() == "private-key"
+    assert "private-key" not in repr(settings)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"contest_auth_mode": "shared_key"},
+        {"contest_auth_mode": "none", "contest_api_key": "unexpected"},
+        {"contest_auth_mode": "shared_key", "contest_api_key": ""},
+        {"contest_auth_mode": "shared_key", "contest_api_key": " padded "},
+    ],
+)
+def test_settings_reject_invalid_auth_combinations(overrides: dict[str, object]) -> None:
+    with pytest.raises(ValidationError):
+        make_settings(**overrides)
+
+
+def test_load_settings_redacts_invalid_auth_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    secret = "unexpected-secret"
+    monkeypatch.setenv("CONTEST_AUTH_MODE", "none")
+    monkeypatch.setenv("CONTEST_API_KEY", secret)
+
+    with pytest.raises(ConfigurationError) as captured:
+        load_settings()
+
+    assert secret not in str(captured.value)
+
+
 def test_safe_summary_is_an_explicit_non_secret_allowlist() -> None:
     settings = make_settings(host="localhost", port=8123)
 
@@ -72,4 +108,6 @@ def test_safe_summary_is_an_explicit_non_secret_allowlist() -> None:
         "port": 8123,
         "log_level": "INFO",
         "log_format": "json",
+        "contest_auth_mode": "none",
+        "contest_api_key_configured": False,
     }

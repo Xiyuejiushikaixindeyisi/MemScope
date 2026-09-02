@@ -87,3 +87,32 @@ def test_json_logging_records_exception_type_without_exception_value(
     payload = json.loads(capsys.readouterr().err)
     assert payload["exception_type"] == "ValueError"
     assert "must-not-be-logged" not in payload.values()
+
+
+def test_http_logging_allows_only_bounded_metadata(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    configure_logging(_json_settings())
+    logger = logging.getLogger(LOGGER_NAME)
+
+    logger.info(
+        "http_request_completed",
+        extra={
+            "http_method": "POST",
+            "http_path": "/add",
+            "status_code": 200,
+            "total_duration_ms": 1.25,
+            "request_id": "must-not-appear",
+            "content": "private-message",
+        },
+    )
+
+    payload = json.loads(capsys.readouterr().err)
+    assert payload["http_method"] == "POST"
+    assert payload["http_path"] == "/add"
+    assert payload["status_code"] == 200
+    assert payload["total_duration_ms"] == 1.25
+    assert "request_id" not in payload
+    assert "content" not in payload
+    assert "must-not-appear" not in payload.values()
+    assert "private-message" not in payload.values()
