@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B00 implementation planning. Code-backed statements must be refreshed in the
-> B00 Gate 2 handoff.
+> Current through B00 implementation commit
+> `ff2484b7732671c3c96f35ad3dd25b4da108618c`; see the B00 Gate 2 handoff for verification data.
 
 ## Objective
 

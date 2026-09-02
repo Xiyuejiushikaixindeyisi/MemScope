@@ -2,11 +2,12 @@
 
 ```yaml
 batch: B00
-status: Approved
+status: Code Review
 base_commit: 4a57925aaee6559fe9c48d174357861c8a8a10d4
 working_tree_context:
   - path: MEMOS_BASELINE_IMPLEMENTATION_PLAN.md
-    state: modified_before_B00_implementation
+    state: committed
+    commit: 099e659447680eac973bc8efc20e05ece9f4078d
     reason: user-requested finals extensibility constraints and organizer-confirmation checklist
 depends_on:
   hard:

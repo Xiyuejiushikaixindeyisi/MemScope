@@ -1,6 +1,6 @@
 # B00 工程基础代码方案
 
-> 状态：Approved，2026-09-02 Gate 1 已批准  
+> 状态：Code Review，2026-09-02 Gate 1 已批准并完成实施
 > Batch：B00  
 > 基线提交：`4a57925aaee6559fe9c48d174357861c8a8a10d4`  
 > 建议分支：`batch/b00-engineering-foundation`  
