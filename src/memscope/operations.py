@@ -116,6 +116,17 @@ class ServiceUnavailableError(MemScopeError):
         )
 
 
+class RequestConflictError(MemScopeError):
+    """Raised when an application request ID conflicts with prior input."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            code="request.conflict",
+            message="Request identifier conflicts with an existing request",
+            retryable=False,
+        )
+
+
 class UnavailableContestOperations:
     """Safe default that never claims persistence or retrieval success."""
 

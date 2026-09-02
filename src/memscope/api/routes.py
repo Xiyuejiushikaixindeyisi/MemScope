@@ -67,7 +67,7 @@ def create_contest_router(*, settings: AppSettings, operations: ContestOperation
     @router.post(
         "/add",
         response_model=AddResponse,
-        responses=_error_responses(401, 422, 500, 503),
+        responses=_error_responses(401, 409, 422, 500, 503),
     )
     async def add(payload: AddRequest, request: Request) -> AddResponse:
         authenticate(request.headers, settings)

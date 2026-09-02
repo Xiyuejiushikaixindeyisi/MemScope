@@ -26,6 +26,13 @@ class JsonFormatter(logging.Formatter):
         "storage_result",
         "schema_version",
         "raw_store_duration_ms",
+        "component_operation",
+        "component_result",
+        "component_duration_ms",
+        "gateway_duration_ms",
+        "model_endpoint",
+        "model_result",
+        "model_duration_ms",
     )
 
     def format(self, record: logging.LogRecord) -> str:

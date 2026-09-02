@@ -13,7 +13,7 @@ from memscope.api.auth import AuthenticationError
 from memscope.api.models import ErrorBody, ErrorResponse
 from memscope.errors import MemScopeError
 from memscope.logging_config import LOGGER_NAME
-from memscope.operations import ServiceUnavailableError
+from memscope.operations import RequestConflictError, ServiceUnavailableError
 
 _CONTEST_PATHS = frozenset({"/health", "/add", "/search"})
 _logger = logging.getLogger(LOGGER_NAME)
@@ -89,6 +89,9 @@ def install_error_handlers(application: FastAPI) -> None:
             headers = {"WWW-Authenticate": "Bearer"}
         elif isinstance(error, ServiceUnavailableError):
             status_code = 503
+            headers = None
+        elif isinstance(error, RequestConflictError):
+            status_code = 409
             headers = None
         else:
             status_code = 500
