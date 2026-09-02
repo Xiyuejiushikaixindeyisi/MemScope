@@ -1,6 +1,6 @@
 # B02 Raw Store 与身份基础代码方案
 
-> 状态：Code Review，2026-09-02 Gate 1 已批准，等待 Gate 2 验收
+> 状态：Accepted/Frozen，2026-09-02 Gate 2 已验收
 > Batch：B02
 > 基线提交：`2f846a06e9c6f6b399a4753ad32bd3b565fd5fff`
 > 实施分支：`batch/b02-raw-identity`

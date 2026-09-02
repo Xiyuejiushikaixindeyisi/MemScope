@@ -1,6 +1,6 @@
 # B02 Gate 2 Handoff
 
-> 状态：Code Review，等待用户 Gate 2 验收
+> 状态：Accepted/Frozen，2026-09-02 用户已完成 Gate 2 验收
 > Gate 1 文档提交：`71b8fb7`
 > 实现提交：`fede40d03bd4f7a21c87499a498b15a9a8581412`
 > 分支：`batch/b02-raw-identity`
@@ -173,15 +173,9 @@ connection，WAL/SHM 已自动 checkpoint/移除，均为 0 bytes。写入约 16
 - 当前 `official/` 仍只是本地规则重建与代理回归集；
 - 主办方 API/Key、硬件/超时/并发、Compose/网络/构建和决赛要求仍未知。
 
-## 12. Gate 2 待验收结论
+## 12. Gate 2 验收结论
 
-B02 已满足批准的 Definition of Done，现停在 Gate 2。请重点验收：
-
-1. canonical payload 和版本化身份是否可冻结；
-2. NEW/PENDING/COMPLETED 及 HTTP 409 延后边界是否可冻结；
-3. 五表 Schema、复合一致性约束和 migration 机制是否可冻结；
-4. 每操作短连接、FULL durability、取消和 local/external consistency 语义是否可冻结；
-5. 默认 HTTP 继续 503、B02 不组装 operations 是否符合分批边界；
-6. 测试、覆盖率、性能和已知限制是否足以通过 B02 Gate 2。
-
-未收到用户 Gate 2 明确批准前，不把 B02 标记为 `Accepted/Frozen`，不创建 B03 分支，不进入 B03。
+用户于 2026-09-02 明确批准 B02 Gate 2 验收。B02 状态更新为 `Accepted/Frozen`。后续 Batch
+只允许依赖本 Handoff、`raw-store-v1.md` 及公开 `memscope.raw_store` 接口明示的不变量，不得依赖
+SQLite 私有 connection、SQL 或表访问顺序。本次验收同时授权进入 B03 Gate 1 代码方案设计，但不授权
+创建 B03 分支或实施 B03 代码。

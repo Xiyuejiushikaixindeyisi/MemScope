@@ -2,10 +2,13 @@
 
 ```yaml
 batch: B02
-status: Code Review
+status: Accepted/Frozen
 approved_at: 2026-09-02
 gate_1_approval: user_explicit
 implementation_commit: fede40d03bd4f7a21c87499a498b15a9a8581412
+accepted_at: 2026-09-02
+accepted_head: ae479f18f153d6c0159cabf28e0be4714f368233
+gate_2_approval: user_explicit
 base_commit: 2f846a06e9c6f6b399a4753ad32bd3b565fd5fff
 planned_branch: batch/b02-raw-identity
 depends_on:

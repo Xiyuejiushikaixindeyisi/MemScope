@@ -40,10 +40,10 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 ## Batch Status
 
-B00 and B01 are `Accepted/Frozen`. B02 is in `Code Review` and provides a framework-independent
+B00, B01 and B02 are `Accepted/Frozen`. B02 provides a framework-independent
 `RawStore` port, SQLite Schema/migrations, canonical persistent idempotency, ordered raw messages,
 stable logical user/Cube identity and a durable pending/completed outbox record.
 
 The default runtime deliberately remains 503 because B02 does not implement Search or assemble a
-complete `ContestOperations`. Raw Store component success is not HTTP service readiness. B03 may
-assemble a no-key Fake path; no later Batch is authorized by the B02 approval.
+complete `ContestOperations`. Raw Store component success is not HTTP service readiness. B03 Gate 1
+may design a no-key Fake path; implementation requires separate explicit approval.
