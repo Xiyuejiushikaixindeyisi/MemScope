@@ -2,9 +2,10 @@
 
 ```yaml
 batch: B01
-status: Approved
+status: Code Review
 approved_at: 2026-09-02
 gate_1_approval: user_explicit
+implementation_commit: 160a46cbbd62dcc9d1aa34bf80f36459541b9d1c
 base_commit: 714e5581104cd84a41cbb05d46a12e89ae10cdda
 planned_branch: batch/b01-api-contract
 depends_on:

@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through B01 implementation on 2026-09-02; see the B01 Gate 2 handoff for verification
-> data and the accepted B00 handoff for the frozen engineering foundation.
+> Current through B01 implementation commit
+> `160a46cbbd62dcc9d1aa34bf80f36459541b9d1c`; see the B01 Gate 2 handoff for verification data.
 
 ## Objective
 
