@@ -12,7 +12,12 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .coverage
+.coverage.*
+coverage.json
 htmlcov/
+dist/
+build/
+*.egg-info/
 
 # Virtual environments
 .venv/

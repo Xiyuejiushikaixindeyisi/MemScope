@@ -1,0 +1,91 @@
+[project]
+name = "memscope"
+version = "0.0.0"
+description = "Contest adapter and engineering foundation for the MemScope memory service"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi==0.115.14",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.10.1",
+    "uvicorn==0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "mypy==1.17.1",
+    "pytest==8.4.1",
+    "pytest-asyncio==0.23.8",
+    "pytest-cov==6.3.0",
+    "ruff==0.11.13",
+]
+
+[build-system]
+requires = ["uv_build==0.12.9"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "--cov=memscope",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-fail-under=95",
+]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["memscope"]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_empty = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+packages = ["memscope"]
+warn_unreachable = true
+
+[tool.ruff]
+extend-exclude = [
+    ".vendor-src",
+    "docs/achieve",
+    "技术难题-Agent-Memory-评测集（开源）-1.0",
+]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "ASYNC",
+    "B",
+    "C4",
+    "E",
+    "F",
+    "I",
+    "N",
+    "PGH",
+    "PIE",
+    "RUF",
+    "S",
+    "SIM",
+    "TC",
+    "UP",
+]
+ignore = [
+    "RUF001",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S104", "S105", "S106", "S603"]
