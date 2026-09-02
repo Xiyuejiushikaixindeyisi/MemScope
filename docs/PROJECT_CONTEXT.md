@@ -13,9 +13,19 @@ memory evidence through Search. The organizer owns final answer generation and j
 
 - The repository's `official/` data is a local rules reconstruction and proxy regression set, not
   an organizer byte-verified package.
-- No organizer Chat, Embedding, or Rerank API or key is currently available.
-- No organizer hardware, timeout, concurrency, failure-policy, Compose, network, build, or finals
-  delivery clarification is currently available.
+- Organizer direction relayed by the user on 2026-09-02: `Qwen-V3.6-27B-DX` and
+  `GLM-V5.1-DX` LLMs will be freely usable, but their detailed API contract/key is not yet recorded.
+- The organizer will not provide Embedding or Rerank API keys and will not expose the platform
+  Answer/Judge models to the team.
+- No formal timeout is currently provided and there is no concurrency requirement. `top_k` may be
+  below 100 and K is a bonus factor, but the exact scoring/input limits are unknown.
+- The requested delivery is one directly deployable, immediately runnable Docker. Whether that
+  permits Compose, multiple processes/services, external databases, runtime network access and
+  large images remains unconfirmed.
+- The organizer may provide a large-database interface with an authentication design if needed;
+  product, protocol, capacity, persistence, latency and availability are not yet defined.
+- Hardware, failure policy, build/network constraints, exact top-k scoring and finals delivery
+  clarification remain unavailable.
 - Missing organizer information does not block the no-key scaffold. It does block the affected
   baseline, deployment, or finals freeze described in the main implementation plan.
 - MemOS is fixed to tag `v2.0.32`, commit
