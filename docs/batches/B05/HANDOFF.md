@@ -102,6 +102,10 @@ and must be preferred over prolonged container debugging when tuning time is at 
 
 ## 6. Tuning-machine priorities
 
+Before deployment or experiments, follow the mandatory
+[`48H_DELIVERY_GUARDRAILS.md`](../../collaboration/48H_DELIVERY_GUARDRAILS.md). Its Docker
+timeboxes and scoring-first priority override general lifecycle completeness.
+
 Start from the unchanged B05 baseline and record latency, failures, extraction precision/recall and
 evaluation score. First compare candidate extractor models with the frozen P0 prompt; only then run
 P1/P2 prompt ablations on a fixed validation slice. Keep one primary extractor, no backup/reviewer,

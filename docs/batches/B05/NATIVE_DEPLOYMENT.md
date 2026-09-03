@@ -4,6 +4,9 @@
 > `memory-api + MemOS v2.0.32 + Neo4j + Qdrant` Real Add 服务。
 >
 > 边界：本指南只覆盖 B05 Add。B06 完成前，公开 `/health` 和 `/search` 返回 503 是预期行为。
+>
+> 时间约束：先执行 [48 小时交付止损规则](../../collaboration/48H_DELIVERY_GUARDRAILS.md)。Docker
+> 预检或排障达到上限后直接使用本指南，不再重复尝试构建。
 
 ## 1. 什么时候使用本方案
 
