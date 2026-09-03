@@ -2,12 +2,13 @@
 
 ```yaml
 batch: B05
-status: gate_1_implementation_verified_gate_2_pending
+status: gate_2_review
 date: 2026-09-03
 gate_0_revision: R1
 gate_0_approval: user_explicit
 gate_1_approval: user_explicit
 base_commit: 0c2a35d62add20472658e316f0ca332159c598f9
+candidate_commit: e7abf5f8140f61cda5d3cee8b17ef8dbd3b0d062
 branch: batch/b05-real-add
 depends_on:
   hard:

@@ -5,7 +5,7 @@
 ## 当前状态
 
 - B00～B04：`Accepted/Frozen`；B04 Gate 2 于 2026-09-03 经用户明确验收。
-- B05：Gate 0 R1、Gate 1 已批准；Real Add baseline 正在完成最终回归与 Gate 2 证据整理。
+- B05：Gate 0 R1、Gate 1 已批准；candidate `e7abf5f` 正在 Gate 2 评审，尚未验收冻结。
 - B06：尚未进入，必须在新 Session 中从 Gate 0 开始。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。

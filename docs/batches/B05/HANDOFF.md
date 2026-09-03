@@ -1,12 +1,14 @@
 # B05 Gate 1 implementation handoff
 
-> Status: implementation verified; Gate 2 approval pending
+> Status: Gate 2 review; approval pending
 >
 > Gate 0 R1 and Gate 1 approved: 2026-09-03
 >
 > Base commit: `0c2a35d62add20472658e316f0ca332159c598f9`
 >
 > Branch: `batch/b05-real-add`
+>
+> Candidate commit: `e7abf5f8140f61cda5d3cee8b17ef8dbd3b0d062`
 
 ## 1. Delivered Real Add baseline
 
@@ -112,3 +114,34 @@ no auto retry and the 115-second hard budget until evidence justifies a reviewed
 
 This handoff does not claim Gate 2 acceptance, a production model choice, a quality score, Search,
 public readiness or final submission readiness.
+
+## 8. Schedule retrospective and Docker stop rules
+
+The roughly four-hour elapsed time cannot be reconstructed minute-by-minute because this batch did
+not record a phase timer. The evidence nevertheless identifies three material causes: repeated
+Docker registry/package resolution, diagnosis of a fixed-source tenant/readback incompatibility,
+and production-grade failure/replay/deadline verification around a small public API change. The
+commit contains about 1,271 added production-source lines, 1,347 test lines, 2,339 documentation
+lines and 1,476 deployment/lock/verifier lines; public endpoint count is not a useful proxy for the
+integration surface.
+
+Two delays were avoidable. First, B04 had already recorded unstable official-PyPI downloads, so B05
+should have selected the explicit Huawei mirror before the first build. Second, the rootless daemon
+should have been preflighted for published ports and cgroups before attempting full lifecycle
+evidence. Once those capabilities were absent, work should have switched immediately to the native
+path instead of continuing Docker diagnosis.
+
+Future batches use this stop policy:
+
+1. Spend at most 10 minutes on daemon/Compose/rootless/port/cgroup and registry/package probes.
+2. Use an explicit audited PyPI mirror on the first slow/failing probe; do not confuse a Python
+   package mirror with a Docker Hub registry mirror.
+3. Freeze application changes before the one candidate image build. Reuse BuildKit cache and add a
+   local/registry cache exporter only when the target environment can consume it.
+4. Cap batch-local Docker investigation at 30 minutes. On expiry, record the exact limitation and
+   switch to native deployment or a known-capable Docker host.
+5. Never let Docker packaging delay model capability probes, baseline evaluation or accuracy tuning.
+
+For repeated multi-machine builds, the preferred infrastructure optimization is a trusted Docker
+Hub pull-through cache configured at the daemon plus a persistent BuildKit local/registry cache.
+That is host provisioning work, not a semantic B05 source change.

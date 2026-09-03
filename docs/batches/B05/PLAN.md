@@ -1,6 +1,6 @@
 # B05 Real Add implementation plan
 
-> Status: Gate 1 approved; implementation verification in progress. Gate 2 not yet requested.
+> Status: Gate 1 approved; implementation commit `e7abf5f` entered Gate 2 review on 2026-09-03.
 >
 > Batch: B05
 >
