@@ -42,6 +42,7 @@
 | B05 Add 设计与调测优先事项 | `batches/B05/ADD_DESIGN_AND_TUNING.md` |
 | B05 非 Docker 部署兜底 | `batches/B05/NATIVE_DEPLOYMENT.md` |
 | B05 冻结上下文 / Gate 2 交接 | `batches/B05/CONTEXT.md`、`batches/B05/HANDOFF.md` |
+| B06 新 Session 首轮 Prompt | `batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责

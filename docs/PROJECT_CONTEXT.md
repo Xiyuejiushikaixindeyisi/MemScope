@@ -132,4 +132,6 @@ baseline or tuning run. The Add tuning authority is
 
 B05 is frozen under `docs/batches/B05/HANDOFF.md`. The tuning machine owns the transferred Docker
 host-port/cgroup check, but it remains non-blocking to model/evaluation tuning. B06 remains unopened
-and requires its own new-Session Gate 0.
+and requires a new Session. Its first authorized action is the read-only Pre-Gate Context Review in
+`docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md`; only explicit user confirmation may advance it
+to Gate 0.

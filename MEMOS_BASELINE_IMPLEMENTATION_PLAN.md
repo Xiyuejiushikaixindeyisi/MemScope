@@ -1052,7 +1052,9 @@ P1 默认按符号和调用链读取，不全仓加载。
 2. 校验 MemOS 为 `v2.0.32`/`185ebdb925911b55c13b7efe666b74e2e292e484`；
 3. 阅读 `docs/README.md`、`docs/PROJECT_CONTEXT.md`、两机协作规范、本方案第 18、19 节和当前
    Batch 的 P0；
-4. B05/B06 先提交 Gate 0；其它 Batch 先提交 Gate 1；
+4. B06 先执行只读 Pre-Gate Context Review，首轮 Prompt 见
+   [`docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md`](./docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md)；
+   用户确认前置理解通过后才提交 Gate 0；其它 Batch 按已批准流程进入 Gate 1；
 5. 未获对应门禁批准前不创建业务代码；
 6. 开发完成后执行 Gate 2，不自动进入下一 Batch；
 7. Session 结束前把测试、风险、偏差、commit 和下游必读信息写回 Markdown。

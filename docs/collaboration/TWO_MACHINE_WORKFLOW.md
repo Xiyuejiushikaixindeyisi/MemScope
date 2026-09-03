@@ -161,3 +161,19 @@ AI 在实施时必须：
 - 保存测试命令、结果、偏差、风险和 commit；
 - 遇到正式文档与用户整理稿冲突时标注来源并请求裁决；
 - 禁止提交或输出明文凭据。
+
+### 8.1 B06 固定协作顺序
+
+B06 按以下顺序推进，不合并阶段：
+
+1. 先执行 Pre-Gate Context Review，只读核验全局状态和准入条件；
+2. 用户确认前置理解通过后进入 Gate 0；
+3. 用户逐个提出设计点和参考，逐一核验、讨论、确认，再沉淀为调测机优先设计文档；
+4. 设计点结束后单独评审 Gate 0 的安全 baseline 优化；
+5. 只做一次最小修订并冻结 Gate 0 R1；
+6. 用户明确要求后进入 Gate 1；
+7. Gate 1 明确审批后才开发；
+8. 完成证据后进入 Gate 2，由用户验收。
+
+新 Session 的可复制首轮指令见
+[`docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md`](../batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md)。
