@@ -123,7 +123,9 @@ def _exec_memos_python(compose: list[str], root: Path, source: str) -> str:
 
 
 def _exec_neo4j(compose: list[str], root: Path, query: str) -> str:
-    command = f'cypher-shell -u neo4j -p "$NEO4J_PASSWORD" --format plain {json.dumps(query)}'
+    command = (
+        f'cypher-shell -u neo4j -p "${{NEO4J_AUTH#neo4j/}}" --format plain {json.dumps(query)}'
+    )
     result = _run(
         [*compose, "exec", "-T", "neo4j", "sh", "-c", command],
         cwd=root,
@@ -293,6 +295,81 @@ def _assert_fault_recovery(compose: list[str], root: Path, health_timeout: float
     _probe_aggregate(compose, root)
 
 
+def _assert_memos_process_recovery(compose: list[str], root: Path, health_timeout: float) -> None:
+    container_id = _service_container_id(compose, root, "memos")
+    state_before = _run(
+        [
+            "docker",
+            "inspect",
+            "--format",
+            "{{.State.Pid}} {{.State.StartedAt}}",
+            container_id,
+        ],
+        cwd=root,
+    ).stdout.strip()
+    pid_before, _, _ = state_before.partition(" ")
+    _run(["kill", "-KILL", pid_before], cwd=root)
+    deadline = time.monotonic() + health_timeout
+    while time.monotonic() < deadline:
+        state = _run(
+            [
+                "docker",
+                "inspect",
+                "--format",
+                "{{.State.Pid}} {{.State.StartedAt}} "
+                "{{if .State.Health}}{{.State.Health.Status}}{{end}}",
+                container_id,
+            ],
+            cwd=root,
+        ).stdout.strip()
+        pid, started_at, health = state.split(maxsplit=2)
+        if f"{pid} {started_at}" != state_before and int(pid) > 0 and health == "healthy":
+            _probe_aggregate(compose, root)
+            return
+        time.sleep(1.0)
+    raise VerificationError("MemOS did not recover automatically after SIGKILL")
+
+
+def _assert_graceful_memos_stop(compose: list[str], root: Path, health_timeout: float) -> None:
+    container_id = _service_container_id(compose, root, "memos")
+    _run([*compose, "stop", "--timeout", "30", "memos"], cwd=root, timeout=60.0)
+    exit_code = _run(
+        ["docker", "inspect", "--format", "{{.State.ExitCode}}", container_id], cwd=root
+    ).stdout.strip()
+    if exit_code != "0":
+        raise VerificationError(f"MemOS graceful stop returned exit code {exit_code}")
+    _run([*compose, "start", "memos"], cwd=root, timeout=60.0)
+    _wait_healthy(compose, root, ("memos",), health_timeout)
+    _probe_aggregate(compose, root)
+
+
+def _assert_runtime_controls(compose: list[str], root: Path) -> None:
+    for service in ("memos", "neo4j", "qdrant"):
+        container_id = _service_container_id(compose, root, service)
+        controls = json.loads(
+            _run(
+                [
+                    "docker",
+                    "inspect",
+                    "--format",
+                    "{{json .HostConfig}}",
+                    container_id,
+                ],
+                cwd=root,
+            ).stdout
+        )
+        if controls.get("Memory", 0) <= 0 or controls.get("NanoCpus", 0) <= 0:
+            raise VerificationError(f"service {service!r} has no CPU/memory ceiling")
+        if controls.get("PidsLimit", 0) != 512:
+            raise VerificationError(f"service {service!r} has unexpected PID ceiling")
+        log_config = controls.get("LogConfig", {})
+        if log_config.get("Type") != "json-file" or log_config.get("Config") != {
+            "max-file": "3",
+            "max-size": "10m",
+        }:
+            raise VerificationError(f"service {service!r} has unexpected log rotation")
+
+
 def verify_lifecycle(args: argparse.Namespace) -> dict[str, Any]:
     if shutil.which("docker") is None:
         raise VerificationError("Docker CLI is not installed; lifecycle verification cannot run")
@@ -308,7 +385,7 @@ def verify_lifecycle(args: argparse.Namespace) -> dict[str, Any]:
         clean_room = Path(clean_room_name)
         _copy_clean_room(REPOSITORY_ROOT, clean_room)
         env_file = clean_room / "b04.env"
-        neo4j_password = secrets.token_urlsafe(24)
+        neo4j_password = f"B04-{secrets.token_urlsafe(24)}"
         env_file.write_text(
             f"NEO4J_PASSWORD={neo4j_password}\n"
             f"B04_BOOTSTRAP_EMBEDDING_DIMENSION={args.embedding_dimension}\n",
@@ -337,6 +414,7 @@ def verify_lifecycle(args: argparse.Namespace) -> dict[str, Any]:
                 _assert_memos_collection(compose, clean_room, args.embedding_dimension)
                 _assert_no_published_ports(compose, clean_room)
                 _assert_internal_network(compose, clean_room)
+                _assert_runtime_controls(compose, clean_room)
                 resolved_images = _resolved_container_images(compose, clean_room)
                 _create_persistence_markers(compose, clean_room)
 
@@ -352,6 +430,8 @@ def verify_lifecycle(args: argparse.Namespace) -> dict[str, Any]:
                 _probe_aggregate(compose, clean_room)
                 _assert_persistence_markers(compose, clean_room)
                 _assert_fault_recovery(compose, clean_room, args.health_timeout)
+                _assert_memos_process_recovery(compose, clean_room, args.health_timeout)
+                _assert_graceful_memos_stop(compose, clean_room, args.health_timeout)
 
                 logs = _run([*compose, "logs", "--no-color"], cwd=clean_room).stdout
                 if neo4j_password in logs:
@@ -394,6 +474,9 @@ def verify_lifecycle(args: argparse.Namespace) -> dict[str, Any]:
             "internal-only runtime network",
             "named-volume persistence across restart",
             "Qdrant stop detection and recovery",
+            "CPU/memory/PID ceilings and bounded log rotation",
+            "MemOS automatic recovery after SIGKILL",
+            "MemOS graceful stop with exit code zero",
         ],
     }
     if args.report is not None:

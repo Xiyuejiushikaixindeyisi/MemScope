@@ -1,18 +1,28 @@
 name: memscope-b04
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   neo4j:
     image: neo4j:5.26.6-community@sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893
-    init: true
     restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: "${B04_NEO4J_MEMORY_LIMIT:-2g}"
+    cpus: "${B04_NEO4J_CPU_LIMIT:-2.0}"
+    pids_limit: 512
+    logging: *default-logging
     environment:
       NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
-      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+      NEO4J_dbms_usage__report_enabled: "false"
     healthcheck:
       test:
         - CMD-SHELL
         - >-
-          cypher-shell -u neo4j -p "$${NEO4J_PASSWORD}"
+          cypher-shell -u neo4j -p "$${NEO4J_AUTH#neo4j/}"
           "RETURN 1 AS ready;" >/dev/null 2>&1
       interval: 2s
       timeout: 5s
@@ -28,9 +38,15 @@ services:
     image: qdrant/qdrant:v1.15.3@sha256:31407c0e8e32eb771b71718f1a4772e2ad47a07557917b21ac96792f40eb8007
     init: true
     restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: "${B04_QDRANT_MEMORY_LIMIT:-2g}"
+    cpus: "${B04_QDRANT_CPU_LIMIT:-2.0}"
+    pids_limit: 512
+    logging: *default-logging
     environment:
       QDRANT__SERVICE__HTTP_PORT: "6333"
       QDRANT__SERVICE__GRPC_PORT: "6334"
+      QDRANT__TELEMETRY_DISABLED: "true"
     healthcheck:
       test:
         - CMD-SHELL
@@ -49,8 +65,14 @@ services:
     build:
       context: .
       dockerfile: docker/memos/Dockerfile
-    init: true
+      args:
+        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://pypi.org/simple}"
     restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: "${B04_MEMOS_MEMORY_LIMIT:-4g}"
+    cpus: "${B04_MEMOS_CPU_LIMIT:-4.0}"
+    pids_limit: 512
+    logging: *default-logging
     depends_on:
       neo4j:
         condition: service_healthy
@@ -82,8 +104,11 @@ services:
       MEMRADER_API_BASE: http://127.0.0.1:9/v1
       MEMRADER_API_KEY: EMPTY
       MEMRADER_MODEL: b04-bootstrap-no-call
+      MEM_READER_TOKENIZER: word
       MOS_RERANKER_BACKEND: cosine_local
       MOS_FEEDBACK_RERANKER_BACKEND: cosine_local
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
       ENABLE_CHAT_API: "false"
       ENABLE_INTERNET: "false"
       ENABLE_ACTIVATION_MEMORY: "false"

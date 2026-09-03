@@ -46,7 +46,9 @@ def test_checksum_file_uses_only_the_locked_archive() -> None:
 
 def test_compose_has_only_approved_services_and_four_named_volumes() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
-    service_block = compose.split("\nnetworks:\n", maxsplit=1)[0]
+    service_block = compose.split("\nservices:\n", maxsplit=1)[1].split(
+        "\nnetworks:\n", maxsplit=1
+    )[0]
     service_names = re.findall(r"^  ([a-z][a-z0-9_-]*):$", service_block, re.MULTILINE)
     assert service_names == ["neo4j", "qdrant", "memos"]
     assert "ports:" not in service_block
@@ -68,15 +70,60 @@ def test_container_image_digests_match_source_lock() -> None:
     assert "pip install --no-cache-dir --upgrade pip" not in dockerfile
 
 
+def test_memos_build_is_multistage_and_uses_configurable_pypi() -> None:
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
+
+    assert "B04_PIP_INDEX_URL:-https://pypi.org/simple" in compose
+    assert "ARG PIP_INDEX_URL=https://pypi.org/simple" in dockerfile
+    assert dockerfile.count("FROM ${PYTHON_IMAGE}") == 2
+    assert "AS builder" in dockerfile
+    assert "AS runtime" in dockerfile
+    assert "COPY --from=builder" in dockerfile
+    assert "apt-get" not in dockerfile
+    assert "build-essential" not in dockerfile
+    assert "ARG SOURCE_DATE_EPOCH=1787929140" in dockerfile
+    assert '--date="@${SOURCE_DATE_EPOCH}"' in dockerfile
+    assert "--constraint /opt/vendor/constraints.txt" in dockerfile
+
+
+def test_memos_transitive_constraints_are_exact() -> None:
+    constraints = (ROOT / "docker" / "memos" / "constraints.txt").read_text(encoding="utf-8")
+    requirements = [line for line in constraints.splitlines() if line and not line.startswith("#")]
+
+    assert len(requirements) == 12
+    assert all(re.fullmatch(r"[A-Za-z0-9_.-]+==[^\s]+", line) for line in requirements)
+
+
 def test_compose_requires_secret_and_disables_model_calls_for_b04() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    neo4j_service = compose.split("  neo4j:\n", maxsplit=1)[1].split("\n  qdrant:\n", maxsplit=1)[0]
     assert "${NEO4J_PASSWORD:?" in compose
     assert "neo4j/12345678" not in compose
+    assert "      NEO4J_PASSWORD:" not in neo4j_service
+    assert "$${NEO4J_AUTH#neo4j/}" in neo4j_service
     assert "MOS_EMBEDDER_BACKEND: universal_api" in compose
     assert "MOS_RERANKER_BACKEND: cosine_local" in compose
+    assert "MEM_READER_TOKENIZER: word" in compose
+    assert 'HF_HUB_OFFLINE: "1"' in compose
+    assert 'TRANSFORMERS_OFFLINE: "1"' in compose
     assert "http://127.0.0.1:9/v1" in compose
     assert 'ENABLE_INTERNET: "false"' in compose
     assert 'API_SCHEDULER_ON: "false"' in compose
+
+
+def test_memos_build_replaces_network_tokenizer_with_runtime_choice() -> None:
+    dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
+
+    assert "grep -F -c" in dockerfile
+    assert "MEM_READER_TOKENIZER" in dockerfile
+    assert 'os.getenv("MEM_READER_TOKENIZER", "word")' in dockerfile
+
+
+def test_memos_build_guards_disabled_scheduler_shutdown() -> None:
+    dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
+
+    assert 'getattr(self, "_io_loop_thread", None)' in dockerfile
 
 
 def test_compose_readiness_covers_all_three_services() -> None:
@@ -88,9 +135,33 @@ def test_compose_readiness_covers_all_three_services() -> None:
     assert compose.count("condition: service_healthy") == 2
 
 
+def test_compose_has_resource_shutdown_and_log_controls() -> None:
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    qdrant_service = compose.split("  qdrant:\n", maxsplit=1)[1].split("\n  memos:\n", maxsplit=1)[
+        0
+    ]
+    memos_service = compose.split("  memos:\n", maxsplit=1)[1].split("\nnetworks:\n", maxsplit=1)[0]
+
+    assert compose.count("stop_grace_period: 30s") == 3
+    assert compose.count("pids_limit: 512") == 3
+    assert compose.count("logging: *default-logging") == 3
+    assert 'max-size: "10m"' in compose
+    assert 'max-file: "3"' in compose
+    for service in ("MEMOS", "NEO4J", "QDRANT"):
+        assert f"B04_{service}_MEMORY_LIMIT" in compose
+        assert f"B04_{service}_CPU_LIMIT" in compose
+    assert "init: true" in qdrant_service
+    assert "init: true" not in memos_service
+
+
 def test_runtime_verifier_is_scoped_to_disposable_b04_projects() -> None:
     verifier = (ROOT / "scripts" / "verify_b04_runtime.py").read_text(encoding="utf-8")
     assert "memscope_b04_gate_" in verifier
+    assert 'f"B04-{secrets.token_urlsafe(24)}"' in verifier
+    assert "NEO4J_AUTH#neo4j/" in verifier
+    assert '"$NEO4J_PASSWORD"' not in verifier
+    assert '["kill", "-KILL", pid_before]' in verifier
+    assert '"stop", "--timeout", "30", "memos"' in verifier
     assert '"down", "--volumes", "--remove-orphans"' in verifier
     assert "docker system prune" not in verifier
     assert "docker volume prune" not in verifier
