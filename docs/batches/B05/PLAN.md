@@ -1,6 +1,7 @@
 # B05 Real Add implementation plan
 
-> Status: Gate 1 approved; implementation commit `e7abf5f` entered Gate 2 review on 2026-09-03.
+> Status: Accepted/Frozen after explicit Gate 2 approval on 2026-09-03; Docker host-port/cgroup
+> validation transferred to a capable tuning-machine daemon.
 >
 > Batch: B05
 >

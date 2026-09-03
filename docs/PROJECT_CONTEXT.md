@@ -1,8 +1,8 @@
 # MemScope Project Context
 
-> Current through B05 Gate 2 review on 2026-09-03. B00–B04 are `Accepted/Frozen`. B05 Gate 0 R1
-> and Gate 1 are approved; candidate `e7abf5f` awaits Gate 2 approval. B06 has not started and must
-> begin in a new Session at Gate 0.
+> Current through B05 Gate 2 acceptance on 2026-09-03. B00–B05 are `Accepted/Frozen`; B05 Docker
+> host-port/cgroup validation is transferred to a capable tuning-machine daemon. B06 has not started
+> and must begin in a new Session at Gate 0.
 
 ## Objective
 
@@ -112,6 +112,6 @@ and templates are under `docs/collaboration/`.
 
 ## Next authorized state
 
-B05 candidate `e7abf5f` is in Gate 2 review under `docs/batches/B05/HANDOFF.md`. Docker
-host-port/cgroup evidence is a non-blocking bonus when the target runtime supports it; model and
-evaluation tuning take priority. B06 remains unopened and requires its own new-Session Gate 0.
+B05 is frozen under `docs/batches/B05/HANDOFF.md`. The tuning machine owns the transferred Docker
+host-port/cgroup check, but it remains non-blocking to model/evaluation tuning. B06 remains unopened
+and requires its own new-Session Gate 0.

@@ -1,8 +1,11 @@
-# B05 Gate 1 implementation handoff
+# B05 Gate 2 handoff
 
-> Status: Gate 2 review; approval pending
+> Status: Accepted/Frozen
 >
 > Gate 0 R1 and Gate 1 approved: 2026-09-03
+>
+> Gate 2 approved: 2026-09-03 by explicit user message, with Docker host-port/cgroup validation
+> transferred to a capable tuning-machine daemon
 >
 > Base commit: `0c2a35d62add20472658e316f0ca332159c598f9`
 >
@@ -112,8 +115,8 @@ no auto retry and the 115-second hard budget until evidence justifies a reviewed
 - Optional clean-room Docker evidence: `scripts/verify_b05_runtime.py`; run only on a daemon that
   supports host port publication and cgroup limits.
 
-This handoff does not claim Gate 2 acceptance, a production model choice, a quality score, Search,
-public readiness or final submission readiness.
+B05 Gate 2 acceptance does not claim a production model choice, a quality score, Search, public
+readiness or final submission readiness.
 
 ## 8. Schedule retrospective and Docker stop rules
 
@@ -145,3 +148,11 @@ Future batches use this stop policy:
 For repeated multi-machine builds, the preferred infrastructure optimization is a trusted Docker
 Hub pull-through cache configured at the daemon plus a persistent BuildKit local/registry cache.
 That is host provisioning work, not a semantic B05 source change.
+
+Repeated candidate builds are not an algorithm requirement. During B05 they occurred because the
+image copies source rather than bind-mounting it: after a Gateway, patchset or deterministic-fixture
+change, a running container still contains the previous files. One rebuild after the real-integration
+fix was therefore needed to prove the fix in the packaged path. A final clean-room build would
+normally prove that the frozen commit has no hidden checkout/cache dependency. Rebuilding after
+every small edit was unnecessary; future development uses native/source-mounted iteration and only
+one frozen-candidate build plus, when justified, one independent clean-room reproduction.

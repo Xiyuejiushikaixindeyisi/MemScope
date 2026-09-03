@@ -2,11 +2,13 @@
 
 ```yaml
 batch: B05
-status: gate_2_review
+status: accepted_frozen
 date: 2026-09-03
 gate_0_revision: R1
 gate_0_approval: user_explicit
 gate_1_approval: user_explicit
+gate_2_approved_at: 2026-09-03
+gate_2_approval: user_explicit_with_docker_validation_transfer
 base_commit: 0c2a35d62add20472658e316f0ca332159c598f9
 candidate_commit: e7abf5f8140f61cda5d3cee8b17ef8dbd3b0d062
 branch: batch/b05-real-add
@@ -83,6 +85,6 @@ capable Docker host when convenient or follow `NATIVE_DEPLOYMENT.md`.
 
 ## Next work
 
-Finish the B05 Gate 2 review/approval without claiming Huawei or semantic-quality evidence. Then
-start B06 only in a new Session with its own Gate 0. The tuning machine should begin with capability
-probes and an unchanged-baseline evaluation before changing the extractor model or prompt.
+B05 is frozen. Start B06 only in a new Session with its own Gate 0. The tuning machine should begin
+with capability probes and an unchanged-baseline evaluation before changing the extractor model or
+prompt, and should revalidate the documented Docker host-port/cgroup items on a capable daemon.

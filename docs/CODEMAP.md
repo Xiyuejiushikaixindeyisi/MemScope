@@ -72,11 +72,11 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
 
 ## Batch ownership
 
-- B00–B04: accepted and frozen. B04 runtime lifecycle evidence is recorded in
-  `docs/batches/B04/HANDOFF.md`.
-- B05: Real Gateway, public adapter composition, Cube lifecycle and synchronous Add. Gate 0 R1 is
-  confirmed, Gate 1 is approved and implementation is in final verification. Docker runtime
-  hardening is optional and must not displace model/evaluation tuning.
+- B00–B05: accepted and frozen. B04 and B05 evidence is recorded in their respective
+  `HANDOFF.md` files.
+- B05 delivers the Real Gateway, public Add composition, Cube lifecycle and synchronous Add. Its
+  remaining Docker host-port/cgroup check belongs to a capable tuning-machine daemon and must not
+  displace model/evaluation tuning.
 - B06: Search conversion, isolation, evidence length/ranking and failure policy. Not started; must
   begin in a separate new Session at Gate 0.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not

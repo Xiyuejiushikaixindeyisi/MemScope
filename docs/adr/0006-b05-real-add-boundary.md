@@ -1,6 +1,6 @@
 # ADR 0006: B05 synchronous Real Add boundary
 
-- Status: Accepted for B05 Gate 1; Gate 2 pending
+- Status: Accepted/Frozen after B05 Gate 2
 - Date: 2026-09-03
 - Decision owner: user-approved B05 Gate 0 R1, Gate 1 and Docker-priority amendment
 

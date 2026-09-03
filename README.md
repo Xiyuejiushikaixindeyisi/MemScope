@@ -3,9 +3,9 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure and is accepted/frozen. B05 Real Add Gate 0 R1 is
-confirmed, Gate 1 is approved, and candidate `e7abf5f` is in Gate 2 review; B06 remains unopened.
-Docker is an optional delivery accelerator, not a prerequisite for tuning.
+MemOS/Neo4j/Qdrant runtime infrastructure. B00–B05 are accepted/frozen; B05 delivers synchronous
+Real Add, with Docker host-port/cgroup validation transferred to a capable tuning-machine daemon.
+B06 remains unopened. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
