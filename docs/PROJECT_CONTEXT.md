@@ -1,48 +1,98 @@
 # MemScope Project Context
 
-> Current through approved B04 Gate 1 on `batch/b04-runtime-infra`; B00–B03 remain accepted and
-> frozen. B04 runtime Gate 2 evidence is not complete.
+> Current through B04 Gate 2 acceptance on 2026-09-03. B00–B04 are `Accepted/Frozen`.
+> B05 and B06 have not started and must each begin in a new Session at Gate 0.
 
 ## Objective
 
-MemScope is an independently deployable long-term memory service for the Agent Memory
-competition. The contestant service accepts conversation history through Add and returns ranked
-memory evidence through Search. The organizer owns final answer generation and judging.
+MemScope is an independently deployable long-term memory service for the Agent Memory competition.
+The contestant service accepts conversation history through Add and returns ranked memory evidence
+through Search. The organizer owns final answer generation and judging.
 
-## Current boundaries
+## Current accepted capabilities
 
-- The repository's `official/` data is a local rules reconstruction and proxy regression set, not
-  an organizer byte-verified package.
+- B01 freezes the contest HTTP contract and strict response shapes.
+- B02 freezes the SQLite Raw Store, persistent idempotency, ordered raw messages and stable logical
+  user/Cube identity.
+- B03 freezes a provider-independent `MemoryGateway`, deterministic in-process Fake, independent
+  Mock Model API and `MemoryOperations` composition for no-key tests.
+- B04 freezes a single Compose entry with pinned MemOS `v2.0.32`, Neo4j and Qdrant, internal
+  networking, named volumes, dependency-gated health, resource ceilings, bounded logs and lifecycle
+  recovery checks.
+
+The default `src/memscope` runtime deliberately remains unavailable/503. B04 does not install the
+infrastructure behind the public contest Adapter and does not claim Add/Search or semantic model
+readiness. Real MemOS Add and Search are B05/B06 work.
+
+## B04 accepted evidence
+
+The clean-room lifecycle verifier passed on Linux/amd64 under WSL2 rootless Docker Engine 29.7.2
+and Compose 5.4.0:
+
+- MemOS image: `sha256:d073319403213693a8fff8351d20ab55eb3049b6f7c3b9d3a4940afa74f60b41`;
+- cold start: 31.547 seconds; Compose restart recovery: 39.252 seconds;
+- aggregate MemOS/Neo4j/Qdrant readiness and MemOS-created Qdrant collection;
+- no host ports, internal-only network and named-volume persistence;
+- Qdrant stop detection/recovery, MemOS SIGKILL self-recovery and graceful exit code 0;
+- configured CPU/memory/PID ceilings and bounded JSON log rotation.
+
+User-approved B04 exceptions:
+
+- MemOS image is about 985 MB and accepted against the project B04 limit of 1 GB.
+- Two no-cache builds had identical RootFS layers but different final OCI config/history metadata;
+  functional reproducibility is accepted because runtime content and behavior match.
+- Trivy found no embedded secrets, but pinned OS/Python dependencies retain known HIGH/CRITICAL
+  findings. This is a documented B04 security-debt waiver, not a claim of zero vulnerabilities.
+- WSL rootless evidence cannot authoritatively prove host cgroup enforcement or boot/daemon
+  auto-start; the final Linux deployment machine must retest those items.
+
+See `docs/batches/B04/HANDOFF.md` for the authoritative B04 handoff.
+
+## Organizer and environment boundaries
+
 - Submission is a source `solution.zip`; the organizer builds it. It includes `INSTRUCTION.md`,
   `SDD.md`, complete `code/` with dependency declarations, and optional Dockerfile/Compose.
 - No hosted database is provided. Add→Search is guaranteed only within one deployment lifecycle;
-  data may remain in container-local/configurable storage. Cross-restart persistence is not a
-  competition dependency, though B04 tests same-host named-volume restart for operational safety.
-- The Huawei AI Gateway base URLs and Bearer authentication are known and its Chat, Embeddings,
-  Responses and rerank paths are OpenAI-compatible. Exact subscribed model IDs still come from
-  `/v1/models`; formal embedding access, model ID, vector dimension and limits remain pending.
-- Model-dependent tools/JSON/extra fields are passed through and reasoning output has platform
-  support, but the exact Qwen/GLM capability combinations still require probes.
-- The organizer does not provide a separate hosted database. Embedding/rerank may be self-hosted,
-  but permission, package size and license limits for bundled weights are still pending.
-- Add has a 1–120 second budget and Search a 1–60 second budget. Rate limits include concurrency
-  and requests-per-minute 429 cases, so later batch execution needs throttling and backoff.
-- The contract fixes formal `top_k=100`; no separate K bonus formula exists. Evaluation accuracy
-  and response time take priority over speculative K tuning.
-- Health is unauthenticated and any 2xx indicates readiness. The final public port/entry command is
-  not published; MemScope will keep the port configurable and use 8000 as its current default.
-- Hardware, memory, disk, architecture and image-size restrictions are currently unspecified.
-- Missing organizer information does not block the no-key scaffold. It does block the affected
-  baseline, deployment, or finals freeze described in the main implementation plan.
-- MemOS is fixed to tag `v2.0.32`, commit
-  `185ebdb925911b55c13b7efe666b74e2e292e484`.
+  data may remain in container-local/configurable storage. B04's named-volume restart is an
+  operational quality check, not a competition dependency.
+- Health is unauthenticated and any 2xx indicates readiness. Public port/entry command is not
+  published; MemScope keeps the port configurable and currently defaults to 8000.
+- Add has a 1–120 second total budget and Search a 1–60 second total budget.
+- Formal `top_k=100`; no separate K bonus formula exists. Accuracy and response time take priority.
+- The Huawei AI Gateway base URLs and Bearer authentication are known. Chat, Embeddings, Responses
+  and rerank paths are advertised as compatible, but exact model capabilities must be probed.
+- Current expected models include `GLM-V5.2-DX`, `Qwen-V3.6-27B-bf16`, `bge-m3` and
+  `bge-reranker-v2-m3`; exact subscribed IDs and the actual Embedding dimension/limits remain
+  runtime facts, not assumptions.
+- Model-dependent tools/JSON/pass-through/reasoning fields require per-model probes.
+- Batch execution must handle concurrency and requests-per-minute 429 responses with throttling and
+  bounded exponential backoff.
+- Permission, package size and license limits for bundled open-source model weights remain pending.
+- The checked formal Markdown does not specify a `solution.zip` size limit; the reported 5 GB limit
+  remains unverified and must not be treated as a hard rule.
+
+## Two-machine workflow
+
+The development machine owns Git, design, deterministic tests, B05/B06 Gate 0–2, initial SDD and
+the B09 tuning handoff. It cannot reach Huawei AI Gateway and must not claim real API or quality
+evidence.
+
+The tuning machine owns real Docker revalidation, Huawei gateway capability probes, resource
+measurements, baseline/full evaluation, controlled tuning and the final submission ZIP. It cannot
+reach GitHub, so the handoff ZIP must contain all build/runtime inputs and instructions.
+
+Every transfer is identified by Git commit and SHA-256. The tuning machine returns the final ZIP,
+source/config diff, sanitized model configuration, reports and Docker evidence for audit. Full rules
+and templates are under `docs/collaboration/`.
 
 ## Delivery stages
 
 1. B00～B09 build and freeze `memos-scaffold-v0` without organizer credentials.
-2. Real API capability probes and representative/full proxy evaluation freeze `baseline-v0`.
-3. Controlled single-variable experiments improve the baseline.
-4. Finals requirements trigger a new scope and architecture review when published.
+2. B05 and B06 each start in a separate Session with user-approved Gate 0 algorithm design.
+3. B06 produces the initial `SDD.md`; B09 freezes the reproducible tuning handoff ZIP.
+4. The Huawei-network tuning machine performs capability probes, baseline evaluation and tuning.
+5. Only a candidate with an identified source/configuration and returned audit evidence is treated
+   as the reproducible final submission candidate.
 
 ## Long-lived engineering constraints
 
@@ -50,26 +100,13 @@ memory evidence through Search. The organizer owns final answer generation and j
 - Use small, stable interfaces at real change boundaries; do not prebuild unused abstractions.
 - Keep configuration typed, centralized, validated and safely summarized.
 - Treat isolation, idempotency, recovery, observability and failure semantics as first-class work.
-- Maintain deterministic no-key tests and separate mock wiring evidence from semantic quality.
+- Maintain deterministic no-key tests and separate Mock wiring evidence from semantic quality.
 - Optimize accuracy, robustness, latency, resources, explainability and reproducibility together.
 - Never hardcode reconstructed questions, gold answers, question IDs or proxy-Judge behavior.
+- Never store keys/tokens in source, Markdown, images, transfer ZIPs, reports or logs.
 
-## Batch Status
+## Next authorized state
 
-B00, B01, B02 and B03 are `Accepted/Frozen`. B04 Gate 1 is approved and its three-service
-MemOS/Neo4j/Qdrant Compose implementation is in progress; it is not accepted until clean-room
-Docker build, cold start, restart persistence and fault recovery are executed. The current host
-has no Docker CLI/daemon, so static evidence cannot be promoted to runtime evidence.
-
-B03 provides a
-framework-independent `MemoryGateway`, deterministic in-process Fake, independent Mock Model API
-and `MemoryOperations` composition. The Fake path proves wiring/recovery/isolation without claiming
-semantic quality or real MemOS compatibility.
-
-B02 provides a framework-independent
-`RawStore` port, SQLite Schema/migrations, canonical persistent idempotency, ordered raw messages,
-stable logical user/Cube identity and a durable pending/completed outbox record.
-
-The default MemScope runtime deliberately remains 503: B04 does not alter `src/memscope` or install
-its infrastructure behind the contest Adapter. Real MemOS/model compatibility, Add/Search,
-durable proactive recovery and production failure policy remain later-batch work.
+B04 is frozen. No B05 code development is authorized by the B04 approval. A future B05 Session must
+read `docs/README.md`, the two-machine workflow, this context, B04/B03 handoffs and the relevant
+contracts, then submit Gate 0 for user discussion and approval.

@@ -2,9 +2,11 @@
 
 ```yaml
 batch: B04
-status: gate_1_implementation_complete_gate_2_runtime_pending
+status: accepted_frozen
 approved_at: 2026-09-02
 gate_1_approval: user_explicit
+gate_2_approved_at: 2026-09-03
+gate_2_approval: user_explicit
 base_commit: 3ed5477
 branch: batch/b04-runtime-infra
 depends_on:
@@ -81,6 +83,9 @@ gate_2_required:
   - no_published_ports_and_internal_runtime_network
   - named_volume_restart_persistence
   - qdrant_fault_detection_and_recovery
+  - runtime_resource_pid_and_log_controls
+  - memos_sigkill_recovery
+  - memos_graceful_stop_exit_zero
   - measured_build_cold_start_restart
 ```
 
@@ -104,8 +109,14 @@ gate_2_required:
 - Hardware, image size and target platform limits are currently unspecified.
 - Permission and size/license rules for bundling an open-source embedding model remain pending.
 
-## Implementation-time environment fact
+## Gate 2 environment fact
 
-The current MemScope host is Linux x86_64 but has no Docker, Podman, nerdctl, buildah or Compose
-binary. Static implementation and tests may complete here; none can be treated as the required
-Gate 2 runtime evidence.
+The current MemScope host is Linux x86_64 under WSL2 with rootless Docker Engine 29.7.2 and Compose
+5.4.0. The complete clean-room lifecycle verifier passed. This environment can prove Compose
+behavior and inspect configured resource ceilings, but cannot authoritatively prove host cgroup
+enforcement or boot/daemon auto-start; the final Linux deployment machine must retest those items.
+
+## Frozen boundary
+
+B04 does not provide the public contest API, real model calls, semantic Add/Search or quality
+results. B05/B06 are not authorized by this manifest and each requires a separate Gate 0 review.

@@ -3,7 +3,8 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure; Real MemOS Add/Search integration remains deferred.
+MemOS/Neo4j/Qdrant runtime infrastructure and is accepted/frozen. Real MemOS Add/Search integration
+remains deferred; B05 and B06 have not started.
 
 ## Development environment
 
@@ -111,15 +112,28 @@ and Qdrant. It exposes no host port and deliberately has no usable model endpoin
 infrastructure lifecycle target rather than a contest service. The complete upstream source archive,
 license, SHA-256 and OCI image locks are included under `third_party/memos/`.
 
-On a clean Linux Docker Compose v2 host, run the complete build/start/restart/fault gate with:
+On a clean Linux Docker Compose v2 host, rerun the accepted build/start/restart/fault gate with:
 
 ```bash
 python scripts/verify_b04_runtime.py --report /tmp/b04-runtime-report.json
 ```
 
-The verifier uses a random isolated project and removes only that project's test volumes. See
-`docs/batches/B04/PLAN.md` and `docs/adr/0005-b04-compose-runtime-topology.md`. Do not interpret
-MemOS `/health` as Add/Search/model readiness.
+The verifier uses a random isolated project and removes only that project's test volumes. B04 Gate 2
+passed on 2026-09-03; evidence and accepted exceptions are in `docs/batches/B04/HANDOFF.md`. See also
+`docs/batches/B04/PLAN.md` and `docs/adr/0005-b04-compose-runtime-topology.md`. Do not interpret MemOS
+`/health` as Add/Search/model readiness.
+
+## Development and tuning workflow
+
+Development/Git work and Huawei-network tuning run on separate machines. The development machine
+owns B05/B06 Gate 0–2, deterministic tests, SDD and a checksummed tuning handoff. The tuning machine
+owns real gateway probes, Docker revalidation, baseline/full evaluation, controlled tuning and the
+final submission ZIP. It must return source/config differences and evidence so the final candidate
+remains auditable.
+
+Start with `docs/README.md`, `docs/acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` and
+`docs/collaboration/TWO_MACHINE_WORKFLOW.md`. B05 and B06 must each begin in a new Session with a
+user-approved Gate 0 algorithm review; B04 acceptance does not authorize either implementation.
 
 ## Current boundaries
 

@@ -1,8 +1,9 @@
 # B04 runtime infrastructure implementation plan
 
-> Status: Gate 1 implementation complete; Docker Gate 2 execution pending
+> Status: Accepted/Frozen; Gate 2 approved 2026-09-03
 > Batch: B04
 > Approved: 2026-09-02 by explicit user message “B04 Gate 1 审批通过”
+> Gate 2 approval: 2026-09-03 by explicit user message “Gate 2 通过”
 > Base commit: `3ed5477d` (`main`)
 > Branch: `batch/b04-runtime-infra`
 > Boundary: B04 infrastructure only; B05 is not authorized
@@ -30,7 +31,7 @@ internal networking, named volumes and an executable clean-room lifecycle verifi
 
 ## Deliverables
 
-- `compose.yaml`, `.dockerignore`, `docker/memos/{Dockerfile,entrypoint.sh}`;
+- `compose.yaml`, `.dockerignore`, `docker/memos/{Dockerfile,constraints.txt,entrypoint.sh}`;
 - `deploy/compose.env.example`;
 - complete archive, `SOURCE_LOCK.json`, `SHA256SUMS`, upstream license and notices;
 - `scripts/verify_b04_runtime.py` and static unit coverage;
@@ -57,15 +58,31 @@ python scripts/verify_b04_runtime.py --report /tmp/b04-runtime-report.json
 
 The verifier copies only build inputs to a fresh temporary directory, validates Compose, builds
 the MemOS image, starts all services, waits for health, probes all backends, verifies the MemOS
-collection, checks network/ports, verifies three-store restart persistence, injects a Qdrant stop,
-checks failure detection and recovery, and removes only its randomly named project and volumes.
+collection, checks network/ports and runtime resource/log controls, verifies three-store restart
+persistence, injects a Qdrant stop and MemOS SIGKILL, checks recovery and graceful shutdown, and
+removes only its randomly named project and volumes.
 
-Gate 2 must record Docker/Compose versions, OS/architecture, image manifests, build/cold-start/
-restart durations and every failure. Missing Docker is an environment blocker, not a pass.
+Gate 2 recorded Docker/Compose versions, OS/architecture, resolved image manifests,
+build/cold-start/restart durations and all asserted checks. The accepted evidence is frozen in
+`HANDOFF.md`.
+
+## Accepted implementation deviations
+
+Gate 2 troubleshooting required two guarded build-time patches to the extracted MemOS source while
+preserving the original vendored archive and checksum:
+
+- replace three hardcoded network-backed GPT-2 tokenizer defaults with configurable
+  `MEM_READER_TOKENIZER`, defaulting to the offline `word` tokenizer for B04 only;
+- guard scheduler shutdown when `_io_loop_thread` was never created because the scheduler is
+  disabled.
+
+Each patch first asserts the exact upstream text/count and fails the image build if the fixed source
+changes. These are B04 bootstrap/lifecycle compatibility fixes, not B05/B06 model or algorithm work.
 
 ## Rollback and safety
 
-- All implementation stays on `batch/b04-runtime-infra` until Gate 2 approval.
+- Implementation stayed on `batch/b04-runtime-infra` until Gate 2 approval and is merged only after
+  final documentation and regression checks.
 - The verifier accepts only project names prefixed `memscope_b04_gate_`.
 - Cleanup is `docker compose down --volumes --remove-orphans` scoped to that project; global prune,
   broad deletion and existing user volumes are forbidden.
@@ -75,5 +92,5 @@ restart durations and every failure. Missing Docker is an environment blocker, n
 
 ## Exit criteria
 
-B04 can enter Gate 2 review only when all static gates and the complete clean-room Docker lifecycle
-run pass. Gate 1 approval authorizes implementation; it does not pre-approve Gate 2 or B05.
+B04 met all accepted static and clean-room lifecycle criteria and was approved on 2026-09-03. It is
+now frozen. This approval does not authorize B05; B05 starts in a separate Session at Gate 0.

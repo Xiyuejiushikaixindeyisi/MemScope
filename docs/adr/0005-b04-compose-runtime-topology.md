@@ -1,8 +1,8 @@
 # ADR 0005: B04 three-service Compose runtime
 
-- Status: Accepted for B04 Gate 1
+- Status: Accepted/Frozen after B04 Gate 2
 - Date: 2026-09-02
-- Decision owner: user-approved B04 Gate 1
+- Decision owner: user-approved B04 Gate 1 and Gate 2
 
 ## Context
 
@@ -35,6 +35,10 @@ not Add/Search or model capability.
 
 MemOS source is bundled as an unmodified deterministic Git archive at tag `v2.0.32`, commit
 `185ebdb925911b55c13b7efe666b74e2e292e484`, with SHA-256, license and image digest locks.
+
+The image build applies two narrow, text-guarded compatibility patches to the extracted copy while
+leaving that archive unchanged: the B04 tokenizer default becomes configurable/offline, and disabled
+scheduler shutdown tolerates an absent I/O-loop thread. Any upstream text drift fails the build.
 
 ## Why not one container with multiple processes
 

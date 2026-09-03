@@ -31,7 +31,9 @@ checkout and is never a build input.
 | Default cube | `APIConfig.get_default_cube_config` | Enabled for concrete tree-memory config |
 | Static download mount | `server_api.py` reads `FILE_LOCAL_PATH` during import | Entrypoint creates writable directory before Uvicorn |
 | Local state root | `src/memos/settings.py:MEMOS_DIR` | `MEMOS_BASE_PATH=/var/lib/memos` named volume |
-| Python dependency lock | `docker/requirements.txt` | Installed exactly as shipped upstream |
+| Python dependency lock | `docker/requirements.txt` | Upstream exact requirements plus B04 exact transitive constraints |
+| Tokenizer bootstrap | three `tokenizer_or_token_counter: gpt2` defaults in `api/config.py` | Text-guarded build patch to configurable `MEM_READER_TOKENIZER`; B04 uses offline `word` |
+| Disabled scheduler shutdown | `_io_loop_thread` access in `rabbitmq_service.py` | Text-guarded `getattr` patch when scheduler never created the thread |
 
 ## B04 configuration boundary
 
@@ -53,18 +55,24 @@ MemOS `/health` only reports that the ASGI process responds. The B04 verifier th
 3. verifies the MemOS-created `neo4j_vec_db` collection and configured dimension;
 4. checks no host port is published and the backend network is internal;
 5. writes markers in all three persistent stores, restarts Compose and reads them back;
-6. stops Qdrant, expects aggregate readiness to fail, restarts it and expects recovery.
+6. stops Qdrant, expects aggregate readiness to fail, restarts it and expects recovery;
+7. checks CPU/memory/PID ceilings and bounded log rotation;
+8. kills the MemOS process and verifies automatic recovery;
+9. verifies graceful MemOS shutdown exits with code 0 and returns healthy after start.
 
 This aggregate result is Gate 2 evidence; it is not exposed as the contest `/health` endpoint in
 B04.
 
-## Known implementation risks for Gate 2
+## Accepted evidence and remaining risks
 
-- The current execution host has no Docker CLI or daemon, so image build/runtime behavior is not
-  yet observed here.
-- The upstream dependency list is large and includes build-time native dependencies. It is pinned,
-  but build success still depends on artifact availability unless wheels/packages are mirrored.
-- Qdrant's in-container health command and MemOS/Qdrant client compatibility must be confirmed by
-  the real Compose run; static review cannot substitute for it.
-- The selected exact images are multi-platform indexes, but Gate 2 must record the actual target
-  architecture and resolved platform manifests.
+The complete Gate 2 lifecycle passed on Linux/amd64 with rootless Docker Engine 29.7.2 and Compose
+5.4.0. Exact timings and resolved image identities are frozen in `docs/batches/B04/HANDOFF.md`.
+
+- Build success still depends on pinned base images and Python wheels being available from a
+  reachable registry/package source or mirror. Runtime is offline.
+- The selected images are multi-platform indexes, but only Linux/amd64 was executed locally; other
+  target architectures require their own lifecycle run.
+- WSL rootless Docker cannot authoritatively prove cgroup enforcement or host boot/daemon recovery;
+  the final Linux deployment machine must retest them.
+- The B04 `word` tokenizer and dimension 16 are bootstrap-only and must not leak into B05/B06 model
+  or ranking decisions.

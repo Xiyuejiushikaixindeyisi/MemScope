@@ -28,6 +28,8 @@
 | `docker/memos/` | Builds/runs the fixed upstream MemOS source archive | pinned Python image, bundled source |
 | `third_party/memos/` | Complete MemOS archive, source/image lock, checksum and upstream license | fixed upstream commit |
 | `scripts/verify_b04_runtime.py` | Disposable clean-room build, readiness, restart persistence and fault-recovery evidence | Docker Engine/Compose v2 |
+| `docs/acceptance/` | Verified contest requirements, project gates and explicitly pending facts | Formal task/API materials and user approvals |
+| `docs/collaboration/` | Two-machine workflow, human/AI rules and transfer/tuning templates | Current project context and Git identities |
 | `tests/unit/` | Settings, errors, logging, HTTP models, identity and persistence value behavior | Public module surfaces |
 | `tests/component/` | SQLite migration, persistence, restart, concurrency, cancellation and fault behavior | Public RawStore interface and temporary databases |
 | `tests/contract/` | Contest HTTP, reusable Gateway, explicit Fake path and Mock Model contracts | Public ports and app factories |
@@ -59,9 +61,15 @@ implementations. Runtime still defaults to `UnavailableContestOperations`; only 
 inject the B03 Fake path. B04 Compose is an independent infrastructure target and does not import
 or replace the `src/memscope` composition root.
 
-## Deferred ownership
+## Batch ownership
 
-- B04: runtime service topology and lifecycle (implemented; real Docker Gate 2 evidence pending).
-- B05+: Real Gateway, public adapter composition and model-backed Add/Search integration.
+- B00–B04: accepted and frozen. B04 runtime lifecycle evidence is recorded in
+  `docs/batches/B04/HANDOFF.md`.
+- B05: Real Gateway, public adapter composition, Cube lifecycle and synchronous Add. Not started;
+  must begin in a new Session at Gate 0.
+- B06: Search conversion, isolation, evidence length/ranking and failure policy. Not started; must
+  begin in a separate new Session at Gate 0.
+- Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
+  become Git facts until their reports and source/config differences are returned.
 
 This file records navigation and dependency direction, not implementation copies.

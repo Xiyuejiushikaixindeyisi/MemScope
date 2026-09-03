@@ -1,7 +1,8 @@
 # MemOS Baseline 最终实现方案
 
-> 状态：Final，D01～D15 评审结论已合并。  
-> 当前目标：先完成无 API/Key 可联调的 `memos-scaffold-v0`；主办方提供真实 API/Key 后完成 MemOS 全链路调测并冻结 `baseline-v0`；之后基于 baseline 逐项调优。  
+> 状态：Final，D01～D15 评审结论已合并。
+>
+> 当前目标：先完成无 API/Key 可联调的 `memos-scaffold-v0`；主办方提供真实 API/Key 后完成 MemOS 全链路调测并冻结 `baseline-v0`；之后基于 baseline 逐项调优。
 > 实施节奏：由用户主动控制；本文只规定阶段依赖、完成标准和技术边界。
 
 历史方案：
@@ -161,6 +162,44 @@ B04 先实现一个更窄的 infra-only Compose：仅 `memos + neo4j + qdrant`�
 服务、无 Add/Search 成功声明。它用于固定源码、数据库启动顺序、Health、internal network 和
 named-volume restart。B05 再加入唯一公开的 `memory-api` 与模型出口；这不会把 B04 的三服务
 拓扑解释为最终提交入口已经完成。
+
+### 5.1 B04 Gate 2 质量结论与批准例外（2026-09-03）
+
+B04 最新候选已通过三服务冷启动、联合 Health、MemOS 创建 Qdrant collection、internal
+network、named-volume restart、Qdrant 故障恢复、MemOS `kill -9` 自愈、优雅停机、资源配置
+和日志轮转检查。实测冷启动约 32 秒，Compose restart 恢复约 39 秒。
+
+本轮 Docker 质量验收采用以下批准口径：
+
+| 项目 | 结论与后续约束 |
+|---|---|
+| 镜像体积 | `docker image ls` 约 985 MB，用户批准将上限放宽到 1 GB，因此 B04 通过；后续新增依赖必须继续报告体积增量。 |
+| 构建复现 | 两次 `--no-cache` 构建的 RootFS 层摘要和运行内容一致；最终 image ID 只因 OCI 配置/构建历史元数据不同而变化。该差异不改变文件系统、入口命令、环境配置或 Compose 拉起行为，本轮按“功能可复现”通过，不要求 bit-for-bit image ID 相同。 |
+| Trivy | 扫描未发现镜像内密钥，但固定 Debian/Python 依赖存在已知 HIGH/CRITICAL 项。用户批准将其作为安全债务豁免，不阻塞 B04；报告不得写成“高危为 0”。若赛事或部署环境后来把安全扫描设为硬门禁，必须重新处置。 |
+| 本机环境 | 当前在 WSL rootless Docker 验证；资源上限已经进入 Compose 且容器配置可检查，但本机无法权威验证 cgroup 强制执行和宿主机开机后 Docker/Compose 自动恢复。最终部署机必须补测这两项。 |
+
+Trivy 给出的部分 Python 修复版本不是无风险的小补丁：FastMCP 的建议修复跨越到 3.x，可能改变
+MCP decorator、transport 和启动接口；Starlette 的建议修复超出当前 FastAPI 0.115.14 的兼容范围，
+需要连同 FastAPI 升级；Transformers 的建议修复跨越到 5.x，而 MemOS v2.0.32 直接依赖
+`DynamicCache` 等 4.x API。直接追到扫描器建议版本可能导致导入失败、路由/中间件行为变化、结构化
+响应差异或 MemOS 启动失败，因此不在 B04 未经全链路回归地升级。
+
+保留当前固定版本不会妨碍主办方正常构建和拉起：漏洞记录本身不会使 pip、Docker 或 Python 拒绝
+启动，并且 FastMCP/MCP 路径不属于当前 B04 `server_api` 的启动入口。不过安全漏洞仍可能在特定
+恶意输入下形成拒绝服务或其他安全影响，故只能作为本轮风险豁免，不能表述为“与服务质量绝对无关”。
+
+华为内网无法访问 GitHub 不影响固定 MemOS 源码：`v2.0.32`/`185ebdb...` 源码归档及校验值已经
+vendored 到提交工程，Docker 构建和运行均不访问 GitHub。构建期仍需取得固定 Python/Neo4j/Qdrant
+基础镜像和 Python wheels；当前通过容器镜像仓库和可配置的 `PIP_INDEX_URL` 获取。如果正式评测机
+也不能访问 Docker Hub/兼容镜像源或 PyPI/内网 PyPI，则仅有 vendored 源码仍不足以构建，必须在
+B09 提交冻结前将基础镜像同步到可达内网仓库，并提供受许可、带哈希的离线 wheelhouse 或确认可达
+的内网 Python 镜像源。运行期保持 `HF_HUB_OFFLINE=1`、`TRANSFORMERS_OFFLINE=1`，不得下载模型或
+tokenizer。
+
+2026-09-03 的验收后冷构建复查已实际触发该风险：一次 PyPI wheel 响应出现哈希不一致并被 pip
+阻断，独立重试得到与 `uv.lock` 一致的正确 wheel，随后完整依赖下载又超过 1,800 秒。项目没有
+放松校验；详细证据见 `docs/batches/B04/HANDOFF.md`。因此内网镜像源/wheelhouse 是 B09 前必须
+关闭的交付项，而不是一般性优化建议。
 
 约束：
 
@@ -623,13 +662,29 @@ baseline 报告至少包含：
 
 ## 18. 分 Batch 协作与质量门禁
 
-开发采用逐 Batch、双门禁方式。每个 Batch 的状态为：
+开发采用逐 Batch 门禁方式。B00～B04 沿用 Gate 1/2；涉及核心算法的 B05、B06 必须增加
+Gate 0。每个 Batch 的状态为：
 
 ```text
 Draft → Approved → In Progress → Code Review → Accepted → Frozen
 ```
 
 未经用户明确批准，不从 `Draft` 进入代码开发；未经用户验收，不将 Batch 视为完成，也不自动进入下一 Batch。
+
+### 18.0 Gate 0：B05/B06 核心算法评审
+
+B05、B06 必须分别在新的开发 Session 中从 Gate 0 开始。Gate 0 只讨论算法和边界，不创建核心
+业务代码，至少说明：
+
+1. 评测问题、核心不变量和主要失败模式；
+2. 备选算法、取舍、拒绝理由和安全回退；
+3. 模块边界、替换点及未来创新空间；
+4. LLM、Embedding、reranker、prompt、chunk、召回、融合、截断和 timeout 等可调变量；
+5. 开发机可验证项与只能在华为内网调测机验证的项目；
+6. 准确率、延迟、调用量、资源、错误率和正负翻转的评价方法；
+7. 防止使用公开 gold、题号或 Judge 行为过拟合的约束。
+
+用户明确批准 Gate 0 后才准备 Gate 1。Gate 0 的批准不等于批准某一具体文件或实现。
 
 ### 18.1 Gate 1：代码方案评审
 
@@ -676,6 +731,9 @@ Draft → Approved → In Progress → Code Review → Accepted → Frozen
 - `HANDOFF.md`。
 
 只有通过测试并由用户验收后，Batch 才进入 `Accepted/Frozen`。
+
+Gate 2 是开发机能够执行的代码验收，不代替真实 Huawei AI Gateway、真实硬件和完整评测集结果。
+B05/B06 Gate 2 之后的真实部署与语义效果由调测调优机单独验收并回传证据。
 
 ### 18.3 代码质量约束
 
@@ -760,6 +818,16 @@ baseline 后才能引入以得分提升为目的的复杂启发式；不得把�
 
 真实 API/Key 到位后的 capability probe、七类样本、数十题和 1000 题运行作为后续 baseline Batch 重新提交方案，不在 B00～B09 中预先实施。
 
+### 18.8 两台机器的交付边界
+
+开发机负责源码/Git 主线、B05/B06 Gate 0～2、无 Key 测试、B06 初版 SDD、B09 后的调优指南和
+调测交接 ZIP。调测调优机负责华为内网 API 探测、真实 Docker 二次验收、资源/基线/完整评测、
+调优及最终提交 ZIP。
+
+两台机器通过带 SHA-256、基准 commit、构建说明和风险清单的 ZIP 人工交换。调测机最终必须回传
+最终 ZIP、源码/配置差异、脱敏模型配置、评测报告和 Docker 证据；否则 GitHub 版本不得声称可以
+复现最终候选。完整规范见 `docs/collaboration/TWO_MACHINE_WORKFLOW.md`。
+
 ## 19. 上下文与依赖管理
 
 项目不能依赖完整聊天记录恢复状态。每个 Batch 必须形成可从 Git commit 独立恢复的最小上下文包。
@@ -770,8 +838,15 @@ baseline 后才能引入以得分提升为目的的复杂启发式；不得把�
 
 ```text
 docs/
+├── README.md
 ├── PROJECT_CONTEXT.md
 ├── CODEMAP.md
+├── acceptance/
+│   └── CONTEST_ACCEPTANCE_CHECKLIST.md
+├── collaboration/
+│   ├── TWO_MACHINE_WORKFLOW.md
+│   ├── TRANSFER_MANIFEST_TEMPLATE.md
+│   └── TUNING_REPORT_TEMPLATE.md
 ├── interfaces/
 ├── integrations/
 │   └── MEMOS_V2_0_32_MAP.md
@@ -784,8 +859,11 @@ docs/
 └── achieve/
 ```
 
+- `README.md`：文档入口、权威性顺序和按任务阅读路径；
 - `PROJECT_CONTEXT.md`：只保留当前有效的架构、边界和关键约束；
 - `CODEMAP.md`：记录模块职责、入口和依赖方向，不复制实现；
+- `acceptance/`：核实后的赛事要求、项目门禁和待确认项；
+- `collaboration/`：两机协作、人机协作、交接与调优证据模板；
 - `interfaces/`：保存当前有效的外部和内部契约；
 - `integrations/`：保存第三方源码路由图、固定版本和关键符号；
 - `adr/`：保存已批准且需要长期解释的重要决策；
@@ -922,10 +1000,12 @@ P1 默认按符号和调用链读取，不全仓加载。
 
 1. 检查主仓库分支、工作区和 HEAD；
 2. 校验 MemOS 为 `v2.0.32`/`185ebdb925911b55c13b7efe666b74e2e292e484`；
-3. 阅读本方案第 18、19 节和当前 Batch 的 P0；
-4. 先提交 Gate 1 方案和评审点；
-5. 未获批准前不创建业务代码；
-6. 开发完成后执行 Gate 2，不自动进入下一 Batch。
+3. 阅读 `docs/README.md`、`docs/PROJECT_CONTEXT.md`、两机协作规范、本方案第 18、19 节和当前
+   Batch 的 P0；
+4. B05/B06 先提交 Gate 0；其它 Batch 先提交 Gate 1；
+5. 未获对应门禁批准前不创建业务代码；
+6. 开发完成后执行 Gate 2，不自动进入下一 Batch；
+7. Session 结束前把测试、风险、偏差、commit 和下游必读信息写回 Markdown。
 
 ## 20. 提交目录
 
@@ -965,6 +1045,9 @@ solution/
 | Update/Forget 泄漏 | MemOps 失分 | MemOS 状态过滤和后续状态层 |
 | Compose 不支持 | 四服务无法部署 | 重新评审部署收缩或应急 profile |
 | 构建/运行无外网 | 依赖不可获得 | 固定并预装依赖，禁止运行时下载 |
+| 评测机无法访问 GitHub/Docker Hub/PyPI | vendored MemOS 源码可用，但基础镜像或 Python wheels 仍可能无法取得，导致构建前失败 | B09 前同步固定 digest 镜像到内网仓库，并准备带哈希的许可 wheelhouse 或确认内网 PyPI；构建和运行不得依赖 GitHub |
+| 固定上游依赖存在 Trivy 高危项 | 本轮可能不影响正常启动和评测路径，但保留潜在安全/拒绝服务风险 | B04 按用户批准记录安全债务豁免；若安全扫描成为硬门禁，单独建立兼容性升级 Batch 并执行全链路回归 |
+| WSL rootless 无法权威验证 cgroup/开机自启 | 本机资源配置存在但强制执行、宿主重启恢复证据不足 | 在最终 Linux Docker/Compose 部署机补测资源上限、daemon 重启和断电恢复，不以本机结果代替 |
 | Adapter 开销过高 | Add/Search 超时 | 分段测量后专项优化 |
 | 返回过长 | Answer 超上下文或噪声 | K 和总字符数消融 |
 
