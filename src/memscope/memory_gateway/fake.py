@@ -72,7 +72,13 @@ class FakeMemoryGateway:
         self._log("readiness", "success" if ready else "unavailable", started)
         return ready
 
-    async def add(self, request: GatewayAdd) -> None:
+    async def add(self, request: GatewayAdd, *, timeout_seconds: float = 115.0) -> None:
+        if (
+            isinstance(timeout_seconds, bool)
+            or not isinstance(timeout_seconds, int | float)
+            or not 0 < timeout_seconds < float("inf")
+        ):
+            raise ValueError("timeout_seconds must be finite and positive")
         started = perf_counter()
         try:
             self._inject(GatewayOperation.ADD)

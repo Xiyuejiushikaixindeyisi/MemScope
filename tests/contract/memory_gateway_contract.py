@@ -23,6 +23,7 @@ async def assert_memory_gateway_contract(factory: GatewayFactory) -> None:
         "contract-user",
         "contract-session",
         "contract-cube",
+        0,
         (GatewayMessage("contract-message", 0, "user", "alpha beta", None),),
     )
     other = GatewayAdd(
@@ -31,12 +32,13 @@ async def assert_memory_gateway_contract(factory: GatewayFactory) -> None:
         "other-user",
         "other-session",
         "other-cube",
+        0,
         (GatewayMessage("other-message", 0, "user", "alpha beta", None),),
     )
     assert await gateway.is_ready() is True
-    await gateway.add(request)
-    await gateway.add(request)
-    await gateway.add(other)
+    await gateway.add(request, timeout_seconds=5)
+    await gateway.add(request, timeout_seconds=5)
+    await gateway.add(other, timeout_seconds=5)
 
     evidence = await gateway.search(GatewaySearch("alpha", "contract-user", "contract-cube", 10))
     assert [(item.id, item.content) for item in evidence] == [("contract-message", "alpha beta")]
@@ -51,8 +53,10 @@ async def assert_memory_gateway_contract(factory: GatewayFactory) -> None:
                 request.user_id,
                 request.session_id,
                 request.cube_id,
+                request.session_start_position,
                 request.messages,
-            )
+            ),
+            timeout_seconds=5,
         )
     await gateway.close()
     assert await gateway.is_ready() is False

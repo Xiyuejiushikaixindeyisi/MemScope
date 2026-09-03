@@ -76,6 +76,7 @@ async def test_prepare_add_atomically_persists_exact_messages_cube_and_outbox(
 
     assert prepared.disposition is AddDisposition.NEW
     assert prepared.response is None
+    assert prepared.session_start_position == 0
     assert prepared.cube.user_id == command.user_id
     assert prepared.cube.cube_id.startswith("cube_v1_")
     assert loaded is not None
@@ -119,6 +120,7 @@ async def test_pending_and_completed_replay_have_no_write_side_effects(tmp_path:
 
     assert pending.disposition is AddDisposition.PENDING
     assert pending.payload_sha256 == first.payload_sha256
+    assert pending.session_start_position == first.session_start_position == 0
     assert _snapshot(path) == pending_snapshot
 
     response = _response(command)
@@ -129,6 +131,7 @@ async def test_pending_and_completed_replay_have_no_write_side_effects(tmp_path:
 
     assert completed.disposition is AddDisposition.COMPLETED
     assert completed.response == response
+    assert completed.session_start_position == 0
     assert _snapshot(path) == completed_snapshot
     await store.close()
 
@@ -218,6 +221,8 @@ async def test_multi_chunk_order_restart_and_cross_user_isolation(tmp_path: Path
     assert loaded_first.response == _response(first)
     assert loaded_second is not None
     assert [message.session_position for message in loaded_second.messages] == [2, 3]
+    second_prepared = await reopened.prepare_add(second)
+    assert second_prepared.session_start_position == 2
     assert loaded_other is not None
     assert [message.session_position for message in loaded_other.messages] == [0, 1]
     assert await reopened.load_add("user-2", first.request_id) is None

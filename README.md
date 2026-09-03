@@ -3,8 +3,9 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure and is accepted/frozen. Real MemOS Add/Search integration
-remains deferred; B05 and B06 have not started.
+MemOS/Neo4j/Qdrant runtime infrastructure and is accepted/frozen. B05 Real Add Gate 0 R1 is
+confirmed, Gate 1 is approved, and the Real Add baseline is in final verification; B06 remains
+unopened. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -105,7 +106,7 @@ It exposes health plus a small non-streaming Chat/Embedding subset, requires no 
 enabled in an organizer profile. See `docs/interfaces/memory-gateway-v1.md` and
 `docs/interfaces/mock-model-api-v1.md` for exact contracts and non-compatibility boundaries.
 
-## B04 infrastructure runtime
+## B04/B05 runtime
 
 B04 uses one Compose entry with three internal services: fixed MemOS `v2.0.32`, Neo4j Community
 and Qdrant. It exposes no host port and deliberately has no usable model endpoint, so it is an
@@ -123,6 +124,12 @@ passed on 2026-09-03; evidence and accepted exceptions are in `docs/batches/B04/
 `docs/batches/B04/PLAN.md` and `docs/adr/0005-b04-compose-runtime-topology.md`. Do not interpret MemOS
 `/health` as Add/Search/model readiness.
 
+B05 adds the public `memory-api`, real MemOS Add wiring and a deterministic no-key runtime fixture.
+The images build successfully, but full host-port and cgroup proof is environment-dependent. If
+Docker/Compose is unavailable or unproductive, use
+`docs/batches/B05/NATIVE_DEPLOYMENT.md`; do not postpone model/evaluation tuning to repair an
+optional container runtime.
+
 ## Development and tuning workflow
 
 Development/Git work and Huawei-network tuning run on separate machines. The development machine
@@ -132,13 +139,16 @@ final submission ZIP. It must return source/config differences and evidence so t
 remains auditable.
 
 Start with `docs/README.md`, `docs/acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` and
-`docs/collaboration/TWO_MACHINE_WORKFLOW.md`. B05 and B06 must each begin in a new Session with a
-user-approved Gate 0 algorithm review; B04 acceptance does not authorize either implementation.
+`docs/collaboration/TWO_MACHINE_WORKFLOW.md`. B05 Gate 0 R1 is recorded in
+`docs/batches/B05/GATE0.md`; its approved Gate 1 implementation plan is
+`docs/batches/B05/PLAN.md`, and the native deployment fallback is
+`docs/batches/B05/NATIVE_DEPLOYMENT.md`. B06 must begin in a separate new Session with a
+user-approved Gate 0 algorithm review.
 
 ## Current boundaries
 
-B04 adds only the pinned infrastructure topology. It does not implement the Real Gateway, public
-contest composition, model access, Add/Search, semantic retrieval, quality results, outbox workers,
-production retries/fallback or final-answer generation. See `docs/interfaces/contest-http-v1.md`,
+B05 implements Real Add only. It does not implement public Search/readiness, semantic retrieval,
+quality results, outbox workers, production retries/fallback or final-answer generation. See
+`docs/interfaces/contest-http-v1.md`,
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.

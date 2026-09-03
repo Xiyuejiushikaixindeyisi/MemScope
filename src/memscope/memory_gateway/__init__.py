@@ -8,6 +8,7 @@ from memscope.memory_gateway.errors import (
     GatewayUnavailableError,
 )
 from memscope.memory_gateway.fake import FakeMemoryGateway, GatewayOperation
+from memscope.memory_gateway.memos import MemosMemoryGateway
 from memscope.memory_gateway.models import (
     GatewayAdd,
     GatewayEvidence,
@@ -15,6 +16,11 @@ from memscope.memory_gateway.models import (
     GatewaySearch,
 )
 from memscope.memory_gateway.protocol import MemoryGateway
+from memscope.memory_gateway.receipt_store import (
+    GatewayReceipt,
+    GatewayReceiptStore,
+    ReceiptStatus,
+)
 
 __all__ = [
     "FakeMemoryGateway",
@@ -25,8 +31,12 @@ __all__ = [
     "GatewayOperation",
     "GatewayProtocolError",
     "GatewayRateLimitedError",
+    "GatewayReceipt",
+    "GatewayReceiptStore",
     "GatewaySearch",
     "GatewayTimeoutError",
     "GatewayUnavailableError",
     "MemoryGateway",
+    "MemosMemoryGateway",
+    "ReceiptStatus",
 ]

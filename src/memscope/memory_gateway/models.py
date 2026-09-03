@@ -56,6 +56,7 @@ class GatewayAdd:
     user_id: str
     session_id: str
     cube_id: str
+    session_start_position: int
     messages: tuple[GatewayMessage, ...]
 
     def __post_init__(self) -> None:
@@ -64,6 +65,7 @@ class GatewayAdd:
         _require_nonblank("user_id", self.user_id)
         _require_nonblank("session_id", self.session_id)
         _require_nonblank("cube_id", self.cube_id)
+        _require_exact_integer("session_start_position", self.session_start_position, minimum=0)
         if not isinstance(self.messages, tuple):
             raise TypeError("messages must be a tuple")
         if not self.messages:

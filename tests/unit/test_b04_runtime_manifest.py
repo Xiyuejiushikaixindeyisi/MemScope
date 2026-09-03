@@ -44,16 +44,18 @@ def test_checksum_file_uses_only_the_locked_archive() -> None:
     assert checksum_lines == [f"{lock['source']['archive_sha256']}  {lock['source']['archive']}"]
 
 
-def test_compose_has_only_approved_services_and_four_named_volumes() -> None:
+def test_compose_has_only_approved_services_and_five_named_volumes() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
     service_block = compose.split("\nservices:\n", maxsplit=1)[1].split(
         "\nnetworks:\n", maxsplit=1
     )[0]
     service_names = re.findall(r"^  ([a-z][a-z0-9_-]*):$", service_block, re.MULTILINE)
-    assert service_names == ["neo4j", "qdrant", "memos"]
-    assert "ports:" not in service_block
+    assert service_names == ["memory-api", "neo4j", "qdrant", "memos"]
+    memory_api, private_services = service_block.split("\n  neo4j:\n", maxsplit=1)
+    assert "ports:" in memory_api
+    assert "ports:" not in private_services
     assert "internal: true" in compose
-    for volume in ("memos_data", "neo4j_data", "neo4j_logs", "qdrant_data"):
+    for volume in ("memscope_data", "memos_data", "neo4j_data", "neo4j_logs", "qdrant_data"):
         assert f"  {volume}:" in compose
 
 
@@ -95,44 +97,49 @@ def test_memos_transitive_constraints_are_exact() -> None:
     assert all(re.fullmatch(r"[A-Za-z0-9_.-]+==[^\s]+", line) for line in requirements)
 
 
-def test_compose_requires_secret_and_disables_model_calls_for_b04() -> None:
+def test_compose_requires_secrets_and_explicit_b05_model_configuration() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
     neo4j_service = compose.split("  neo4j:\n", maxsplit=1)[1].split("\n  qdrant:\n", maxsplit=1)[0]
     assert "${NEO4J_PASSWORD:?" in compose
     assert "neo4j/12345678" not in compose
     assert "      NEO4J_PASSWORD:" not in neo4j_service
     assert "$${NEO4J_AUTH#neo4j/}" in neo4j_service
+    assert 'MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?' in compose
     assert "MOS_EMBEDDER_BACKEND: universal_api" in compose
     assert "MOS_RERANKER_BACKEND: cosine_local" in compose
     assert "MEM_READER_TOKENIZER: word" in compose
     assert 'HF_HUB_OFFLINE: "1"' in compose
     assert 'TRANSFORMERS_OFFLINE: "1"' in compose
-    assert "http://127.0.0.1:9/v1" in compose
+    assert 'MOS_EMBEDDER_API_BASE: "${MOS_EMBEDDER_API_BASE:?' in compose
+    assert 'MEMRADER_API_BASE: "${MEMRADER_API_BASE:?' in compose
+    assert 'EMBEDDING_DIMENSION: "${EMBEDDING_DIMENSION:?' in compose
     assert 'ENABLE_INTERNET: "false"' in compose
     assert 'API_SCHEDULER_ON: "false"' in compose
+    assert 'MOS_ENABLE_REORGANIZE: "false"' in compose
 
 
-def test_memos_build_replaces_network_tokenizer_with_runtime_choice() -> None:
+def test_memos_build_applies_locked_b04_and_b05_patchset() -> None:
     dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
 
-    assert "grep -F -c" in dockerfile
-    assert "MEM_READER_TOKENIZER" in dockerfile
-    assert 'os.getenv("MEM_READER_TOKENIZER", "word")' in dockerfile
+    assert "COPY docker/memos/apply_patchset.py" in dockerfile
+    assert "COPY docker/memos/PATCHSET_LOCK.json" in dockerfile
+    assert "python /opt/vendor/apply_patchset.py --source /opt/memos" in dockerfile
+    assert "grep -F -c" not in dockerfile
 
 
-def test_memos_build_guards_disabled_scheduler_shutdown() -> None:
-    dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
+def test_memos_patchset_guards_disabled_scheduler_shutdown() -> None:
+    patcher = (ROOT / "docker" / "memos" / "apply_patchset.py").read_text(encoding="utf-8")
 
-    assert 'getattr(self, "_io_loop_thread", None)' in dockerfile
+    assert 'getattr(self, "_io_loop_thread", None)' in patcher
 
 
-def test_compose_readiness_covers_all_three_services() -> None:
+def test_compose_readiness_covers_all_four_services() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
-    assert compose.count("healthcheck:") == 3
+    assert compose.count("healthcheck:") == 4
     assert "cypher-shell" in compose
     assert "/dev/tcp/127.0.0.1/6333" in compose
     assert "http://127.0.0.1:8000/health" in compose
-    assert compose.count("condition: service_healthy") == 2
+    assert compose.count("condition: service_healthy") == 3
 
 
 def test_compose_has_resource_shutdown_and_log_controls() -> None:
@@ -140,17 +147,24 @@ def test_compose_has_resource_shutdown_and_log_controls() -> None:
     qdrant_service = compose.split("  qdrant:\n", maxsplit=1)[1].split("\n  memos:\n", maxsplit=1)[
         0
     ]
-    memos_service = compose.split("  memos:\n", maxsplit=1)[1].split("\nnetworks:\n", maxsplit=1)[0]
+    memos_service = compose.split("\n  memos:\n", maxsplit=1)[1].split("\nnetworks:\n", maxsplit=1)[
+        0
+    ]
+    memory_api_service = compose.split("  memory-api:\n", maxsplit=1)[1].split(
+        "\n  neo4j:\n", maxsplit=1
+    )[0]
 
-    assert compose.count("stop_grace_period: 30s") == 3
+    assert compose.count("stop_grace_period: 30s") == 4
     assert compose.count("pids_limit: 512") == 3
-    assert compose.count("logging: *default-logging") == 3
+    assert "pids_limit: 256" in memory_api_service
+    assert compose.count("logging: *default-logging") == 4
     assert 'max-size: "10m"' in compose
     assert 'max-file: "3"' in compose
     for service in ("MEMOS", "NEO4J", "QDRANT"):
         assert f"B04_{service}_MEMORY_LIMIT" in compose
         assert f"B04_{service}_CPU_LIMIT" in compose
     assert "init: true" in qdrant_service
+    assert "init: true" in memory_api_service
     assert "init: true" not in memos_service
 
 

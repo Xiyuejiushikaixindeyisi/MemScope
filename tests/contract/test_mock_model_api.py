@@ -146,6 +146,20 @@ async def test_timeout_fault_completes_when_client_allows_delay() -> None:
     assert response.status_code == 200
 
 
+async def test_configured_chat_delay_is_cancellable() -> None:
+    async with httpx.AsyncClient(
+        transport=_transport(chat_delay_ms=200), base_url="http://test"
+    ) as client:
+        with pytest.raises(TimeoutError):
+            await asyncio.wait_for(
+                client.post(
+                    "/v1/chat/completions",
+                    json={"model": "m", "messages": [{"role": "user", "content": "x"}]},
+                ),
+                timeout=0.02,
+            )
+
+
 @pytest.mark.parametrize(
     "payload",
     [
@@ -196,6 +210,9 @@ async def test_duplicate_failure_header_is_rejected() -> None:
         ({"timeout_delay_ms": True}, ValueError),
         ({"timeout_delay_ms": 9}, ValueError),
         ({"timeout_delay_ms": 5001}, ValueError),
+        ({"chat_delay_ms": True}, ValueError),
+        ({"chat_delay_ms": -1}, ValueError),
+        ({"chat_delay_ms": 120001}, ValueError),
     ],
 )
 def test_mock_app_factory_rejects_invalid_configuration(

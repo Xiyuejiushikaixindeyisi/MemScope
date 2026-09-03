@@ -35,6 +35,7 @@ def _add(
         user_id=user_id,
         session_id="session-1",
         cube_id=cube_id,
+        session_start_position=0,
         messages=(GatewayMessage(message_id, 0, "user", content, timestamp_ms),),
     )
 

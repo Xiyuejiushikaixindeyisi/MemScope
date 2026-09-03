@@ -1,4 +1,4 @@
-name: memscope-b04
+name: memscope-b05
 
 x-logging: &default-logging
   driver: json-file
@@ -7,6 +7,61 @@ x-logging: &default-logging
     max-file: "3"
 
 services:
+  memory-api:
+    image: memscope/memory-api:0.0.0-b05
+    build:
+      context: .
+      dockerfile: docker/memory-api/Dockerfile
+      args:
+        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://pypi.org/simple}"
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: "${B05_MEMORY_API_MEMORY_LIMIT:-512m}"
+    cpus: "${B05_MEMORY_API_CPU_LIMIT:-1.0}"
+    pids_limit: 256
+    logging: *default-logging
+    depends_on:
+      memos:
+        condition: service_healthy
+        restart: true
+    environment:
+      APP_PROFILE: memos_add
+      HOST: 0.0.0.0
+      PORT: "8080"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      LOG_FORMAT: json
+      CONTEST_AUTH_MODE: "${CONTEST_AUTH_MODE:-none}"
+      CONTEST_API_KEY: "${CONTEST_API_KEY:-}"
+      DATABASE_PATH: /var/lib/memscope/raw.db
+      MEMOS_GATEWAY_RECEIPT_PATH: /var/lib/memscope/gateway-receipts.db
+      SQLITE_BUSY_TIMEOUT_MS: "5000"
+      MEMOS_BASE_URL: http://memos:8000
+      ADD_DEADLINE_SECONDS: "${ADD_DEADLINE_SECONDS:-115}"
+      ADD_WARN_SECONDS: "${ADD_WARN_SECONDS:-105}"
+      MEMOS_DEADLINE_RESERVE_SECONDS: "${MEMOS_DEADLINE_RESERVE_SECONDS:-5}"
+      MEMOS_CONNECT_TIMEOUT_SECONDS: "${MEMOS_CONNECT_TIMEOUT_SECONDS:-3}"
+      MEMOS_RESPONSE_MAX_BYTES: "${MEMOS_RESPONSE_MAX_BYTES:-1048576}"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import socket;
+          s=socket.create_connection(('127.0.0.1',8080),timeout=2);
+          s.close()
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    ports:
+      - "${MEMSCOPE_PUBLIC_PORT:-8080}:8080"
+    volumes:
+      - memscope_data:/var/lib/memscope
+    networks:
+      - backend
+
   neo4j:
     image: neo4j:5.26.6-community@sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893
     restart: unless-stopped
@@ -61,7 +116,7 @@ services:
       - backend
 
   memos:
-    image: memscope/memos:2.0.32-b04
+    image: memscope/memos:2.0.32-b05
     build:
       context: .
       dockerfile: docker/memos/Dockerfile
@@ -81,6 +136,7 @@ services:
         condition: service_healthy
         restart: true
     environment:
+      MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?set MEMSCOPE_MODEL_PROFILE to gateway or mock}"
       FILE_LOCAL_PATH: /var/lib/memos/files
       MEMOS_BASE_PATH: /var/lib/memos
       GRAPH_DB_BACKEND: neo4j-community
@@ -90,21 +146,28 @@ services:
       NEO4J_DB_NAME: neo4j
       QDRANT_HOST: qdrant
       QDRANT_PORT: "6333"
-      EMBEDDING_DIMENSION: "${B04_BOOTSTRAP_EMBEDDING_DIMENSION:-16}"
+      EMBEDDING_DIMENSION: "${EMBEDDING_DIMENSION:?set EMBEDDING_DIMENSION}"
       MOS_EMBEDDER_BACKEND: universal_api
       MOS_EMBEDDER_PROVIDER: openai
-      MOS_EMBEDDER_API_BASE: http://127.0.0.1:9/v1
-      MOS_EMBEDDER_API_KEY: EMPTY
-      MOS_EMBEDDER_MODEL: b04-bootstrap-no-call
+      MOS_EMBEDDER_API_BASE: "${MOS_EMBEDDER_API_BASE:?set MOS_EMBEDDER_API_BASE}"
+      MOS_EMBEDDER_API_KEY: "${MOS_EMBEDDER_API_KEY:?set MOS_EMBEDDER_API_KEY}"
+      MOS_EMBEDDER_MODEL: "${MOS_EMBEDDER_MODEL:?set MOS_EMBEDDER_MODEL}"
+      MOS_EMBEDDER_TIMEOUT: "${MOS_EMBEDDER_TIMEOUT:-5}"
       MOS_EMBEDDER_BACKUP_CLIENT: "false"
       MOS_CHAT_MODEL_PROVIDER: openai
-      MOS_CHAT_MODEL: b04-bootstrap-no-call
-      OPENAI_API_BASE: http://127.0.0.1:9/v1
-      OPENAI_API_KEY: EMPTY
-      MEMRADER_API_BASE: http://127.0.0.1:9/v1
-      MEMRADER_API_KEY: EMPTY
-      MEMRADER_MODEL: b04-bootstrap-no-call
+      MOS_CHAT_MODEL: "${MEMRADER_MODEL:?set MEMRADER_MODEL}"
+      OPENAI_API_BASE: "${MEMRADER_API_BASE:?set MEMRADER_API_BASE}"
+      OPENAI_API_KEY: "${MEMRADER_API_KEY:?set MEMRADER_API_KEY}"
+      MEMRADER_API_BASE: "${MEMRADER_API_BASE:?set MEMRADER_API_BASE}"
+      MEMRADER_API_KEY: "${MEMRADER_API_KEY:?set MEMRADER_API_KEY}"
+      MEMRADER_MODEL: "${MEMRADER_MODEL:?set MEMRADER_MODEL}"
+      MEMRADER_TIMEOUT_SECONDS: "${MEMRADER_TIMEOUT_SECONDS:-110}"
+      MEM_READER_BACKEND: simple_struct
       MEM_READER_TOKENIZER: word
+      MEM_READER_CHAT_WINDOW_MAX_TOKENS: "${MEM_READER_CHAT_WINDOW_MAX_TOKENS:-1024}"
+      MEM_READER_REMOVE_PROMPT_EXAMPLE: "${MEM_READER_REMOVE_PROMPT_EXAMPLE:-false}"
+      SIMPLE_STRUCT_ADD_FILTER: "false"
+      MEM_READER_SAVE_RAWFILENODE: "false"
       MOS_RERANKER_BACKEND: cosine_local
       MOS_FEEDBACK_RERANKER_BACKEND: cosine_local
       HF_HUB_OFFLINE: "1"
@@ -116,6 +179,7 @@ services:
       ENABLE_DINGDING_BOT: "false"
       MOS_ENABLE_SCHEDULER: "false"
       API_SCHEDULER_ON: "false"
+      MOS_ENABLE_REORGANIZE: "false"
       MEMSCHEDULER_USE_REDIS_QUEUE: "false"
       MOS_ENABLE_DEFAULT_CUBE_CONFIG: "true"
       NACOS_ENABLE_WATCH: "false"
@@ -136,12 +200,15 @@ services:
       - memos_data:/var/lib/memos
     networks:
       - backend
+      - model-egress
 
 networks:
   backend:
     internal: true
+  model-egress:
 
 volumes:
+  memscope_data:
   memos_data:
   neo4j_data:
   neo4j_logs:

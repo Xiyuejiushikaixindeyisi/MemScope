@@ -4,8 +4,9 @@ import asyncio
 import logging
 from collections.abc import Sequence
 from time import perf_counter
-from typing import Any
+from typing import Any, Protocol
 
+from memscope.application.user_lanes import UserLanes
 from memscope.errors import MemScopeError
 from memscope.logging_config import LOGGER_NAME
 from memscope.memory_gateway.models import GatewayAdd, GatewayMessage, GatewaySearch
@@ -24,6 +25,23 @@ from memscope.raw_store.protocol import RawStore
 _LOGGER = logging.getLogger(LOGGER_NAME)
 
 
+class MonotonicClock(Protocol):
+    """Small clock seam for deterministic deadline tests."""
+
+    def __call__(self) -> float: ...
+
+
+class AddTimeoutError(MemScopeError):
+    """The complete Add operation exhausted its accepted time budget."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            code="add.timeout",
+            message="Add operation timed out",
+            retryable=True,
+        )
+
+
 class MemoryOperationInvariantError(MemScopeError):
     """A composed dependency violated its accepted application contract."""
 
@@ -38,9 +56,28 @@ class MemoryOperationInvariantError(MemScopeError):
 class MemoryOperations:
     """Production-shaped orchestration usable with Fake and future real Gateway implementations."""
 
-    def __init__(self, *, raw_store: RawStore, gateway: MemoryGateway) -> None:
+    def __init__(
+        self,
+        *,
+        raw_store: RawStore,
+        gateway: MemoryGateway,
+        add_deadline_seconds: float = 115.0,
+        add_warn_seconds: float = 105.0,
+        gateway_reserve_seconds: float = 5.0,
+        clock: MonotonicClock = perf_counter,
+        user_lanes: UserLanes | None = None,
+    ) -> None:
+        if not 0 < add_warn_seconds < add_deadline_seconds < 120:
+            raise ValueError("Add timing must satisfy 0 < warning < deadline < 120")
+        if not 0 < gateway_reserve_seconds < add_deadline_seconds:
+            raise ValueError("Gateway reserve must be positive and below the Add deadline")
         self._raw_store = raw_store
         self._gateway = gateway
+        self._add_deadline_seconds = add_deadline_seconds
+        self._add_warn_seconds = add_warn_seconds
+        self._gateway_reserve_seconds = gateway_reserve_seconds
+        self._clock = clock
+        self._user_lanes = user_lanes or UserLanes()
 
     async def is_ready(self) -> bool:
         started = perf_counter()
@@ -55,6 +92,27 @@ class MemoryOperations:
 
     async def add(self, command: AddCommand) -> None:
         started = perf_counter()
+        deadline = self._clock() + self._add_deadline_seconds
+        loop = asyncio.get_running_loop()
+        warning = loop.call_later(self._add_warn_seconds, self._log_warning)
+        try:
+            async with asyncio.timeout(self._add_deadline_seconds):
+                async with self._user_lanes.acquire(command.user_id):
+                    await self._add_in_lane(command, deadline=deadline, started=started)
+        except TimeoutError as error:
+            timeout = AddTimeoutError()
+            self._log("add", "timeout", started, timeout)
+            raise timeout from error
+        finally:
+            warning.cancel()
+
+    async def _add_in_lane(
+        self,
+        command: AddCommand,
+        *,
+        deadline: float,
+        started: float,
+    ) -> None:
         try:
             prepared = await self._raw_store.prepare_add(command)
         except IdempotencyConflictError as error:
@@ -73,6 +131,7 @@ class MemoryOperations:
             user_id=command.user_id,
             session_id=command.session_id,
             cube_id=prepared.cube.cube_id,
+            session_start_position=prepared.session_start_position,
             messages=tuple(
                 GatewayMessage(
                     message_id=message_id_for_position(command.request_id, position),
@@ -85,7 +144,10 @@ class MemoryOperations:
             ),
         )
         try:
-            await self._gateway.add(request)
+            remaining = deadline - self._clock() - self._gateway_reserve_seconds
+            if remaining <= 0:
+                raise AddTimeoutError()
+            await self._gateway.add(request, timeout_seconds=remaining)
             response = StoredAddResponse(
                 success=True,
                 request_id=command.request_id,
@@ -101,6 +163,13 @@ class MemoryOperations:
             self._log("add", "failed", started, error)
             raise
         self._log("add", prepared.disposition.value, started)
+
+    @staticmethod
+    def _log_warning() -> None:
+        _LOGGER.warning(
+            "memory_operation_slow",
+            extra={"component_operation": "add", "component_result": "warning"},
+        )
 
     async def search(self, query: SearchQuery) -> Sequence[MemoryEvidence]:
         started = perf_counter()

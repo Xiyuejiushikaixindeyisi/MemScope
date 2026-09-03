@@ -330,7 +330,12 @@ class SqliteRawStore:
                 (command.request_id,),
             ).fetchone()
             if existing is not None:
-                result = self._classify_existing(connection, existing, digest)
+                result = self._classify_existing(
+                    connection,
+                    existing,
+                    digest,
+                    expected_message_count=len(command.messages),
+                )
                 connection.commit()
                 return result
 
@@ -418,6 +423,7 @@ class SqliteRawStore:
             disposition=AddDisposition.NEW,
             payload_sha256=digest,
             cube=UserCube(user_id=command.user_id, cube_id=cube_id, status="reserved"),
+            session_start_position=first_session_position,
             response=None,
         )
 
@@ -426,6 +432,8 @@ class SqliteRawStore:
         connection: sqlite3.Connection,
         row: sqlite3.Row,
         digest: str,
+        *,
+        expected_message_count: int,
     ) -> PreparedAdd:
         if row["payload_schema_version"] != PAYLOAD_SCHEMA_VERSION:
             raise RawStoreInvariantError()
@@ -458,6 +466,27 @@ class SqliteRawStore:
                 raise RawStoreInvariantError()
         else:
             raise RawStoreInvariantError()
+        position_row = connection.execute(
+            """
+            SELECT COUNT(*) AS message_count,
+                   MIN(request_position) AS first_request_position,
+                   MAX(request_position) AS last_request_position,
+                   MIN(session_position) AS first_session_position,
+                   MAX(session_position) AS last_session_position
+            FROM raw_messages WHERE request_id = ?
+            """,
+            (row["request_id"],),
+        ).fetchone()
+        if (
+            position_row is None
+            or position_row["message_count"] != expected_message_count
+            or position_row["first_request_position"] != 0
+            or position_row["last_request_position"] != expected_message_count - 1
+            or not isinstance(position_row["first_session_position"], int)
+            or position_row["last_session_position"]
+            != position_row["first_session_position"] + expected_message_count - 1
+        ):
+            raise RawStoreInvariantError()
         return PreparedAdd(
             disposition=disposition,
             payload_sha256=digest,
@@ -466,6 +495,7 @@ class SqliteRawStore:
                 cube_id=cube_row["cube_id"],
                 status=cube_row["status"],
             ),
+            session_start_position=position_row["first_session_position"],
             response=response,
         )
 

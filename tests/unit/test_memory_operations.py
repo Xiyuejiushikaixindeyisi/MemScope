@@ -7,7 +7,11 @@ from datetime import UTC, datetime
 
 import pytest
 
-from memscope.application.memory_operations import MemoryOperationInvariantError, MemoryOperations
+from memscope.application.memory_operations import (
+    AddTimeoutError,
+    MemoryOperationInvariantError,
+    MemoryOperations,
+)
 from memscope.memory_gateway import (
     GatewayAdd,
     GatewayEvidence,
@@ -46,6 +50,7 @@ def _prepared(disposition: AddDisposition = AddDisposition.NEW) -> PreparedAdd:
         disposition,
         "a" * 64,
         UserCube("user-1", cube_id_for_user("user-1"), "reserved"),
+        0,
         _response() if disposition is AddDisposition.COMPLETED else None,
     )
 
@@ -112,7 +117,8 @@ class StubGateway:
             raise self.ready
         return self.ready
 
-    async def add(self, request: GatewayAdd) -> None:
+    async def add(self, request: GatewayAdd, *, timeout_seconds: float) -> None:
+        assert 0 < timeout_seconds < 115
         self.add_calls.append(request)
         self.add_started.set()
         if self.add_gate is not None:
@@ -141,6 +147,7 @@ async def test_add_maps_exact_gateway_request_then_completes(disposition: AddDis
     sent = gateway.add_calls[0]
     assert sent.request_id == "request-1"
     assert sent.cube_id == cube_id_for_user("user-1")
+    assert sent.session_start_position == 0
     assert [(item.message_id, item.request_position) for item in sent.messages] == [
         (message_id_for_position("request-1", 0), 0),
         (message_id_for_position("request-1", 1), 1),
@@ -267,6 +274,72 @@ async def test_add_cancellation_propagates_without_completion() -> None:
     with pytest.raises(asyncio.CancelledError):
         await task
     assert raw.complete_calls == []
+
+
+@pytest.mark.parametrize(
+    ("deadline", "warning", "reserve"),
+    [
+        (115, 0, 5),
+        (115, 115, 5),
+        (120, 105, 5),
+        (115, 105, 0),
+        (115, 105, 115),
+    ],
+)
+def test_add_rejects_invalid_timing_configuration(
+    deadline: float, warning: float, reserve: float
+) -> None:
+    with pytest.raises(ValueError):
+        MemoryOperations(
+            raw_store=StubRawStore(_prepared()),
+            gateway=StubGateway(),
+            add_deadline_seconds=deadline,
+            add_warn_seconds=warning,
+            gateway_reserve_seconds=reserve,
+        )
+
+
+async def test_add_fails_before_gateway_when_reserved_budget_is_exhausted() -> None:
+    readings = iter((0.0, 20.0))
+    raw = StubRawStore(_prepared())
+    gateway = StubGateway()
+    operations = MemoryOperations(
+        raw_store=raw,
+        gateway=gateway,
+        add_deadline_seconds=10,
+        add_warn_seconds=5,
+        gateway_reserve_seconds=1,
+        clock=lambda: next(readings),
+    )
+
+    with pytest.raises(AddTimeoutError) as captured:
+        await operations.add(_command())
+    assert captured.value.code == "add.timeout"
+    assert captured.value.retryable is True
+    assert gateway.add_calls == []
+    assert raw.complete_calls == []
+
+
+async def test_add_total_deadline_cancels_slow_gateway_and_cleans_lane(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gate = asyncio.Event()
+    raw = StubRawStore(_prepared())
+    gateway = StubGateway(add_gate=gate)
+    operations = MemoryOperations(
+        raw_store=raw,
+        gateway=gateway,
+        add_deadline_seconds=0.04,
+        add_warn_seconds=0.01,
+        gateway_reserve_seconds=0.005,
+    )
+
+    with pytest.raises(AddTimeoutError):
+        await operations.add(_command())
+
+    assert raw.complete_calls == []
+    assert await operations._user_lanes.active_lane_count() == 0
+    assert any(record.message == "memory_operation_slow" for record in caplog.records)
 
 
 def test_stub_gateway_satisfies_protocol_shape() -> None:

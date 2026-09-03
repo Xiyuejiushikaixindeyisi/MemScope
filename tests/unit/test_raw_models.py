@@ -39,7 +39,7 @@ def _message() -> PersistedMessage:
 
 def test_valid_models_are_frozen_and_preserve_values() -> None:
     response = _response()
-    prepared = PreparedAdd(AddDisposition.COMPLETED, _DIGEST, _cube(), response)
+    prepared = PreparedAdd(AddDisposition.COMPLETED, _DIGEST, _cube(), 0, response)
     persisted = PersistedAdd(
         "request", _DIGEST, "user", "session", "completed", (_message(),), response
     )
@@ -60,9 +60,10 @@ def test_valid_models_are_frozen_and_preserve_values() -> None:
         lambda: UserCube(" ", "cube", "reserved"),
         lambda: UserCube("user", " ", "reserved"),
         lambda: UserCube("user", "cube", "created"),
-        lambda: PreparedAdd(AddDisposition.NEW, "bad", _cube(), None),
-        lambda: PreparedAdd(AddDisposition.COMPLETED, _DIGEST, _cube(), None),
-        lambda: PreparedAdd(AddDisposition.PENDING, _DIGEST, _cube(), _response()),
+        lambda: PreparedAdd(AddDisposition.NEW, "bad", _cube(), 0, None),
+        lambda: PreparedAdd(AddDisposition.COMPLETED, _DIGEST, _cube(), 0, None),
+        lambda: PreparedAdd(AddDisposition.PENDING, _DIGEST, _cube(), 0, _response()),
+        lambda: PreparedAdd(AddDisposition.NEW, _DIGEST, _cube(), -1, None),
         lambda: PersistedMessage(" ", 0, 0, "user", "content", None),
         lambda: PersistedMessage("message", -1, 0, "user", "content", None),
         lambda: PersistedMessage("message", 0, -1, "user", "content", None),

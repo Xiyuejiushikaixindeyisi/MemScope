@@ -57,13 +57,16 @@ request absent
 
 `NEW` means the local transaction was inserted. `PENDING` is never a successful Add replay because
 there is no stored successful response yet. `COMPLETED` always includes a validated exact response.
-The future orchestration layer owns pending wait/recovery behavior and HTTP 409 mapping.
+B05 orchestration owns pending reconciliation, deadline behavior and HTTP 409 mapping.
 
 ## Ordering and isolation
 
 - `request_position` starts at zero for every Add chunk and preserves input order.
 - `session_position` is allocated continuously for the exact `(user_id, session_id)` under
   `BEGIN IMMEDIATE`; concurrent chunks are ordered by acquisition of the SQLite write transaction.
+- `PreparedAdd.session_start_position` exposes the first stable session position of the chunk to
+  the Gateway. Exact NEW/PENDING/COMPLETED replay must return the same value and a persisted gap or
+  mismatch fails closed; no schema migration is needed because v1 messages already store it.
 - `load_add` requires both user and request ID and returns no record for a mismatched user.
 - Composite foreign keys bind messages to their request/user/session and outbox records to their
   request/Cube. User and logical Cube IDs are both unique.
@@ -108,4 +111,6 @@ request ID converges through persistent idempotency.
 Changing canonicalization, ID algorithms, Schema v1 interpretation, Add dispositions or transaction
 boundaries requires a new architecture review. Schema evolution must use a new forward migration.
 FTS/Raw Search, outbox leases/retries, provider Cube state and lifecycle fields belong to later
-batches and must not be retrofitted into v1 semantics silently.
+batches and must not be retrofitted into v1 semantics silently. Exposing the already-persisted chunk
+start position is an additive B05 contract clarification and does not change identity,
+canonicalization or storage semantics.

@@ -27,6 +27,7 @@ def _add(**changes: object) -> GatewayAdd:
         "user_id": "user-1",
         "session_id": "session-1",
         "cube_id": "cube-1",
+        "session_start_position": 0,
         "messages": (_message(),),
         **changes,
     }
@@ -64,6 +65,8 @@ def test_gateway_message_rejects_invalid_values(
         ({"user_id": " "}, ValueError),
         ({"session_id": ""}, ValueError),
         ({"cube_id": ""}, ValueError),
+        ({"session_start_position": True}, TypeError),
+        ({"session_start_position": -1}, ValueError),
         ({"messages": [_message()]}, TypeError),
         ({"messages": ()}, ValueError),
         ({"messages": (_message(request_position=1),)}, ValueError),

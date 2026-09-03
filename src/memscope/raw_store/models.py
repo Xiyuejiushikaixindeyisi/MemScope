@@ -61,10 +61,17 @@ class PreparedAdd:
     disposition: AddDisposition
     payload_sha256: str
     cube: UserCube
+    session_start_position: int
     response: StoredAddResponse | None
 
     def __post_init__(self) -> None:
         _require_sha256(self.payload_sha256)
+        if isinstance(self.session_start_position, bool) or not isinstance(
+            self.session_start_position, int
+        ):
+            raise TypeError("session_start_position must be an integer")
+        if self.session_start_position < 0:
+            raise ValueError("session_start_position must not be negative")
         if self.disposition is AddDisposition.COMPLETED and self.response is None:
             raise ValueError("completed preparation requires a stored response")
         if self.disposition is not AddDisposition.COMPLETED and self.response is not None:

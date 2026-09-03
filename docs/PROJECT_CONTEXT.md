@@ -1,7 +1,8 @@
 # MemScope Project Context
 
-> Current through B04 Gate 2 acceptance on 2026-09-03. B00–B04 are `Accepted/Frozen`.
-> B05 and B06 have not started and must each begin in a new Session at Gate 0.
+> Current through B05 Gate 1 implementation verification on 2026-09-03. B00–B04 are
+> `Accepted/Frozen`. B05 Gate 0 R1 and Gate 1 are approved; Gate 2 has not been requested. B06 has
+> not started and must begin in a new Session at Gate 0.
 
 ## Objective
 
@@ -19,10 +20,13 @@ through Search. The organizer owns final answer generation and judging.
 - B04 freezes a single Compose entry with pinned MemOS `v2.0.32`, Neo4j and Qdrant, internal
   networking, named volumes, dependency-gated health, resource ceilings, bounded logs and lifecycle
   recovery checks.
+- B05 Gate 0 R1 freezes the Real Add design. The approved Gate 1 implementation adds the real MemOS
+  Add Gateway, durable receipts, same-user lanes, deadline propagation, guarded fixed-source
+  patches, public runtime composition and deterministic verification fixtures.
 
-The default `src/memscope` runtime deliberately remains unavailable/503. B04 does not install the
-infrastructure behind the public contest Adapter and does not claim Add/Search or semantic model
-readiness. Real MemOS Add and Search are B05/B06 work.
+The default `core` profile remains unavailable/503. The explicit `memos_add` profile serves Real Add
+but deliberately leaves public Health/Search unavailable until B06. Semantic quality and real model
+capability are not yet verified.
 
 ## B04 accepted evidence
 
@@ -77,9 +81,10 @@ The development machine owns Git, design, deterministic tests, B05/B06 Gate 0–
 the B09 tuning handoff. It cannot reach Huawei AI Gateway and must not claim real API or quality
 evidence.
 
-The tuning machine owns real Docker revalidation, Huawei gateway capability probes, resource
-measurements, baseline/full evaluation, controlled tuning and the final submission ZIP. It cannot
-reach GitHub, so the handoff ZIP must contain all build/runtime inputs and instructions.
+The tuning machine owns Huawei gateway capability probes, baseline/full evaluation, controlled
+tuning and the final submission ZIP. Docker revalidation and resource measurements are useful
+delivery evidence but must not consume time needed for accuracy tuning; the native deployment guide
+is the supported fallback when Docker is unavailable or unproductive.
 
 Every transfer is identified by Git commit and SHA-256. The tuning machine returns the final ZIP,
 source/config diff, sanitized model configuration, reports and Docker evidence for audit. Full rules
@@ -107,6 +112,7 @@ and templates are under `docs/collaboration/`.
 
 ## Next authorized state
 
-B04 is frozen. No B05 code development is authorized by the B04 approval. A future B05 Session must
-read `docs/README.md`, the two-machine workflow, this context, B04/B03 handoffs and the relevant
-contracts, then submit Gate 0 for user discussion and approval.
+B05 Gate 1 implementation and verification are authorized under `docs/batches/B05/PLAN.md`.
+Complete deterministic regression evidence and the B05 handoff before requesting Gate 2. Docker
+host-port/cgroup evidence is a non-blocking bonus when the target runtime supports it; model and
+evaluation tuning take priority. B06 remains unopened and requires its own new-Session Gate 0.

@@ -1,0 +1,37 @@
+{
+  "files": {
+    "src/memos/api/config.py": {
+      "post_sha256": "4014ea54bb90eb7378385e37d76fbc01854e7b997cfa41b27323a80caeccba5e",
+      "pre_sha256": "d544314dbf896d0e820c0539de31d6e838f7f613915a8b44f08adbb8945fec13"
+    },
+    "src/memos/api/handlers/add_handler.py": {
+      "post_sha256": "d5e1ec610b20a90fbb77c09f7ac5dcc22387293973b1bb503615c2fecbe66c82",
+      "pre_sha256": "4ee1e46862bfdafa9cee6eaa9ee9aea5660d1f480bd72faf30f8a1294e947774"
+    },
+    "src/memos/configs/llm.py": {
+      "post_sha256": "41f0bb0619f66abbd6f26ad2f30ffe59197862e0c51a8c648b89665104276ea8",
+      "pre_sha256": "22c1fb95b89da32600ee1ea4fc0388b7b343abedab7c9778a11ce700730d6e33"
+    },
+    "src/memos/llms/openai.py": {
+      "post_sha256": "e4460c43806d686262d506a3ff978a8b08e1b34356b48ce518ff22c47408d1e0",
+      "pre_sha256": "e59fb18db0d30eb4b1ed0c75c63c2ad344ac8fc671d1bb21169ec5f2d30a4e31"
+    },
+    "src/memos/mem_reader/simple_struct.py": {
+      "post_sha256": "6ebc9f83aeb0796a281a6027d13909548eb0ed3b0dca0e2f742f4ce9007666d5",
+      "pre_sha256": "0eb303d4dbd19f33aedb6b2ab82c509878c1de44e133d4e73c7005fcc5bba86a"
+    },
+    "src/memos/mem_scheduler/webservice_modules/rabbitmq_service.py": {
+      "post_sha256": "3fe2181cd47ba75d16f2a4908f391ecb5828fc52c593670c5d17b5cff0a9d479",
+      "pre_sha256": "bbd48731c2d257480be8232af6c4c44e0fb2b317df90b0836941264013b0c39d"
+    },
+    "src/memos/memories/textual/tree_text_memory/organize/manager.py": {
+      "post_sha256": "ab13a0c0aea2da8bd1c13e7f64405fe6e787d7665d06488bcada1a0feb97a989",
+      "pre_sha256": "f6705f2b059eb6a08bac880979ce28c8cbb7ea638fbe6bbc1d66d306a5e36bee"
+    },
+    "src/memos/multi_mem_cube/single_cube.py": {
+      "post_sha256": "128a3a5e968e789599ffdcdcbf39c7c1f373fb0da5572df12982bbab08920ae1",
+      "pre_sha256": "a43b3f2f1bd2cdb54df35a6d0fec7b848d24ec0ebca9b7dca74f226035ec835d"
+    }
+  },
+  "schema": "memscope.memos.patchset.v1"
+}

@@ -1,4 +1,4 @@
-# MemOS v2.0.32 B04 source map
+# MemOS v2.0.32 B04/B05 source map
 
 ## Fixed source
 
@@ -45,6 +45,29 @@ internal Compose network prevent implicit runtime downloads.
 `EMBEDDING_DIMENSION=16` is a bootstrap schema value only. It matches the B03 deterministic Mock
 dimension for a cheap infrastructure check but does not select the B05 embedding model. B05 must
 replace model ID, endpoint, credential and dimension as one reviewed configuration change.
+
+## B05 Real Add mapping
+
+| Concern | Fixed upstream symbol/path | B05 use |
+|---|---|---|
+| Synchronous Product Add | `POST /product/add` | `async_mode=sync`, `mode=fine`, exactly one `writable_cube_ids` value |
+| Tenant-scoped readback | `POST /product/get_memory` | filters exact user, Cube and `memscope_payload_sha256`; avoids startup-default tenant behavior in `get_memory_by_ids` |
+| Technical extraction failure | `SimpleMemReader` parse/fallback path | guarded patch propagates model/parse/schema failure; valid empty remains valid |
+| Outer-window order | `MemReader` concurrent task collection | guarded index/reassembly preserves source order |
+| Per-task metadata | reader `info` forwarding | guarded copy prevents shared mutation and retains provenance |
+| Graph write failure | batch graph add path | guarded patch propagates instead of logging and swallowing |
+| Vector status | returned/read memory `vector_sync` | public Add rejects any non-success value |
+| Scheduler dispatch | sync Add task submission | disabled scheduler means no immediate background task |
+| Nested LLM timeout | OpenAI-compatible reader client | bounded remaining request deadline is forwarded |
+| Sensitive logs | Product Add and reader log calls | counts/model/status/timing only; no request, prompt or model response bodies |
+
+The build extracts the unchanged archive and executes `docker/memos/apply_patchset.py`. The
+applicator validates exact preimage and postimage SHA-256 values from `PATCHSET_LOCK.json`; source
+drift, partial application and a second application all fail closed.
+
+Model ID, endpoint, credential, embedding dimension and prompt variants are deployment/tuning
+inputs. The deterministic Mock profile is verification-only and is rejected by the production
+profile boundary.
 
 ## Health interpretation
 

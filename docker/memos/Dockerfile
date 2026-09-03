@@ -16,21 +16,14 @@ COPY third_party/memos/${MEMOS_ARCHIVE} ./
 COPY third_party/memos/SHA256SUMS ./
 COPY docker/memos/constraints.txt ./constraints.txt
 COPY docker/memos/entrypoint.sh ./memos-entrypoint.sh
+COPY docker/memos/apply_patchset.py ./apply_patchset.py
+COPY docker/memos/PATCHSET_LOCK.json ./PATCHSET_LOCK.json
 
 RUN sha256sum --check SHA256SUMS \
     && mkdir -p /opt/memos \
     && tar --extract --gzip --file "${MEMOS_ARCHIVE}" \
         --strip-components=1 --directory /opt/memos \
-    && test "$(grep -F -c '"tokenizer_or_token_counter": "gpt2"' \
-        /opt/memos/src/memos/api/config.py)" -eq 3 \
-    && sed -i \
-        's|"tokenizer_or_token_counter": "gpt2"|"tokenizer_or_token_counter": os.getenv("MEM_READER_TOKENIZER", "word")|g' \
-        /opt/memos/src/memos/api/config.py \
-    && test "$(grep -F -c 'if self._io_loop_thread and self._io_loop_thread.is_alive():' \
-        /opt/memos/src/memos/mem_scheduler/webservice_modules/rabbitmq_service.py)" -eq 1 \
-    && sed -i \
-        's|if self._io_loop_thread and self._io_loop_thread.is_alive():|if getattr(self, "_io_loop_thread", None) and self._io_loop_thread.is_alive():|' \
-        /opt/memos/src/memos/mem_scheduler/webservice_modules/rabbitmq_service.py \
+    && python /opt/vendor/apply_patchset.py --source /opt/memos \
     && install --mode=0755 memos-entrypoint.sh /opt/memos/memos-entrypoint.sh \
     && python -m venv /opt/venv \
     && /opt/venv/bin/python -m pip install \

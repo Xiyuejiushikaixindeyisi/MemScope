@@ -99,6 +99,7 @@ def create_mock_model_app(
     chat_content: str = '{"memories":[]}',
     embedding_dimension: int = 16,
     timeout_delay_ms: int = 100,
+    chat_delay_ms: int = 0,
 ) -> FastAPI:
     """Create an isolated deterministic Mock Model ASGI application."""
 
@@ -126,6 +127,12 @@ def create_mock_model_app(
         or not 10 <= timeout_delay_ms <= 5000
     ):
         raise ValueError("timeout_delay_ms must be between 10 and 5000")
+    if (
+        isinstance(chat_delay_ms, bool)
+        or not isinstance(chat_delay_ms, int)
+        or not 0 <= chat_delay_ms <= 120_000
+    ):
+        raise ValueError("chat_delay_ms must be between 0 and 120000")
 
     application = FastAPI(
         title="MemScope Mock Model API",
@@ -155,6 +162,8 @@ def create_mock_model_app(
     ) -> ChatCompletionResponse | Response:
         del failure_header
         started = perf_counter()
+        if chat_delay_ms:
+            await asyncio.sleep(chat_delay_ms / 1000)
         failure, response = await _apply_failure(
             request,
             endpoint="chat",

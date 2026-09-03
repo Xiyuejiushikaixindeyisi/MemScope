@@ -5,7 +5,8 @@
 ## 当前状态
 
 - B00～B04：`Accepted/Frozen`；B04 Gate 2 于 2026-09-03 经用户明确验收。
-- B05、B06：尚未进入；两者必须分别在新 Session 中从 Gate 0 开始。
+- B05：Gate 0 R1、Gate 1 已批准；Real Add baseline 正在完成最终回归与 Gate 2 证据整理。
+- B06：尚未进入，必须在新 Session 中从 Gate 0 开始。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 
@@ -34,6 +35,11 @@
 | 两机开发与调测 | `collaboration/TWO_MACHINE_WORKFLOW.md` |
 | 制作或接收交接包 | `collaboration/TRANSFER_MANIFEST_TEMPLATE.md` |
 | 记录真实环境调优 | `collaboration/TUNING_REPORT_TEMPLATE.md` |
+| B05 Gate 0 R1 决策 | `batches/B05/GATE0.md` |
+| B05 Gate 1 已批准实施方案 | `batches/B05/PLAN.md` |
+| B05 Add 设计与调测优先事项 | `batches/B05/ADD_DESIGN_AND_TUNING.md` |
+| B05 非 Docker 部署兜底 | `batches/B05/NATIVE_DEPLOYMENT.md` |
+| B05 当前上下文 / Gate 1 交接 | `batches/B05/CONTEXT.md`、`batches/B05/HANDOFF.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责

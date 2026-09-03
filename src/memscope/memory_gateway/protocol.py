@@ -14,7 +14,7 @@ class MemoryGateway(Protocol):
 
         ...  # pragma: no cover - structural protocol signature
 
-    async def add(self, request: GatewayAdd) -> None:
+    async def add(self, request: GatewayAdd, *, timeout_seconds: float) -> None:
         """Synchronously make an idempotent Add visible to Search."""
 
         ...  # pragma: no cover - structural protocol signature
