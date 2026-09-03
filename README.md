@@ -132,6 +132,19 @@ optional container runtime.
 
 ## Development and tuning workflow
 
+During the active 48-hour delivery window, use the mandatory fast iteration path:
+
+```text
+Python unit/contract tests
+  -> native memory-api or source bind mount
+  -> reuse running Neo4j/Qdrant/MemOS
+  -> freeze code
+  -> one final image build
+```
+
+See `docs/collaboration/48H_DELIVERY_GUARDRAILS.md` and the linked B05 Add tuning design before
+starting Docker or model experiments.
+
 Development/Git work and Huawei-network tuning run on separate machines. The development machine
 owns B05/B06 Gate 0–2, deterministic tests, SDD and a checksummed tuning handoff. The tuning machine
 owns real gateway probes, Docker revalidation, baseline/full evaluation, controlled tuning and the

@@ -90,6 +90,24 @@ Every transfer is identified by Git commit and SHA-256. The tuning machine retur
 source/config diff, sanitized model configuration, reports and Docker evidence for audit. Full rules
 and templates are under `docs/collaboration/`.
 
+### Active 48-hour execution memory
+
+The user declared roughly 48 hours remaining before code submission. Until submission, all agents
+must read `docs/collaboration/48H_DELIVERY_GUARDRAILS.md` and use this development path:
+
+```text
+Python unit/contract tests
+  -> native memory-api or source bind mount
+  -> reuse running Neo4j/Qdrant/MemOS
+  -> freeze code
+  -> one final image build
+```
+
+Docker gets a 10-minute capability preflight and a 30-minute per-stage stop limit. Model, prompt,
+URL, key and threshold experiments do not rebuild images. Docker failure cannot stop a native
+baseline or tuning run. The Add tuning authority is
+`docs/batches/B05/ADD_DESIGN_AND_TUNING.md`.
+
 ## Delivery stages
 
 1. B00～B09 build and freeze `memos-scaffold-v0` without organizer credentials.

@@ -34,6 +34,7 @@
 | 核对比赛要求 | `acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` 及其中引用的正式材料 |
 | 两机开发与调测 | `collaboration/TWO_MACHINE_WORKFLOW.md` |
 | 提交前 48 小时止损规则 | `collaboration/48H_DELIVERY_GUARDRAILS.md` |
+| 总体实现方案与强制快速迭代流程 | `../MEMOS_BASELINE_IMPLEMENTATION_PLAN.md` |
 | 制作或接收交接包 | `collaboration/TRANSFER_MANIFEST_TEMPLATE.md` |
 | 记录真实环境调优 | `collaboration/TUNING_REPORT_TEMPLATE.md` |
 | B05 Gate 0 R1 决策 | `batches/B05/GATE0.md` |

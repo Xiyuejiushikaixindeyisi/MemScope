@@ -4,11 +4,52 @@
 >
 > 当前目标：先完成无 API/Key 可联调的 `memos-scaffold-v0`；主办方提供真实 API/Key 后完成 MemOS 全链路调测并冻结 `baseline-v0`；之后基于 baseline 逐项调优。
 > 实施节奏：由用户主动控制；本文只规定阶段依赖、完成标准和技术边界。
+>
+> **2026-09-03 交付优先级修订：**距代码提交约 48 小时，开发和调测必须执行
+> [48 小时交付止损规则](./docs/collaboration/48H_DELIVERY_GUARDRAILS.md)。该规则在 Docker
+> 时间盒、构建次数和可评分闭环优先级上覆盖本文较早的一般性流程描述。
+
+当前调优与交付必读：
+
+- **[B05 Add 调优设计文档](./docs/batches/B05/ADD_DESIGN_AND_TUNING.md)**：模型选择、prompt、
+  状态处理、Add/Search 时序、指标和调测实验顺序；
+- [48 小时交付止损规则](./docs/collaboration/48H_DELIVERY_GUARDRAILS.md)：开发与 Docker
+  时间盒、优先级和调测机启动顺序；
+- [开发机与调测机协作规范](./docs/collaboration/TWO_MACHINE_WORKFLOW.md)：交接、回传和审计边界；
+- [B05 非 Docker 部署指南](./docs/batches/B05/NATIVE_DEPLOYMENT.md)：Docker 不可用时的主办方
+  部署路径；
+- [调测报告模板](./docs/collaboration/TUNING_REPORT_TEMPLATE.md)：baseline、实验和最终候选证据。
 
 历史方案：
 
 - [原始实现方案](./docs/achieve/MEMOS_BASELINE_IMPLEMENTATION_PLAN.md)
 - [v0 评审稿](./docs/achieve/MEMOS_BASELINE_V0_IMPLEMENTATION_PLAN.md)
+
+## 0. 当前强制开发—构建流程
+
+```text
+Python 单元/契约测试
+        ↓
+memory-api 原生运行或源码 bind mount
+        ↓
+复用已经运行的 Neo4j/Qdrant/MemOS
+        ↓
+代码冻结
+        ↓
+一次最终镜像构建
+```
+
+这不是建议，而是剩余交付期的默认执行顺序：
+
+- Python 代码和 Search/Add 行为先通过快速测试验证；
+- 开发迭代不重建完整镜像，优先原生启动 memory-api，或在开发专用容器中只挂载源码；
+- Neo4j、Qdrant 和 MemOS 作为长生命周期后端复用，不因 Adapter、prompt 或普通配置变化重建；
+- model ID、URL、Key、prompt、阈值和检索参数变化不得触发镜像构建；
+- 候选代码和依赖冻结后，只进行一次最终镜像构建；
+- 只有 MemOS patchset 或镜像依赖发生变化时，才允许在冻结前定向重建对应服务；不得连带重建
+  未变化服务；
+- 独立 clean-room 构建属于最终交付证据，在正常 daemon 且不挤占 baseline/调优时执行，不作为
+  日常开发循环。
 
 ## 1. 总体目标
 
@@ -45,7 +86,8 @@ Mock 结果只证明工程接线，不产生 baseline 分数。
 - 记录准确率、延迟、token、限流、错误和资源信息；
 - 冻结代码、MemOS commit、模型、配置、镜像和报告。
 
-只有该冻结版本命名为 `baseline-v0`。
+只有该冻结版本命名为 `baseline-v0`。具体实验变量和选择标准以
+[B05 Add 调优设计文档](./docs/batches/B05/ADD_DESIGN_AND_TUNING.md) 为准。
 
 ### 1.3 baseline 后调优
 
@@ -207,7 +249,8 @@ tokenizer。
 - 其它服务只在 Compose 内网可见；
 - MemOS 必须等待数据库和当前模型 profile 健康；
 - organizer profile 不包含 Mock；
-- 禁止源码 bind mount、默认数据库密码和运行时下载；
+- organizer/最终候选禁止源码 bind mount、默认数据库密码和运行时下载；开发迭代允许只读/受控
+  源码 bind mount，最终镜像必须从冻结源码独立构建；
 - 不使用 `main`、`latest` 或未记录的依赖版本；
 - 如果主办方不支持 Compose，单独评审部署收缩方案。
 
@@ -564,6 +607,10 @@ baseline 报告至少包含：
 
 ## 15. 调优规则
 
+本节的具体 Add 调优设计、模型/prompt 矩阵和状态/Search 一致性要求见
+**[B05 Add 调优设计文档](./docs/batches/B05/ADD_DESIGN_AND_TUNING.md)**。时间紧张时先执行
+[48 小时交付止损规则](./docs/collaboration/48H_DELIVERY_GUARDRAILS.md)，不得先做 Docker 美化。
+
 1. 从 baseline-v0 创建实验版本；
 2. 一次只改一个主要变量；
 3. 先跑小样本，再跑固定验证集；
@@ -658,7 +705,8 @@ baseline 报告至少包含：
 
 ### 阶段 V：调优和提交冻结
 
-按第 15 节实验；完成干净构建、冷启动、Smoke、文档、许可证和 solution.zip。
+按第 15 节实验；开发期间使用原生运行/源码挂载并复用后端。最终候选代码冻结后只做一次镜像
+构建，再完成冷启动、Smoke、必要文档、许可证和 solution.zip。
 
 ## 18. 分 Batch 协作与质量门禁
 
@@ -820,13 +868,14 @@ baseline 后才能引入以得分提升为目的的复杂启发式；不得把�
 
 ### 18.8 两台机器的交付边界
 
-开发机负责源码/Git 主线、B05/B06 Gate 0～2、无 Key 测试、B06 初版 SDD、B09 后的调优指南和
+开发机负责源码/Git 主线、B05/B06 Gate 0～2、无 Key 测试、B06 初版 SDD、当前调优设计和
 调测交接 ZIP。调测调优机负责华为内网 API 探测、真实 Docker 二次验收、资源/基线/完整评测、
 调优及最终提交 ZIP。
 
 两台机器通过带 SHA-256、基准 commit、构建说明和风险清单的 ZIP 人工交换。调测机最终必须回传
 最终 ZIP、源码/配置差异、脱敏模型配置、评测报告和 Docker 证据；否则 GitHub 版本不得声称可以
-复现最终候选。完整规范见 `docs/collaboration/TWO_MACHINE_WORKFLOW.md`。
+复现最终候选。完整规范见 [开发机与调测机协作规范](./docs/collaboration/TWO_MACHINE_WORKFLOW.md)，
+紧急执行顺序见 [48 小时交付止损规则](./docs/collaboration/48H_DELIVERY_GUARDRAILS.md)。
 
 ## 19. 上下文与依赖管理
 
@@ -845,6 +894,7 @@ docs/
 │   └── CONTEST_ACCEPTANCE_CHECKLIST.md
 ├── collaboration/
 │   ├── TWO_MACHINE_WORKFLOW.md
+│   ├── 48H_DELIVERY_GUARDRAILS.md
 │   ├── TRANSFER_MANIFEST_TEMPLATE.md
 │   └── TUNING_REPORT_TEMPLATE.md
 ├── interfaces/
@@ -863,7 +913,7 @@ docs/
 - `PROJECT_CONTEXT.md`：只保留当前有效的架构、边界和关键约束；
 - `CODEMAP.md`：记录模块职责、入口和依赖方向，不复制实现；
 - `acceptance/`：核实后的赛事要求、项目门禁和待确认项；
-- `collaboration/`：两机协作、人机协作、交接与调优证据模板；
+- `collaboration/`：两机协作、人机协作、48 小时止损、交接与调优证据模板；
 - `interfaces/`：保存当前有效的外部和内部契约；
 - `integrations/`：保存第三方源码路由图、固定版本和关键符号；
 - `adr/`：保存已批准且需要长期解释的重要决策；
