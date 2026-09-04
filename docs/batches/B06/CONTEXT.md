@@ -9,7 +9,7 @@ gate_0_approval: user_explicit
 gate_1_approval: user_explicit
 gate_2: accepted_by_user_2026_09_04
 base_commit: 3e735b3e0aa49c8b66436123fa245c9bc974dee7
-candidate_commit: pending_user_authorized_commit
+candidate_commit: 1507317b048fc06d25f020ded751f35fae2aeb6f
 branch: batch/b06-real-search
 depends_on:
   hard:
@@ -104,7 +104,7 @@ becomes empty HTTP 200, or any cross-user evidence would block acceptance and re
 ## Next authorized state
 
 The user accepted B06 Gate 2 on 2026-09-04. Its contract, design and implementation semantics are
-therefore frozen; the real Huawei-host smoke and Docker P4 checks are transferred under the explicit
-conditions in `HANDOFF.md`. The accepted worktree is not yet an implementation commit. Do not
-auto-commit, push, build Docker or create a B07 branch. A later Session must report the exact Git
-boundary and wait for explicit authorization before making the B06 commit or entering B07 work.
+therefore frozen at implementation commit `1507317b048fc06d25f020ded751f35fae2aeb6f`; the real
+Huawei-host smoke and Docker P4 checks are transferred under the explicit conditions in
+`HANDOFF.md`. Do not build Docker or create a B07 branch automatically. A later Session must first
+complete the read-only B07–B09 closure context review and wait for explicit authorization.

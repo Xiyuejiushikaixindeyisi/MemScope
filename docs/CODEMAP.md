@@ -82,8 +82,7 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
   remaining Docker host-port/cgroup check belongs to a capable tuning-machine daemon and must not
   displace model/evaluation tuning.
 - B06: Search conversion, isolation, evidence length/ranking and failure policy. Gate 0 R1 and the
-  implementation were accepted/frozen at Gate 2 on 2026-09-04; the implementation commit is still
-  pending explicit authorization.
+  implementation were accepted/frozen at Gate 2 on 2026-09-04; implementation commit `1507317`.
 - B07–B09: closure scope must first be reconciled against the accepted B05/B06 invariants. The old
   master-plan references to automatic retry and Raw fallback are not implementation authorization.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not

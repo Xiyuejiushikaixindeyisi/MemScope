@@ -2,8 +2,8 @@
 
 > Current through B06 Gate 2 acceptance on 2026-09-04. B00–B06 are `Accepted/Frozen`;
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
-> machine under explicit handoff conditions. The accepted B06 worktree still requires an authorized
-> implementation commit before a B07 branch is created.
+> machine under explicit handoff conditions. The accepted B06 implementation commit is
+> `1507317b048fc06d25f020ded751f35fae2aeb6f`.
 
 ## Objective
 
@@ -134,8 +134,7 @@ baseline or tuning run. The Add tuning authority is
 ## Next authorized state
 
 B05 and B06 are frozen under their respective `HANDOFF.md` files. B06 Gate 2 was explicitly
-accepted by the user on 2026-09-04; real model/latency/score and optional Docker P4 evidence remain
-tuning-machine tasks. The accepted B06 changes are still an uncommitted working tree at the time of
-this update, so no B07 branch may be created until the user separately authorizes the implementation
-commit. A new Session must first complete the read-only B07–B09 closure context review in
+accepted by the user on 2026-09-04 and committed as `1507317`; real model/latency/score and optional
+Docker P4 evidence remain tuning-machine tasks. A new Session must first complete the read-only
+B07–B09 closure context review in
 `docs/batches/B07/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` and wait for explicit approval.

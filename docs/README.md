@@ -6,8 +6,8 @@
 
 - B00～B05：`Accepted/Frozen`；B05 Gate 2 于 2026-09-03 经用户明确验收，Docker
   host-port/cgroup 验证转交具备正常 daemon 的调测机。
-- B06：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；真实模型、语义分数和
-  Docker P4 验证按接受条件转交调测机。验收工作树尚未形成实现提交。
+- B06：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；实现提交为 `1507317`。
+  真实模型、语义分数和 Docker P4 验证按接受条件转交调测机。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 

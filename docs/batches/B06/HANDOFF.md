@@ -8,7 +8,7 @@
 >
 > Branch: `batch/b06-real-search`
 >
-> Candidate commit: pending
+> Candidate commit: `1507317b048fc06d25f020ded751f35fae2aeb6f`
 
 ## 1. Delivered candidate
 
@@ -156,7 +156,7 @@ development-machine evidence are now `Accepted/Frozen`. Real-model Add/Search se
 quality and optional Docker P4 evidence are transferred to the tuning machine under sections 7–8;
 they were not falsely claimed as development-machine evidence.
 
-The accepted files remain an uncommitted working tree (`Candidate commit: pending`) at this point.
-Acceptance freezes their semantics but does not authorize an automatic commit, push or B07 branch.
-Those Git transitions require a separate explicit user instruction. No later Batch begins
-automatically.
+The accepted implementation is frozen at commit
+`1507317b048fc06d25f020ded751f35fae2aeb6f`. This acceptance and commit do not automatically create
+a B07 branch or enter a later Batch; the next Session must perform the B07–B09 closure context review
+and wait for explicit user approval.
