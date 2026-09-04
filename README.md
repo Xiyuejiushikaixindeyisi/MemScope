@@ -29,16 +29,19 @@ On a Linux x86_64 laboratory host with Docker Engine and Compose v2, the complet
 stack can be validated, built and started with one command:
 
 ```bash
-./scripts/deploy_linux.sh --env-file /secure/path/memscope.env
+./scripts/deploy_linux.sh
 ```
 
 The script verifies the locked MemOS archive, runs `uv sync --frozen`, validates Compose without
 printing resolved secrets, builds both local images, starts the four-service stack and waits for the
 public Health contract. If the selected env file does not exist, the script creates it from
 `deploy/compose.env.example` with mode `0600` and opens `${VISUAL:-$EDITOR}` (or a standard terminal
-editor) so the operator can replace the placeholders. Existing env files are never overwritten. It
-never creates credentials or removes persistent volumes. Use `--check-only` to stop after the
-configuration preflight or `--build-only` to stop after the image build.
+editor) so the operator can replace the placeholders. The default private path is
+`compose.env` in the repository root; it is Git-ignored, and `--env-file` can override it. Existing
+env files are never overwritten. The script automatically supports either the `docker compose`
+plugin or the standalone `docker-compose` command. It never creates credentials or removes
+persistent volumes. Use `--check-only` to stop after the configuration preflight or `--build-only`
+to stop after the image build.
 
 Create a local environment file only when overrides are needed:
 

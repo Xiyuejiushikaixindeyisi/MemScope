@@ -143,6 +143,7 @@ services:
         restart: true
     environment:
       MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?set MEMSCOPE_MODEL_PROFILE to gateway or mock}"
+      MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP: "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP:-false}"
       FILE_LOCAL_PATH: /var/lib/memos/files
       MEMOS_BASE_PATH: /var/lib/memos
       GRAPH_DB_BACKEND: neo4j-community

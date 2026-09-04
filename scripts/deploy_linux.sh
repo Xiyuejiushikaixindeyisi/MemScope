@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-readonly DEFAULT_ENV_FILE="${REPO_ROOT}/deploy/compose.env"
+readonly DEFAULT_ENV_FILE="${MEMSCOPE_CONFIG_DIR:-${REPO_ROOT}}/compose.env"
 readonly DEFAULT_PROJECT_NAME="memscope"
 readonly REQUIRED_UV_VERSION="0.12.9"
 
@@ -11,6 +11,7 @@ ENV_FILE="${DEFAULT_ENV_FILE}"
 PROJECT_NAME="${DEFAULT_PROJECT_NAME}"
 MODE="deploy"
 WAIT_TIMEOUT_SECONDS="300"
+COMPOSE_COMMAND=()
 
 usage() {
     cat <<'EOF'
@@ -21,7 +22,7 @@ Usage:
 
 Options:
   --env-file PATH       Private Compose environment file
-                        (default: deploy/compose.env)
+                        (default: <repository>/compose.env)
   --project NAME        Compose project name (default: memscope)
   --wait-timeout SEC    Startup health timeout (default: 300)
   --check-only          Validate prerequisites and configuration only
@@ -133,7 +134,7 @@ validate_secret_file() {
         MOS_EMBEDDER_API_KEY
         EMBEDDING_DIMENSION
     )
-    local key value
+    local allow_insecure_http key value
     for key in "${required[@]}"; do
         value="$(read_env_value "${key}" || true)"
         [[ -n "${value}" ]] || die "required setting is missing or empty: ${key}"
@@ -147,10 +148,22 @@ validate_secret_file() {
     value="$(read_env_value MEMSCOPE_MODEL_PROFILE)"
     [[ "${value}" == "gateway" ]] || die "MEMSCOPE_MODEL_PROFILE must be gateway for this deployment script"
 
+    allow_insecure_http="$(read_env_value MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP || true)"
+    case "${allow_insecure_http:-false}" in
+        true|false) ;;
+        *) die "MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP must be true or false" ;;
+    esac
+
     value="$(read_env_value MEMRADER_API_BASE)"
-    [[ "${value}" == https://* ]] || die "MEMRADER_API_BASE must use HTTPS"
+    if [[ "${value}" != https://* ]]; then
+        [[ "${value}" == http://* ]] || die "MEMRADER_API_BASE must use HTTP or HTTPS"
+        [[ "${allow_insecure_http}" == "true" ]] || die "HTTP model endpoints require MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true"
+    fi
     value="$(read_env_value MOS_EMBEDDER_API_BASE)"
-    [[ "${value}" == https://* ]] || die "MOS_EMBEDDER_API_BASE must use HTTPS"
+    if [[ "${value}" != https://* ]]; then
+        [[ "${value}" == http://* ]] || die "MOS_EMBEDDER_API_BASE must use HTTP or HTTPS"
+        [[ "${allow_insecure_http}" == "true" ]] || die "HTTP model endpoints require MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true"
+    fi
 
     value="$(read_env_value EMBEDDING_DIMENSION)"
     [[ "${value}" =~ ^[1-9][0-9]*$ ]] || die "EMBEDDING_DIMENSION must be a positive integer"
@@ -160,7 +173,7 @@ validate_secret_file() {
 }
 
 compose() {
-    docker compose \
+    "${COMPOSE_COMMAND[@]}" \
         --project-directory "${REPO_ROOT}" \
         --file "${REPO_ROOT}/compose.yaml" \
         --env-file "${ENV_FILE}" \
@@ -238,8 +251,19 @@ require_command stat
 
 actual_uv_version="$(uv --version | awk '{print $2}')"
 [[ "${actual_uv_version}" == "${REQUIRED_UV_VERSION}" ]] || die "uv ${REQUIRED_UV_VERSION} is required; found ${actual_uv_version:-unknown}"
-docker compose version >/dev/null 2>&1 || die "Docker Compose v2 is required"
 docker info >/dev/null 2>&1 || die "Docker daemon is unavailable or the current user lacks permission"
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE_COMMAND=(docker compose)
+elif command -v docker-compose >/dev/null 2>&1 && docker-compose version >/dev/null 2>&1; then
+    COMPOSE_COMMAND=(docker-compose)
+else
+    die "Docker Compose is required; neither 'docker compose' nor 'docker-compose' is available"
+fi
+compose_version="$("${COMPOSE_COMMAND[@]}" version --short 2>/dev/null || true)"
+if [[ ! "${compose_version}" =~ ^v?([0-9]+)\. ]]; then
+    die "could not determine the Docker Compose version"
+fi
+(( BASH_REMATCH[1] >= 2 )) || die "Docker Compose v2 or newer is required; found ${compose_version}"
 
 if [[ -r /proc/meminfo ]]; then
     total_memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"

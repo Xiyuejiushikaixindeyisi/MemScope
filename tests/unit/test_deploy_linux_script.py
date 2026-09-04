@@ -37,6 +37,14 @@ def _write_env(path: Path, *, placeholder: bool = False) -> None:
     path.chmod(0o600)
 
 
+def _write_internal_http_env(path: Path, *, allow: bool) -> None:
+    _write_env(path)
+    source = path.read_text(encoding="utf-8").replace("https://models.invalid", "http://models")
+    if allow:
+        source += "MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true\n"
+    path.write_text(source, encoding="utf-8")
+
+
 def _fake_commands(directory: Path, log: Path) -> None:
     _write_executable(
         directory / "uv",
@@ -54,6 +62,26 @@ exit 0
         f"""#!/usr/bin/env bash
 set -eu
 printf 'docker %s\\n' "$*" >> {log!s}
+if [[ "${{FAKE_DOCKER_COMPOSE_UNAVAILABLE:-0}}" == "1" && "$*" == "compose version" ]]; then
+    exit 1
+fi
+if [[ "$*" == "compose version --short" ]]; then
+    printf '%s\\n' "${{FAKE_COMPOSE_VERSION:-2.40.0}}"
+fi
+if [[ "$*" == *" port memory-api 8080" ]]; then
+    printf '0.0.0.0:18080\\n'
+fi
+exit 0
+""",
+    )
+    _write_executable(
+        directory / "docker-compose",
+        f"""#!/usr/bin/env bash
+set -eu
+printf 'docker-compose %s\\n' "$*" >> {log!s}
+if [[ "$*" == "version --short" ]]; then
+    printf '%s\\n' "${{FAKE_COMPOSE_VERSION:-2.40.0}}"
+fi
 if [[ "$*" == *" port memory-api 8080" ]]; then
     printf '0.0.0.0:18080\\n'
 fi
@@ -115,6 +143,59 @@ def test_check_only_does_not_sync_build_or_start(tmp_path: Path) -> None:
     assert " up " not in commands
 
 
+def test_accepts_explicitly_allowed_internal_http_model_endpoints(tmp_path: Path) -> None:
+    env_file = tmp_path / "memscope.env"
+    _write_internal_http_env(env_file, allow=True)
+
+    result = _run_script(tmp_path, "--env-file", str(env_file), "--check-only")
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_rejects_internal_http_without_explicit_opt_in(tmp_path: Path) -> None:
+    env_file = tmp_path / "memscope.env"
+    _write_internal_http_env(env_file, allow=False)
+
+    result = _run_script(tmp_path, "--env-file", str(env_file), "--check-only")
+
+    assert result.returncode != 0
+    assert "HTTP model endpoints require MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true" in result.stderr
+
+
+def test_falls_back_to_standalone_docker_compose(tmp_path: Path) -> None:
+    env_file = tmp_path / "memscope.env"
+    _write_env(env_file)
+
+    result = _run_script(
+        tmp_path,
+        "--env-file",
+        str(env_file),
+        "--check-only",
+        environment_overrides={"FAKE_DOCKER_COMPOSE_UNAVAILABLE": "1"},
+    )
+
+    assert result.returncode == 0, result.stderr
+    commands = (tmp_path / "commands.log").read_text(encoding="utf-8")
+    assert "docker-compose --project-directory" in commands
+    assert "docker-compose version" in commands
+
+
+def test_rejects_legacy_compose_v1(tmp_path: Path) -> None:
+    env_file = tmp_path / "memscope.env"
+    _write_env(env_file)
+
+    result = _run_script(
+        tmp_path,
+        "--env-file",
+        str(env_file),
+        "--check-only",
+        environment_overrides={"FAKE_COMPOSE_VERSION": "1.29.2"},
+    )
+
+    assert result.returncode != 0
+    assert "Docker Compose v2 or newer is required" in result.stderr
+
+
 def test_missing_env_is_created_from_template_and_opened_in_editor(tmp_path: Path) -> None:
     valid_env = tmp_path / "valid.env"
     _write_env(valid_env)
@@ -142,6 +223,36 @@ chmod 0600 "$1"
     assert destination.stat().st_mode & 0o777 == 0o600
     assert "Created" in result.stdout
     assert "Preflight checks passed" in result.stdout
+
+
+def test_default_env_is_created_in_config_directory(tmp_path: Path) -> None:
+    valid_env = tmp_path / "valid.env"
+    _write_env(valid_env)
+    editor = tmp_path / "fake-editor"
+    _write_executable(
+        editor,
+        """#!/usr/bin/env bash
+set -eu
+cp "${VALID_ENV}" "$1"
+chmod 0600 "$1"
+""",
+    )
+    config_dir = tmp_path / "config"
+
+    result = _run_script(
+        tmp_path,
+        "--check-only",
+        environment_overrides={
+            "EDITOR": str(editor),
+            "VALID_ENV": str(valid_env),
+            "MEMSCOPE_CONFIG_DIR": str(config_dir),
+        },
+    )
+
+    assert result.returncode == 0, result.stderr
+    destination = config_dir / "compose.env"
+    assert destination.is_file()
+    assert destination.stat().st_mode & 0o777 == 0o600
 
 
 @pytest.mark.parametrize("mode", [0o640, 0o644])

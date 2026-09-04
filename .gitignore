@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+/compose.env
 *.pem
 *.key
 

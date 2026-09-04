@@ -105,6 +105,10 @@ def test_compose_requires_secrets_and_explicit_b05_model_configuration() -> None
     assert "      NEO4J_PASSWORD:" not in neo4j_service
     assert "$${NEO4J_AUTH#neo4j/}" in neo4j_service
     assert 'MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?' in compose
+    assert (
+        'MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP: "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP:-false}"'
+        in compose
+    )
     assert "MOS_EMBEDDER_BACKEND: universal_api" in compose
     assert "MOS_RERANKER_BACKEND: cosine_local" in compose
     assert "MEM_READER_TOKENIZER: word" in compose
@@ -116,6 +120,10 @@ def test_compose_requires_secrets_and_explicit_b05_model_configuration() -> None
     assert 'ENABLE_INTERNET: "false"' in compose
     assert 'API_SCHEDULER_ON: "false"' in compose
     assert 'MOS_ENABLE_REORGANIZE: "false"' in compose
+
+    entrypoint = (ROOT / "docker" / "memos" / "entrypoint.sh").read_text(encoding="utf-8")
+    assert ': "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP:=false}"' in entrypoint
+    assert 'http://*) test "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP}" = "true"' in entrypoint
 
 
 def test_memos_build_applies_locked_b04_and_b05_patchset() -> None:

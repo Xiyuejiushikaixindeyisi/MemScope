@@ -38,7 +38,7 @@ a different model or dimension.
 Create a private environment file outside the source tree:
 
 ```bash
-install -m 0600 deploy/compose.env.example /srv/memscope/compose.env
+install -m 0600 deploy/compose.env.example ./compose.env
 ```
 
 Replace every `replace-with-*` value. Required private/runtime-specific values are:
@@ -48,9 +48,12 @@ Replace every `replace-with-*` value. Required private/runtime-specific values a
 - `MOS_EMBEDDER_MODEL`, `MOS_EMBEDDER_API_BASE`, `MOS_EMBEDDER_API_KEY`
 - `EMBEDDING_DIMENSION`
 
-The URLs must use HTTPS in the real `gateway` profile. Do not write credentials into source files,
-Compose YAML, command-line arguments, reports or logs. If inbound authentication is required, add
-these values only to the private environment file:
+The URLs must use HTTPS in the real `gateway` profile by default. A trusted isolated laboratory
+gateway that only exposes HTTP requires the explicit private setting
+`MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true`; never use that exception for an Internet-routable
+endpoint. Do not write credentials into source files, Compose YAML, command-line arguments, reports
+or logs. If inbound authentication is required, add these values only to the private environment
+file:
 
 ```bash
 CONTEST_AUTH_MODE=shared_key
@@ -69,15 +72,18 @@ On a Linux x86_64 host with `uv 0.12.9`, Docker Engine and Compose v2 already in
 synchronize, build, start and health-check the complete stack with:
 
 ```bash
-./scripts/deploy_linux.sh --env-file /srv/memscope/compose.env
+./scripts/deploy_linux.sh
 ```
 
 If the private file does not exist, the script creates its parent directory, installs
 `deploy/compose.env.example` there with mode `0600`, and opens `${VISUAL:-$EDITOR}` or a standard
 terminal editor. Existing files are never overwritten. Before continuing, the file must contain no
-example placeholders, use HTTPS model endpoints and specify the exact positive
-`EMBEDDING_DIMENSION`. The script does not install Docker, invent model settings, print credentials
-or remove persistent volumes. For staged diagnosis, use `--check-only` or `--build-only`; run
+example placeholders, use HTTPS model endpoints or explicitly opt into trusted internal HTTP, and
+specify the exact positive `EMBEDDING_DIMENSION`. The default location is
+`compose.env` in the repository root; it is Git-ignored, and `--env-file PATH` can override it. Both
+the `docker compose` plugin and standalone `docker-compose` command are supported automatically.
+The script does not install Docker, invent model settings, print credentials or remove persistent
+volumes. For staged diagnosis, use `--check-only` or `--build-only`; run
 `./scripts/deploy_linux.sh --help` for all options.
 
 ### Manual equivalent
@@ -86,23 +92,23 @@ First validate interpolation without printing the resolved configuration:
 
 ```bash
 docker compose -p memscope-final \
-  --env-file /srv/memscope/compose.env config --quiet
+  --env-file ./compose.env config --quiet
 ```
 
 Build the two local images once from the frozen source candidate:
 
 ```bash
 docker compose -p memscope-final \
-  --env-file /srv/memscope/compose.env build memory-api memos
+  --env-file ./compose.env build memory-api memos
 ```
 
 Start the stack non-interactively:
 
 ```bash
 docker compose -p memscope-final \
-  --env-file /srv/memscope/compose.env up -d
+  --env-file ./compose.env up -d
 docker compose -p memscope-final \
-  --env-file /srv/memscope/compose.env ps
+  --env-file ./compose.env ps
 ```
 
 Only memory-api publishes a host port. The default public origin is `http://127.0.0.1:8080`; set
@@ -114,7 +120,7 @@ A normal stop is:
 
 ```bash
 docker compose -p memscope-final \
-  --env-file /srv/memscope/compose.env stop
+  --env-file ./compose.env stop
 ```
 
 ## 5. Native fallback
