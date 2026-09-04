@@ -13,8 +13,8 @@
 - B08：2026-09-04 经用户明确验收，以“调测机 live 证据转交例外”
   `Accepted/Frozen`；确定性候选为 `44ce4a7`。本验收不宣称真实部署的 exercise、
   重启持久化或资源验证通过，三类证据仍由调测机补齐。
-- B09：Gate 1 计划已于 2026-09-04 经用户明确批准，正在实施可复现交付收口；
-  未进入 Gate 2，未创建最终 tag/交付包。
+- B09：Gate 1 计划已于 2026-09-04 经用户明确批准；可复现交付候选
+  `fe246c0` 已完成并等待 Gate 2 评审。未创建最终 tag/交付包。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 
@@ -64,6 +64,7 @@
 | B08 系统验证执行手册 | `batches/B08/SYSTEM_VERIFICATION.md` |
 | B08 确定性候选与 live 证据缺口 | `batches/B08/HANDOFF.md` |
 | B09 Gate 1 上下文、获批计划与交付手册 | `batches/B09/CONTEXT.md`、`batches/B09/PLAN.md`、`batches/B09/DELIVERY.md` |
+| B09 Gate 2 候选与证据 | `batches/B09/HANDOFF.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责

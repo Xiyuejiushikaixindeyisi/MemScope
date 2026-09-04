@@ -1,6 +1,6 @@
 # MemScope Project Context
 
-> Current through B08 Gate 2 acceptance and approved B09 Gate 1 implementation on 2026-09-04. B00–B08 are
+> Current through the B09 reproducible-delivery candidate on 2026-09-04. B00–B08 are
 > `Accepted/Frozen`; B08 uses a named tuning-machine live-evidence transfer exception.
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
@@ -158,4 +158,5 @@ exception. The missing `exercise`, restart-persistence and resource evidence rem
 obligation, not a passed claim. The user also entered B09 Gate 1; B09 implementation requires
 no product behavior change. The user then explicitly approved its plan for organizer instructions,
 lock/license audit, deterministic delivery packaging and two-machine identity closure; Gate 2
-remains a separate explicit decision.
+remains a separate explicit decision. The implementation candidate is `fe246c0`; deterministic
+archive and quality evidence is recorded in `docs/batches/B09/HANDOFF.md`.

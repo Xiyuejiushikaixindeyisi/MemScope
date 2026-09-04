@@ -2,12 +2,13 @@
 
 ```yaml
 batch: B09
-status: gate_1_approved_implementation_in_progress
+status: implementation_candidate_complete_gate_2_ready
 date: 2026-09-04
 gate_1_entry: user_explicit
 gate_1_approval: user_explicit
 base_commit: 2498c904e97ab36d85a8596898996243460dae6f
 branch: batch/b09-delivery-closure
+candidate_commit: fe246c0ba59a39a108850f6e35126114c0a20716
 depends_on:
   hard:
     - b00_through_b08_accepted_frozen
@@ -31,6 +32,16 @@ forbidden_without_reapproval:
   - retry_fallback_background_worker_or_multi_worker_change
   - fabricated_live_evidence_or_official_score
   - final_tag_or_release_before_gate_2_acceptance
+deterministic_evidence:
+  b09_unit_tests: 4_passed
+  full_pytest: 556_passed
+  combined_coverage: 96.73_percent
+  statement_coverage: 97.21_percent
+  branch_coverage: 94.92_percent
+  ruff: passed
+  mypy: passed
+  handoff_reproducible_sha256: 1ec051876a3098476adfb49422b46cffe37984d5f248cbb6aee8ba367fb6b6f7
+  submission_reproducible_sha256: af647cd751b6378f1d9aa2417b874107d5a8eddef3e20a7bdf8a7b58e0473960
 ```
 
 ## P0 context
