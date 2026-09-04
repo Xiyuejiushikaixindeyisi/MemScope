@@ -77,18 +77,18 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
 
 ## Batch ownership
 
-- B00–B06: accepted and frozen. B04, B05 and B06 evidence is recorded in their respective
+- B00–B07: accepted and frozen. B04, B05, B06 and B07 evidence is recorded in their respective
   `HANDOFF.md` files.
 - B05 delivers the Real Gateway, public Add composition, Cube lifecycle and synchronous Add. Its
   remaining Docker host-port/cgroup check belongs to a capable tuning-machine daemon and must not
   displace model/evaluation tuning.
 - B06: Search conversion, isolation, evidence length/ranking and failure policy. Gate 0 R1 and the
   implementation were accepted/frozen at Gate 2 on 2026-09-04; implementation commit `1507317`.
-- B07: the Gate 2 candidate was completed on 2026-09-04 after explicit Gate 1 approval. It adds
-  composed deterministic recovery evidence and document reconciliation only; production modules,
-  contracts and schemas remain frozen. Gate 2 acceptance is pending.
-- B08 and B09 require separate post-B07 approval. B08 owns system verification; B09 owns locks,
-  licensing, clean build, two-machine evidence and delivery/baseline closure.
+- B07: Gate 2 was explicitly accepted/frozen on 2026-09-04 at `e30fa91`. It adds composed
+  deterministic recovery evidence and document reconciliation only; production modules, contracts
+  and schemas remain unchanged.
+- B08 Gate 1 has been entered but its plan is not yet approved. B08 owns system verification; B09
+  owns locks, licensing, clean build, two-machine evidence and delivery/baseline closure.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 

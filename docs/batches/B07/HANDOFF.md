@@ -1,6 +1,6 @@
 # B07 reliability closure handoff
 
-> Status: Gate 2 candidate; pending explicit user acceptance
+> Status: Gate 2 Accepted/Frozen by explicit user approval on 2026-09-04
 >
 > Gate 1 approved by explicit user message on 2026-09-04
 >
@@ -8,7 +8,7 @@
 >
 > Branch: `batch/b07-reliability-closure`
 >
-> Candidate commit: uncommitted; commit/push require explicit authorization
+> Candidate commit: `e30fa91d332e2945f27185b5a5f3248cc5ebe680`
 
 ## 1. Delivered scope
 
@@ -90,12 +90,13 @@ provider Add with no extracted memories but before receipt completion, exact pro
 cannot distinguish that committed-empty outcome from not-yet-attempted state. B07 does not add a
 worker, marker or retry protocol to change this accepted B05 limitation.
 
-## 6. Gate 2 decision and B08 input
+## 6. Gate 2 acceptance and B08 input
 
-B07 is ready for Gate 2 review if the user accepts that deterministic composition is sufficient for
-this Batch and that no production reliability mechanism is warranted without failing evidence.
+B07 Gate 2 was explicitly accepted/frozen by the user on 2026-09-04. Deterministic composition is
+accepted as sufficient for this Batch; no production reliability mechanism is warranted without
+failing evidence.
 
-After explicit B07 Gate 2 acceptance, B08 may submit its own Gate 1 plan for full-path, concurrency,
-restart, resource and segmented latency verification. B08 must inherit the same no-automatic-retry,
-no-Raw-fallback, single-worker and fail-closed boundaries and must not begin automatically from this
-handoff.
+The user also explicitly entered B08 Gate 1. B08 may therefore submit its own plan for full-path,
+concurrency, restart, resource and segmented latency verification. It must inherit the same
+no-automatic-retry, no-Raw-fallback, single-worker and fail-closed boundaries and cannot begin
+implementation until that separate plan is approved.

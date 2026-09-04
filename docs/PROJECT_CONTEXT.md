@@ -1,6 +1,6 @@
 # MemScope Project Context
 
-> Current through the B07 Gate 2 candidate on 2026-09-04. B00–B06 are `Accepted/Frozen`;
+> Current through B07 Gate 2 acceptance on 2026-09-04. B00–B07 are `Accepted/Frozen`;
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
 > `1507317b048fc06d25f020ded751f35fae2aeb6f`.
@@ -31,10 +31,10 @@ strict active/provenance filtering, stable exact deduplication and a 55-second S
 Semantic quality and real model capability are transferred verification items, not claims made by
 the development machine.
 
-The B07 Gate 2 candidate adds deterministic cross-layer evidence for completed-receipt Raw recovery,
+The accepted B07 closure adds deterministic cross-layer evidence for completed-receipt Raw recovery,
 lost-response provenance reconciliation, partial-provenance fail-closed behavior and one provider
-attempt per external replay. It changes no production module or runtime contract and remains pending
-explicit user acceptance.
+attempt per external replay. It changes no production module or runtime contract and is frozen at
+candidate commit `e30fa91`.
 
 ## B04 accepted evidence
 
@@ -143,7 +143,7 @@ baseline or tuning run. The Add tuning authority is
 
 ## Next authorized state
 
-B05 and B06 are frozen under their respective `HANDOFF.md` files. B07 Gate 1 was explicitly
-approved on 2026-09-04 and is limited to deterministic composed recovery tests plus documentation
-reconciliation on `batch/b07-reliability-closure`. B07 Gate 2 acceptance is still required before
-entering B08. Real model/latency/score and optional Docker P4 evidence remain tuning-machine tasks.
+B05–B07 are frozen under their respective `HANDOFF.md` files. B07 Gate 2 was explicitly accepted on
+2026-09-04 at candidate commit `e30fa91`. The user entered B08 Gate 1, but B08 implementation must
+wait for explicit approval of its separate plan. Real model/latency/score and optional Docker P4
+evidence remain tuning-machine tasks.

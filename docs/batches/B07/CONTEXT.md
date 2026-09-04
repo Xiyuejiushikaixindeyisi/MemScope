@@ -2,12 +2,14 @@
 
 ```yaml
 batch: B07
-status: gate_2_candidate_pending_user_acceptance
+status: accepted_frozen
 date: 2026-09-04
 gate_1_approval: user_explicit
+gate_2_approval: user_explicit
+gate_2_approved_at: 2026-09-04
 base_commit: ee4a8720ec400642fa5925350c0c441b2cabfbb6
 branch: batch/b07-reliability-closure
-candidate_commit: uncommitted
+candidate_commit: e30fa91d332e2945f27185b5a5f3248cc5ebe680
 depends_on:
   hard:
     - b00_b01_b02_b03_b04_b05_b06_accepted_frozen
@@ -72,5 +74,5 @@ If deterministic composition shows that any accepted invariant requires producti
 configuration, dependency or fixed-source patch changes, implementation stops and requests a formal
 Gate 1 amendment or B05/B06 revision. B07 must not silently repair a frozen semantic boundary.
 
-No such gap was found by the B07 candidate. Gate 2 acceptance remains a user decision and does not
-implicitly authorize B08, a commit or a push.
+No such gap was found by the B07 candidate. The user explicitly accepted/froze Gate 2 and entered
+B08 Gate 1 on 2026-09-04. B08 implementation still requires approval of its separate Gate 1 plan.

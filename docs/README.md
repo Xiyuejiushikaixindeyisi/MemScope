@@ -8,8 +8,9 @@
   host-port/cgroup 验证转交具备正常 daemon 的调测机。
 - B06：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；实现提交为 `1507317`。
   真实模型、语义分数和 Docker P4 验证按接受条件转交调测机。
-- B07：2026-09-04 经用户批准 Gate 1 后已形成 Gate 2 候选；只包含 Raw/receipt/Real Gateway
-  的组合恢复测试与 B07～B09 收口文档校准，尚未 Gate 2 验收，生产代码零变更。
+- B07：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；候选提交为 `e30fa91`。只包含
+  Raw/receipt/Real Gateway 的组合恢复测试与 B07～B09 收口文档校准，生产代码零变更。
+- B08：用户已进入 Gate 1；计划尚待审批，未开始系统验证或文件修改。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 

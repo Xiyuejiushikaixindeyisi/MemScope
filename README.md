@@ -3,11 +3,12 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure. B00–B06 are accepted/frozen; B05 delivers synchronous
+MemOS/Neo4j/Qdrant runtime infrastructure. B00–B07 are accepted/frozen; B05 delivers synchronous
 Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
 host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
-conditions. The B07 tests-and-documents reliability candidate is pending Gate 2 and does not change
-production code. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+conditions. B07 freezes the tests-and-documents reliability closure without changing production
+code. B08 is at Gate 1 planning. Docker is an optional delivery accelerator, not a prerequisite for
+tuning.
 
 ## Development environment
 
@@ -177,6 +178,7 @@ production retries/fallback or final-answer generation. See
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.
 
-B07 Gate 1 was approved on 2026-09-04. Its candidate scope is limited to composed restart,
+B07 Gate 2 was accepted/frozen on 2026-09-04 at `e30fa91`. Its scope is limited to composed restart,
 reconciliation, fail-closed and no-automatic-retry evidence in deterministic tests plus correction of
-the historical B07–B09 sequencing text. B08 cannot start until B07 Gate 2 is explicitly accepted.
+the historical B07–B09 sequencing text. B08 has entered Gate 1 planning but is not approved for
+implementation.
