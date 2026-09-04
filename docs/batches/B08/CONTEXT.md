@@ -7,6 +7,7 @@ date: 2026-09-04
 gate_1_approval: user_explicit
 base_commit: d281aa03b5b90f9e9903033fd9f1fc822011a490
 branch: batch/b08-system-verification
+candidate_commit: 44ce4a7be3e052fa839692bb3dc2c4c8b149ecb4
 depends_on:
   hard:
     - b00_b01_b02_b03_b04_b05_b06_b07_accepted_frozen

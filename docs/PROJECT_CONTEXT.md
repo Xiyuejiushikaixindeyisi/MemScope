@@ -38,8 +38,8 @@ candidate commit `e30fa91`.
 
 The B08 deterministic candidate adds a standard-library three-phase public verifier plus ASGI system
 tests for concurrency, isolation, restart and typed failures. It changes no runtime implementation.
-Live exercise/restart/resource evidence is still required from an admitted deployment before
-ordinary Gate 2 acceptance.
+It is recorded at candidate commit `44ce4a7`. Live exercise/restart/resource evidence is still
+required from an admitted deployment before ordinary Gate 2 acceptance.
 
 ## B04 accepted evidence
 

@@ -7,8 +7,8 @@ MemOS/Neo4j/Qdrant runtime infrastructure. B00–B07 are accepted/frozen; B05 de
 Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
 host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
 conditions. B07 freezes the tests-and-documents reliability closure without changing production
-code. B08's deterministic system-verification candidate is complete; Gate 2 awaits live deployment
-evidence. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+code. B08's deterministic system-verification candidate is recorded at `44ce4a7`; Gate 2 awaits
+live deployment evidence. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 

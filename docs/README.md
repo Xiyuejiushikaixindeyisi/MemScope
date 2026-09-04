@@ -10,8 +10,8 @@
   真实模型、语义分数和 Docker P4 验证按接受条件转交调测机。
 - B07：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；候选提交为 `e30fa91`。只包含
   Raw/receipt/Real Gateway 的组合恢复测试与 B07～B09 收口文档校准，生产代码零变更。
-- B08：Gate 1 已批准，确定性验证候选完成；本机无 live 服务拓扑，Gate 2 等待调测机返回
-  exercise/restart/resource 脱敏证据，未修改生产代码。
+- B08：Gate 1 已批准，确定性验证候选 `44ce4a7` 完成；本机无 live 服务拓扑，Gate 2
+  等待调测机返回 exercise/restart/resource 脱敏证据，未修改生产代码。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 

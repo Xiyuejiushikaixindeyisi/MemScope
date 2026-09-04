@@ -8,7 +8,7 @@
 >
 > Branch: `batch/b08-system-verification`
 >
-> Candidate commit: uncommitted
+> Deterministic candidate commit: `44ce4a7be3e052fa839692bb3dc2c4c8b149ecb4`
 
 ## 1. Delivered candidate
 
