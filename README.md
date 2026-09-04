@@ -25,6 +25,21 @@ Install the locked development environment:
 uv sync --frozen
 ```
 
+On a Linux x86_64 laboratory host with Docker Engine and Compose v2, the complete production-profile
+stack can be validated, built and started with one command:
+
+```bash
+./scripts/deploy_linux.sh --env-file /secure/path/memscope.env
+```
+
+The script verifies the locked MemOS archive, runs `uv sync --frozen`, validates Compose without
+printing resolved secrets, builds both local images, starts the four-service stack and waits for the
+public Health contract. If the selected env file does not exist, the script creates it from
+`deploy/compose.env.example` with mode `0600` and opens `${VISUAL:-$EDITOR}` (or a standard terminal
+editor) so the operator can replace the placeholders. Existing env files are never overwritten. It
+never creates credentials or removes persistent volumes. Use `--check-only` to stop after the
+configuration preflight or `--build-only` to stop after the image build.
+
 Create a local environment file only when overrides are needed:
 
 ```bash

@@ -63,6 +63,25 @@ clients may use the configured key through `Authorization: Bearer`, `Authorizati
 
 ## 4. Compose build and startup
 
+### One-command Linux deployment
+
+On a Linux x86_64 host with `uv 0.12.9`, Docker Engine and Compose v2 already installed, validate,
+synchronize, build, start and health-check the complete stack with:
+
+```bash
+./scripts/deploy_linux.sh --env-file /srv/memscope/compose.env
+```
+
+If the private file does not exist, the script creates its parent directory, installs
+`deploy/compose.env.example` there with mode `0600`, and opens `${VISUAL:-$EDITOR}` or a standard
+terminal editor. Existing files are never overwritten. Before continuing, the file must contain no
+example placeholders, use HTTPS model endpoints and specify the exact positive
+`EMBEDDING_DIMENSION`. The script does not install Docker, invent model settings, print credentials
+or remove persistent volumes. For staged diagnosis, use `--check-only` or `--build-only`; run
+`./scripts/deploy_linux.sh --help` for all options.
+
+### Manual equivalent
+
 First validate interpolation without printing the resolved configuration:
 
 ```bash
