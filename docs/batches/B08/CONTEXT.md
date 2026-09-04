@@ -2,13 +2,14 @@
 
 ```yaml
 batch: B08
-status: gate_2_review_open_not_accepted_not_frozen
+status: gate_2_accepted_frozen_with_live_evidence_transfer_exception
 date: 2026-09-04
 gate_1_approval: user_explicit
 gate_2_review_entry: user_explicit
-gate_2_disposition: pending_tuning_machine_live_evidence
-accepted: false
-frozen: false
+gate_2_acceptance: user_explicit
+gate_2_disposition: accepted_under_tuning_machine_live_evidence_transfer_exception
+accepted: true
+frozen: true
 base_commit: d281aa03b5b90f9e9903033fd9f1fc822011a490
 branch: batch/b08-system-verification
 candidate_commit: 44ce4a7be3e052fa839692bb3dc2c4c8b149ecb4
@@ -71,9 +72,9 @@ MockTransport and local fixture evidence cannot be presented as a real-model bas
 
 The deterministic candidate is complete. A read-only listener check on 2026-09-04 found no
 memory-api, MemOS, Neo4j or Qdrant listeners on their candidate ports, so no live execution was
-attempted. The user explicitly opened Gate 2 review but retained the ordinary acceptance standard:
-B08 is not Accepted/Frozen until the tuning machine returns real `exercise`, restart-persistence
-and resource evidence and that evidence is reviewed.
+attempted. The user explicitly accepted/froze Gate 2 under the named tuning-machine live-evidence
+transfer exception. This is not a live-system pass claim: real `exercise`, restart-persistence and
+resource evidence remains pending from the tuning machine.
 
 ## Stop condition
 

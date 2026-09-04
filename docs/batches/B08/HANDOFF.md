@@ -1,10 +1,12 @@
 # B08 system verification handoff
 
-> Status: Gate 2 review open; not Accepted/Frozen; deployed-system evidence assigned to tuning machine
+> Status: Gate 2 Accepted/Frozen under the tuning-machine live-evidence transfer exception
 >
 > Gate 1 approved by explicit user message on 2026-09-04
 >
 > Gate 2 review entered by explicit user message on 2026-09-04
+>
+> Gate 2 accepted/frozen by explicit user message on 2026-09-04
 >
 > Base commit: `d281aa03b5b90f9e9903033fd9f1fc822011a490`
 >
@@ -74,20 +76,22 @@ handoff does not claim:
 - live P50/P95/P99/max, CPU/RSS/disk, Qdrant collection or Neo4j index evidence;
 - zero live 429/timeout/5xx/unclassified failures.
 
-The user explicitly entered Gate 2 review on 2026-09-04 while preserving this limitation. B08
-**cannot be judged Accepted/Frozen under the ordinary standard** because real deployed-system
-`exercise`, restart-persistence and resource evidence is missing. Producing that evidence is
-assigned to the tuning machine. The review therefore remains open; entering review is not an
-acceptance decision, and deterministic tests do not substitute for live system evidence.
+The user explicitly accepted/froze B08 Gate 2 on 2026-09-04 under the named **tuning-machine
+live-evidence transfer exception**. This accepts the deterministic development-machine candidate
+and transfers the missing deployed-system verification; it does not claim that real `exercise`,
+restart persistence or resource verification passed. Those three evidence classes remain assigned
+to the tuning machine, and deterministic tests do not substitute for them.
 
-## 6. Next action
+## 6. Frozen follow-up evidence and B09 input
 
 Run `SYSTEM_VERIFICATION.md` on the Huawei tuning machine or another admitted native/Compose
 candidate using the exact source commit. Return the three JSON reports plus sanitized
 restart/resource observations and their hashes. The development-machine reviewer must validate the
-returned candidate identity and evidence before making a later Accepted/Frozen or rejected
-decision. Any cross-user evidence, changed replay, lost evidence identity, Add at least 120 seconds,
-Search at least 60 seconds or unclassified failure blocks Gate 2 and must not be repaired inside B08
-without a revised plan.
+returned candidate identity and evidence before attaching it to the frozen B08 record. Any
+cross-user evidence, changed replay, lost evidence identity, Add at least 120 seconds, Search at
+least 60 seconds or unclassified failure invalidates the transferred live-verification assumption
+and must be reported for a formal B08 revision; it must not be repaired silently inside B09.
 
-B09 cannot begin while this review is open and before explicit B08 Gate 2 acceptance.
+The user explicitly entered B09 Gate 1 on 2026-09-04. B09 may now submit a separate
+reproducibility/delivery closure plan, but implementation remains blocked until that plan is
+explicitly approved.

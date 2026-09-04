@@ -3,13 +3,13 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure. B00–B07 are accepted/frozen; B05 delivers synchronous
+MemOS/Neo4j/Qdrant runtime infrastructure. B00–B08 are accepted/frozen; B05 delivers synchronous
 Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
 host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
 conditions. B07 freezes the tests-and-documents reliability closure without changing production
-code. B08's deterministic system-verification candidate is recorded at `44ce4a7`; Gate 2 review is
-open but B08 is not Accepted/Frozen while live exercise/restart/resource evidence remains assigned
-to the tuning machine. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+code. B08's deterministic system-verification candidate at `44ce4a7` is accepted/frozen under the
+tuning-machine live-evidence transfer exception; this is not a live-system pass claim. B09 Gate 1
+planning is open. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -182,6 +182,7 @@ documents for the current contracts and scope.
 B07 Gate 2 was accepted/frozen on 2026-09-04 at `e30fa91`. Its scope is limited to composed restart,
 reconciliation, fail-closed and no-automatic-retry evidence in deterministic tests plus correction of
 the historical B07–B09 sequencing text. B08 Gate 1 is approved and adds only a public verifier,
-deterministic system tests and a runbook. Gate 2 review is open, but no live topology exists on this
-development machine; B08 remains not Accepted/Frozen until the tuning machine returns
-exercise/restart/resource evidence. B09 has not begun.
+deterministic system tests and a runbook. B08 Gate 2 was accepted/frozen on 2026-09-04 under the
+tuning-machine live-evidence transfer exception; real exercise/restart/resource evidence remains a
+transferred item and is not claimed as passed. B09 has entered Gate 1 planning, with no B09
+implementation authorized yet.

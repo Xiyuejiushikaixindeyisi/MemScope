@@ -89,10 +89,10 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
 - B07: Gate 2 was explicitly accepted/frozen on 2026-09-04 at `e30fa91`. It adds composed
   deterministic recovery evidence and document reconciliation only; production modules, contracts
   and schemas remain unchanged.
-- B08 Gate 1 is approved and its deterministic verifier/system-test candidate is recorded at
-  `44ce4a7`. Gate 2 review is open, but B08 is not Accepted/Frozen until the tuning machine returns
-  real exercise/restart/resource evidence and it is reviewed. B09 owns locks, licensing, clean
-  build, two-machine evidence and delivery/baseline closure.
+- B08 is Accepted/Frozen at deterministic candidate `44ce4a7` under the named tuning-machine
+  live-evidence transfer exception; no live-system pass is claimed. B09 Gate 1 planning is open and
+  owns locks, licensing, clean build, two-machine evidence and delivery/baseline closure, but its
+  implementation is not yet authorized.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 

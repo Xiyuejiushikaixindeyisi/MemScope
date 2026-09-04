@@ -1,6 +1,7 @@
 # MemScope Project Context
 
-> Current through the open B08 Gate 2 review on 2026-09-04. B00–B07 are `Accepted/Frozen`;
+> Current through B08 Gate 2 acceptance and B09 Gate 1 entry on 2026-09-04. B00–B08 are
+> `Accepted/Frozen`; B08 uses a named tuning-machine live-evidence transfer exception.
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
 > `1507317b048fc06d25f020ded751f35fae2aeb6f`.
@@ -38,9 +39,9 @@ candidate commit `e30fa91`.
 
 The B08 deterministic candidate adds a standard-library three-phase public verifier plus ASGI system
 tests for concurrency, isolation, restart and typed failures. It changes no runtime implementation.
-It is recorded at candidate commit `44ce4a7`. Gate 2 review is open, but B08 is not Accepted/Frozen:
-live exercise/restart/resource evidence is still required from the tuning machine before an
-ordinary Gate 2 decision.
+It is recorded at candidate commit `44ce4a7` and is Accepted/Frozen under the tuning-machine
+live-evidence transfer exception. This acceptance does not claim a live-system pass; real
+exercise/restart/resource evidence remains due from the tuning machine.
 
 ## B04 accepted evidence
 
@@ -149,10 +150,10 @@ baseline or tuning run. The Add tuning authority is
 
 ## Next authorized state
 
-B05–B07 are frozen under their respective `HANDOFF.md` files. B07 Gate 2 was explicitly accepted on
+B05–B08 are frozen under their respective `HANDOFF.md` files. B07 Gate 2 was explicitly accepted on
 2026-09-04 at candidate commit `e30fa91`. B08 Gate 1 is approved and its deterministic public
-verifier/system-test candidate is complete without production changes. The user explicitly entered
-B08 Gate 2 review on 2026-09-04, while preserving that it cannot be judged Accepted/Frozen under
-the ordinary standard without real deployed `exercise`, restart-persistence and resource evidence.
-That verification is assigned to the tuning machine. B09 must not begin before explicit B08 Gate 2
-acceptance.
+verifier/system-test candidate is complete without production changes. The user explicitly
+accepted/froze B08 Gate 2 on 2026-09-04 under the named tuning-machine live-evidence transfer
+exception. The missing `exercise`, restart-persistence and resource evidence remains a transferred
+obligation, not a passed claim. The user also entered B09 Gate 1; B09 implementation requires
+separate explicit approval of its plan.
