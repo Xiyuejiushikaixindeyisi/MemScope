@@ -1,6 +1,6 @@
 # MemScope Project Context
 
-> Current through B07 Gate 2 acceptance on 2026-09-04. B00–B07 are `Accepted/Frozen`;
+> Current through the B08 deterministic candidate on 2026-09-04. B00–B07 are `Accepted/Frozen`;
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
 > `1507317b048fc06d25f020ded751f35fae2aeb6f`.
@@ -35,6 +35,11 @@ The accepted B07 closure adds deterministic cross-layer evidence for completed-r
 lost-response provenance reconciliation, partial-provenance fail-closed behavior and one provider
 attempt per external replay. It changes no production module or runtime contract and is frozen at
 candidate commit `e30fa91`.
+
+The B08 deterministic candidate adds a standard-library three-phase public verifier plus ASGI system
+tests for concurrency, isolation, restart and typed failures. It changes no runtime implementation.
+Live exercise/restart/resource evidence is still required from an admitted deployment before
+ordinary Gate 2 acceptance.
 
 ## B04 accepted evidence
 
@@ -144,6 +149,8 @@ baseline or tuning run. The Add tuning authority is
 ## Next authorized state
 
 B05–B07 are frozen under their respective `HANDOFF.md` files. B07 Gate 2 was explicitly accepted on
-2026-09-04 at candidate commit `e30fa91`. The user entered B08 Gate 1, but B08 implementation must
-wait for explicit approval of its separate plan. Real model/latency/score and optional Docker P4
-evidence remain tuning-machine tasks.
+2026-09-04 at candidate commit `e30fa91`. B08 Gate 1 is approved and its deterministic public
+verifier/system-test candidate is complete without production changes. No live candidate services
+are available on this development machine, so B08 Gate 2 is not ready until the tuning machine or
+another admitted deployment returns the required exercise/restart/resource evidence, or the user
+explicitly accepts a named transfer exception. B09 must not begin before B08 Gate 2 acceptance.

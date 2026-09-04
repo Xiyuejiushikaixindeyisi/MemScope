@@ -10,7 +10,8 @@
   真实模型、语义分数和 Docker P4 验证按接受条件转交调测机。
 - B07：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；候选提交为 `e30fa91`。只包含
   Raw/receipt/Real Gateway 的组合恢复测试与 B07～B09 收口文档校准，生产代码零变更。
-- B08：用户已进入 Gate 1；计划尚待审批，未开始系统验证或文件修改。
+- B08：Gate 1 已批准，确定性验证候选完成；本机无 live 服务拓扑，Gate 2 等待调测机返回
+  exercise/restart/resource 脱敏证据，未修改生产代码。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 
@@ -56,6 +57,9 @@
 | B07–B09 收口新 Session Prompt | `batches/B07/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` |
 | B07 Gate 1 上下文与获批计划 | `batches/B07/CONTEXT.md`、`batches/B07/PLAN.md` |
 | B07 Gate 2 候选交接 | `batches/B07/HANDOFF.md` |
+| B08 Gate 1 上下文与获批计划 | `batches/B08/CONTEXT.md`、`batches/B08/PLAN.md` |
+| B08 系统验证执行手册 | `batches/B08/SYSTEM_VERIFICATION.md` |
+| B08 确定性候选与 live 证据缺口 | `batches/B08/HANDOFF.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责
