@@ -105,9 +105,10 @@ least 60 seconds, unclassified failures, credential exposure or manifest mismatc
 candidate. A required product, contract, schema, dependency, MemOS patch or worker-topology change
 must return to the owning Batch for approval; packaging is not authorization to patch it.
 
-## 6. Gate boundary
+## 6. Gate boundary and current hold
 
-Before B09 Gate 2, generated archives are previews only. After explicit Gate 2 acceptance, build the
-named handoff archive from the exact frozen commit, record its bytes and SHA-256, and transfer it by
-the approved out-of-band channel. Tagging, upload and final submission remain separate explicit
-actions.
+The user accepted/froze B09 Gate 2 on 2026-09-04 but explicitly prohibited generating the final
+handoff ZIP and out-of-band SHA-256 while additional development and version consolidation remain.
+Do not execute the final build commands, promote either preview hash, create a sidecar/tag, upload or
+transfer an artifact. This hold remains until the additional scope is approved and the user gives a
+new explicit artifact instruction.

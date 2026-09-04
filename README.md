@@ -3,14 +3,15 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure. B00–B08 are accepted/frozen; B05 delivers synchronous
+MemOS/Neo4j/Qdrant runtime infrastructure. B00–B09 are accepted/frozen; B05 delivers synchronous
 Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
 host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
 conditions. B07 freezes the tests-and-documents reliability closure without changing production
 code. B08's deterministic system-verification candidate at `44ce4a7` is accepted/frozen under the
 tuning-machine live-evidence transfer exception; this is not a live-system pass claim. B09 Gate 1
-is approved and the reproducible-delivery candidate is complete at `fe246c0`; Gate 2 review is open
-but not Accepted/Frozen. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+is approved and reproducible-delivery candidate `fe246c0` is Accepted/Frozen at Gate 2. Final
+handoff ZIP/hash generation is explicitly prohibited pending additional development and version
+consolidation. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -188,4 +189,6 @@ tuning-machine live-evidence transfer exception; real exercise/restart/resource 
 transferred item and is not claimed as passed. B09 has entered Gate 1 planning, with no B09
 product change authorized. Its delivery candidate `fe246c0` adds organizer instructions,
 lock/license audit, deterministic handoff/submission packaging and two-machine SHA-256 closure.
-B09 Gate 2 review is open; acceptance, final artifact creation and tagging remain pending.
+B09 Gate 2 is Accepted/Frozen, but the user explicitly prohibited the final handoff ZIP and
+out-of-band SHA-256 pending additional development/version consolidation. No final artifact or tag
+exists, and the preview hashes are not final delivery identities.

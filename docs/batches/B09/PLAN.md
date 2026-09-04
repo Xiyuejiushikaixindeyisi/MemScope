@@ -92,7 +92,10 @@ The B09 Gate 2 candidate includes the implementation commit, clean working tree,
 evidence, preview artifact hashes, limitations and rollback. Preview archives live outside the
 repository and are not committed.
 
-No final tag, release or named handoff ZIP is created until explicit B09 Gate 2 acceptance. After
-acceptance, the exact frozen commit produces the handoff artifact and SHA-256 for transfer. The
-tuning machine then returns B08 live evidence, real baseline/tuning records, the final submission
-ZIP, source/config differences and hashes under the two-machine protocol.
+No final tag, release or named handoff ZIP is created until explicit B09 Gate 2 acceptance.
+
+**Post-approval override, 2026-09-04:** the user accepted B09 Gate 2 but explicitly prohibited the
+planned final handoff ZIP and out-of-band SHA-256 because additional development and version
+consolidation are required. Therefore acceptance freezes the B09 implementation only; it does not
+authorize the artifact, sidecar or tag. A new explicit instruction is required after the additional
+work is scoped and approved.

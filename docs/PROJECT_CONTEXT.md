@@ -1,7 +1,7 @@
 # MemScope Project Context
 
-> Current through the open B09 Gate 2 review on 2026-09-04. B00–B08 are
-> `Accepted/Frozen`; B08 uses a named tuning-machine live-evidence transfer exception.
+> Current through B09 Gate 2 acceptance on 2026-09-04. B00–B09 are `Accepted/Frozen`; B08 uses a
+> named tuning-machine live-evidence transfer exception, and B09 final artifact generation is held.
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
 > `1507317b048fc06d25f020ded751f35fae2aeb6f`.
@@ -160,4 +160,6 @@ no product behavior change. The user then explicitly approved its plan for organ
 lock/license audit, deterministic delivery packaging and two-machine identity closure; Gate 2
 remains a separate explicit decision. The implementation candidate is `fe246c0`; deterministic
 archive and quality evidence is recorded in `docs/batches/B09/HANDOFF.md`. The user entered Gate 2
-review, but B09 is not Accepted/Frozen and no final artifact or tag exists.
+review and then explicitly accepted/froze B09. The same approval prohibited final handoff ZIP and
+out-of-band SHA-256 generation pending additional development/version consolidation. No final
+artifact or tag exists; further work requires a separate approved scope.

@@ -1,10 +1,12 @@
 # B09 reproducible delivery handoff
 
-> Status: Gate 2 review open; not Accepted/Frozen
+> Status: Gate 2 Accepted/Frozen; final handoff ZIP/hash generation prohibited by user
 >
 > Gate 1 approved by explicit user message on 2026-09-04
 >
 > Gate 2 review entered by explicit user message on 2026-09-04
+>
+> Gate 2 accepted/frozen by explicit user message on 2026-09-04
 >
 > Base commit: `2498c904e97ab36d85a8596898996243460dae6f`
 >
@@ -91,19 +93,26 @@ not claim:
 - a final Docker build/start, image result or host-port/cgroup result;
 - a tuning-machine final submission ZIP.
 
-The handoff manifest records those pending claims. The tuning machine must follow `DELIVERY.md`,
-`SYSTEM_VERIFICATION.md` and the two-machine workflow, then return the final ZIP/hash,
-source/config differences and sanitized evidence.
+The handoff manifest records those pending claims. Once a later explicit instruction lifts the
+current artifact hold, the tuning machine must follow `DELIVERY.md`, `SYSTEM_VERIFICATION.md` and
+the two-machine workflow, then return the final ZIP/hash, source/config differences and sanitized
+evidence.
 
-## 6. Gate 2 decision and post-acceptance action
+## 6. Gate 2 acceptance and artifact hold
 
-The user explicitly entered B09 Gate 2 review on 2026-09-04. The review is open; entering review is
-not an acceptance or freeze decision. A later Gate 2 acceptance must not be interpreted as external
-live/baseline acceptance.
+The user explicitly accepted/froze B09 Gate 2 on 2026-09-04. This accepts the reproducible-delivery
+implementation and its deterministic evidence; it does not accept or claim external live/baseline
+evidence.
 
-No final ZIP, release or tag has been created. Only after explicit B09 Gate 2 acceptance should the
-exact frozen commit build the named handoff archive and sidecar. Upload, remote push, final tuning
-submission and project-license selection remain separate actions requiring their own authority.
+The same approval explicitly prohibits generating the final handoff ZIP and its out-of-band
+SHA-256 because additional development and version consolidation are still required. It supersedes
+the previously planned automatic post-acceptance artifact step. No final ZIP, sidecar, release or
+tag has been created, and none is authorized by this acceptance. The recorded preview hashes remain
+reproducibility evidence only and must not be presented as final delivery identities.
+
+Further development/version work is outside this frozen B09 scope until the user defines and
+approves a separate plan. Final artifact creation, upload, remote push, tuning submission and
+project-license selection each remain separately unauthorized.
 
 Rollback is a normal revert of B09 documentation, script and tests; it does not touch services,
 volumes or provider data.

@@ -2,13 +2,17 @@
 
 ```yaml
 batch: B09
-status: gate_2_review_open_not_accepted_not_frozen
+status: gate_2_accepted_frozen_final_artifact_generation_prohibited
 date: 2026-09-04
 gate_1_entry: user_explicit
 gate_1_approval: user_explicit
 gate_2_review_entry: user_explicit
-accepted: false
-frozen: false
+gate_2_acceptance: user_explicit
+accepted: true
+frozen: true
+final_handoff_zip: prohibited_pending_additional_development_and_version_consolidation
+final_out_of_band_sha256: prohibited_pending_additional_development_and_version_consolidation
+final_tag: not_created_not_authorized
 base_commit: 2498c904e97ab36d85a8596898996243460dae6f
 branch: batch/b09-delivery-closure
 candidate_commit: fe246c0ba59a39a108850f6e35126114c0a20716
@@ -35,6 +39,7 @@ forbidden_without_reapproval:
   - retry_fallback_background_worker_or_multi_worker_change
   - fabricated_live_evidence_or_official_score
   - final_tag_or_release_before_gate_2_acceptance
+  - final_artifact_sidecar_or_tag_without_new_explicit_authorization
 deterministic_evidence:
   b09_unit_tests: 4_passed
   full_pytest: 556_passed
@@ -71,3 +76,10 @@ invent or grant a root project license; such a legal decision requires separate 
 Any discovered need to change production behavior, dependencies, fixed MemOS source/patches,
 Compose topology or public contracts stops B09 and requires a revised plan or formal revision of the
 owning frozen Batch. A tuning-machine P0 failure reopens B08 rather than being hidden in packaging.
+
+## Gate 2 disposition
+
+The user accepted/froze B09 Gate 2 on 2026-09-04 but explicitly prohibited creating the final
+handoff ZIP and out-of-band SHA-256 because more development and version consolidation are needed.
+The preview artifacts remain non-final evidence. No final package, sidecar or tag exists, and new
+work requires a separately approved scope.

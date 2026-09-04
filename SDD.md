@@ -1,10 +1,11 @@
 # MemScope System Design Description
 
-> Version: B09 reproducible-delivery candidate, 2026-09-04.
+> Version: B09 Gate 2 accepted reproducible-delivery implementation, 2026-09-04.
 >
 > This document describes the implemented baseline, not an official score or a final model choice.
-> B00–B08 are Accepted/Frozen. B08 uses the tuning-machine live-evidence transfer exception;
+> B00–B09 are Accepted/Frozen. B08 uses the tuning-machine live-evidence transfer exception;
 > real-model, live-system and semantic-quality evidence remains a tuning-machine responsibility.
+> Final artifact generation is held pending additional development and version consolidation.
 
 ## 1. Purpose and evaluation role
 
