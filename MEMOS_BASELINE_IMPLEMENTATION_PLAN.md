@@ -851,6 +851,11 @@ baseline 后才能引入以得分提升为目的的复杂启发式；不得把�
 
 以下是默认顺序。用户可以主动调整、合并或暂停 Batch，但不得绕过其依赖和验收门禁。
 
+> **2026-09-04 B07～B09 收口校准：** 下表原始 B07 描述早于 B05/B06 Gate 0 R1。
+> B05/B06 已冻结 durable receipt、同步 readback/provenance reconciliation、显式失败且无自动重试/
+> Raw fallback 的边界，因此 B07 不再以旧描述为新增 outbox worker、retry、fallback 或 D04-B 的授权。
+> 最新获批顺序为 B07 确定性可靠性证据闭环、B08 系统验证、B09 可复现交付与 baseline 证据收口。
+
 | Batch | 目标 | 主要交付 | 退出条件 |
 |---|---|---|---|
 | B00 | 工程基础 | 目录、依赖锁、Settings、日志、异常、质量工具、测试框架 | 无 Key 测试框架和最小应用可运行 |
@@ -860,11 +865,13 @@ baseline 后才能引入以得分提升为目的的复杂启发式；不得把�
 | B04 | 运行基础设施 | 固定 MemOS、Qdrant、Neo4j Compose、持久卷、Health | 三个服务冷启动和重启检查通过 |
 | B05 | MemOS 写入链路 | Real Gateway、Cube 生命周期、字段转换、同步 Add | Mock Model API 下真实 MemOS Add 可验证 |
 | B06 | MemOS 检索链路 | Search 参数/响应转换、隔离、长度控制、失败策略 | Mock Model API 下真实 MemOS Search 可验证 |
-| B07 | 可靠性闭环 | outbox、重试、readback、strict/fallback、可选 D04-B | 故障注入、恢复、幂等和一致性测试通过 |
-| B08 | 系统验证 | 全链路、并发、重启、资源和分段性能测试 | 代表性无 Key 场景全部通过，无未分类失败 |
-| B09 | Scaffold 冻结 | 文档、镜像/依赖锁、许可证、干净构建和交付检查 | 用户验收并标记 `memos-scaffold-v0` |
+| B07 | 可靠性证据闭环 | 组合 Raw/receipt/Gateway 的故障、重启、幂等和一致性确定性测试；不新增机制 | 冻结恢复语义被跨层测试证明，且生产代码零变更 |
+| B08 | 系统验证 | 全链路、并发、重启、资源和分段性能验证及失败分类 | 代表性场景通过，无未分类失败；不借测试引入新架构 |
+| B09 | 交付与 baseline 收口 | 文档、依赖/源码/镜像 lock、许可证、clean build、两机证据和提交包 | 用户验收可复现候选及真实/未验证证据边界 |
 
-真实 API/Key 到位后的 capability probe、七类样本、数十题和 1000 题运行作为后续 baseline Batch 重新提交方案，不在 B00～B09 中预先实施。
+真实 API/Key 的 capability probe、七类样本、baseline/完整评测只能在华为调测机执行，并按
+带 SHA-256 的两机交接闭环进入 B09；开发机不得用 Mock 结果替代或伪造这些证据。若调测机证据未
+及时回传，B09 必须明确标记未验证项，不能把它们写成已完成事实。
 
 ### 18.8 两台机器的交付边界
 

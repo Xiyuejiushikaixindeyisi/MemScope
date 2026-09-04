@@ -1,6 +1,6 @@
 # MemScope Project Context
 
-> Current through B06 Gate 2 acceptance on 2026-09-04. B00–B06 are `Accepted/Frozen`;
+> Current through the B07 Gate 2 candidate on 2026-09-04. B00–B06 are `Accepted/Frozen`;
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
 > `1507317b048fc06d25f020ded751f35fae2aeb6f`.
@@ -30,6 +30,11 @@ the accepted B06 Real Add + Search and complete readiness baseline: single-Cube 
 strict active/provenance filtering, stable exact deduplication and a 55-second Search deadline.
 Semantic quality and real model capability are transferred verification items, not claims made by
 the development machine.
+
+The B07 Gate 2 candidate adds deterministic cross-layer evidence for completed-receipt Raw recovery,
+lost-response provenance reconciliation, partial-provenance fail-closed behavior and one provider
+attempt per external replay. It changes no production module or runtime contract and remains pending
+explicit user acceptance.
 
 ## B04 accepted evidence
 
@@ -113,11 +118,16 @@ baseline or tuning run. The Add tuning authority is
 
 ## Delivery stages
 
-1. B00～B09 build and freeze `memos-scaffold-v0` without organizer credentials.
-2. B05 and B06 each start in a separate Session with user-approved Gate 0 algorithm design.
-3. B06 produces the initial `SDD.md`; B09 freezes the reproducible tuning handoff ZIP.
-4. The Huawei-network tuning machine performs capability probes, baseline evaluation and tuning.
-5. Only a candidate with an identified source/configuration and returned audit evidence is treated
+1. B00～B06 are accepted/frozen and provide the Real Add + Search candidate.
+2. B07 proves the frozen recovery boundary with composed deterministic tests and adds no production
+   reliability mechanism.
+3. After separate approval, B08 owns end-to-end, concurrency, restart, resource and segmented
+   performance verification without redesigning the architecture.
+4. After B08 acceptance, B09 freezes documentation, locks, licenses, clean-build/two-machine
+   evidence and the reproducible delivery candidate.
+5. The Huawei-network tuning machine performs real capability probes, baseline/full evaluation and
+   controlled tuning; only returned, checksummed evidence becomes a repository fact.
+6. Only a candidate with an identified source/configuration and returned audit evidence is treated
    as the reproducible final submission candidate.
 
 ## Long-lived engineering constraints
@@ -133,8 +143,7 @@ baseline or tuning run. The Add tuning authority is
 
 ## Next authorized state
 
-B05 and B06 are frozen under their respective `HANDOFF.md` files. B06 Gate 2 was explicitly
-accepted by the user on 2026-09-04 and committed as `1507317`; real model/latency/score and optional
-Docker P4 evidence remain tuning-machine tasks. A new Session must first complete the read-only
-B07–B09 closure context review in
-`docs/batches/B07/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` and wait for explicit approval.
+B05 and B06 are frozen under their respective `HANDOFF.md` files. B07 Gate 1 was explicitly
+approved on 2026-09-04 and is limited to deterministic composed recovery tests plus documentation
+reconciliation on `batch/b07-reliability-closure`. B07 Gate 2 acceptance is still required before
+entering B08. Real model/latency/score and optional Docker P4 evidence remain tuning-machine tasks.

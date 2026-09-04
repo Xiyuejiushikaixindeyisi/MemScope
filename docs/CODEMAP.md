@@ -43,6 +43,7 @@
 | `docs/collaboration/` | Two-machine workflow, human/AI rules and transfer/tuning templates | Current project context and Git identities |
 | `tests/unit/` | Settings, errors, logging, HTTP models, identity and persistence value behavior | Public module surfaces |
 | `tests/component/` | SQLite migration, persistence, restart, concurrency, cancellation and fault behavior | Public RawStore interface and temporary databases |
+| `tests/component/test_b07_reliability_boundary.py` | Composed Raw/receipt/Real Gateway restart, reconciliation, fail-closed and no-retry evidence | Temporary SQLite databases and HTTPX MockTransport |
 | `tests/contract/` | Contest HTTP, reusable Gateway, explicit Fake path and Mock Model contracts | Public ports and app factories |
 | `tests/smoke/` | Default/Fake ASGI paths and real default/Mock Uvicorn processes | Installed project and locked test dependencies |
 
@@ -83,8 +84,11 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
   displace model/evaluation tuning.
 - B06: Search conversion, isolation, evidence length/ranking and failure policy. Gate 0 R1 and the
   implementation were accepted/frozen at Gate 2 on 2026-09-04; implementation commit `1507317`.
-- B07–B09: closure scope must first be reconciled against the accepted B05/B06 invariants. The old
-  master-plan references to automatic retry and Raw fallback are not implementation authorization.
+- B07: the Gate 2 candidate was completed on 2026-09-04 after explicit Gate 1 approval. It adds
+  composed deterministic recovery evidence and document reconciliation only; production modules,
+  contracts and schemas remain frozen. Gate 2 acceptance is pending.
+- B08 and B09 require separate post-B07 approval. B08 owns system verification; B09 owns locks,
+  licensing, clean build, two-machine evidence and delivery/baseline closure.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 

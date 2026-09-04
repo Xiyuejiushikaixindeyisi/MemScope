@@ -6,7 +6,8 @@ provider-independent Memory Gateway plus deterministic no-key substitutes. B04 a
 MemOS/Neo4j/Qdrant runtime infrastructure. B00–B06 are accepted/frozen; B05 delivers synchronous
 Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
 host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
-conditions. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+conditions. The B07 tests-and-documents reliability candidate is pending Gate 2 and does not change
+production code. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -152,7 +153,7 @@ See `docs/collaboration/48H_DELIVERY_GUARDRAILS.md` and the linked B05 Add tunin
 starting Docker or model experiments.
 
 Development/Git work and Huawei-network tuning run on separate machines. The development machine
-owns B05/B06 Gate 0–2, deterministic tests, SDD and a checksummed tuning handoff. The tuning machine
+owns accepted B05/B06, B07 deterministic closure, SDD and a checksummed tuning handoff. The tuning machine
 owns real gateway probes, Docker revalidation, baseline/full evaluation, controlled tuning and the
 final submission ZIP. It must return source/config differences and evidence so the final candidate
 remains auditable.
@@ -175,3 +176,7 @@ production retries/fallback or final-answer generation. See
 `docs/interfaces/contest-http-v1.md`,
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.
+
+B07 Gate 1 was approved on 2026-09-04. Its candidate scope is limited to composed restart,
+reconciliation, fail-closed and no-automatic-retry evidence in deterministic tests plus correction of
+the historical B07–B09 sequencing text. B08 cannot start until B07 Gate 2 is explicitly accepted.

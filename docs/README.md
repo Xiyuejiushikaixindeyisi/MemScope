@@ -8,6 +8,8 @@
   host-port/cgroup 验证转交具备正常 daemon 的调测机。
 - B06：2026-09-04 经用户 Gate 2 验收，`Accepted/Frozen`；实现提交为 `1507317`。
   真实模型、语义分数和 Docker P4 验证按接受条件转交调测机。
+- B07：2026-09-04 经用户批准 Gate 1 后已形成 Gate 2 候选；只包含 Raw/receipt/Real Gateway
+  的组合恢复测试与 B07～B09 收口文档校准，尚未 Gate 2 验收，生产代码零变更。
 - 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
   GitHub 版本静默分叉。
 
@@ -51,6 +53,8 @@
 | B06 非 Docker 完整部署 | `batches/B06/NATIVE_DEPLOYMENT.md` |
 | B06 开发机候选交接 | `batches/B06/CONTEXT.md`、`batches/B06/HANDOFF.md` |
 | B07–B09 收口新 Session Prompt | `batches/B07/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` |
+| B07 Gate 1 上下文与获批计划 | `batches/B07/CONTEXT.md`、`batches/B07/PLAN.md` |
+| B07 Gate 2 候选交接 | `batches/B07/HANDOFF.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责
