@@ -23,3 +23,15 @@ images pinned by OCI index digest. The MemOS image installs the fully pinned ups
 `docker/requirements.txt` plus exact B04 transitive constraints during image build. Each dependency
 remains subject to its own license. The exact image references are recorded in
 `third_party/memos/SOURCE_LOCK.json`.
+
+## B09 delivery treatment
+
+The formal B09 submission package repeats the MemOS Apache-2.0 license at
+`solution/LICENSES/MemOS-Apache-2.0.txt` and retains the source copy under
+`solution/code/third_party/memos/LICENSE`. The deterministic manifest records hashes for both paths.
+
+Python packages and OCI images are resolved or pulled during build rather than copied from this
+development environment. Their pinned identities do not replace their upstream license terms.
+
+No root license has been selected for original MemScope source. This notice records third-party
+attribution only and does not grant a new license for original project code.

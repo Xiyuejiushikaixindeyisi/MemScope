@@ -1,10 +1,10 @@
 # MemScope System Design Description
 
-> Version: B06 Gate 2 accepted baseline, 2026-09-04.
+> Version: B09 reproducible-delivery candidate, 2026-09-04.
 >
 > This document describes the implemented baseline, not an official score or a final model choice.
-> B00–B06 are Accepted/Frozen; real-model and semantic-quality evidence remains a tuning-machine
-> responsibility under the accepted handoff conditions.
+> B00–B08 are Accepted/Frozen. B08 uses the tuning-machine live-evidence transfer exception;
+> real-model, live-system and semantic-quality evidence remains a tuning-machine responsibility.
 
 ## 1. Purpose and evaluation role
 
@@ -184,6 +184,11 @@ idempotency, isolation, error propagation, deadlines, status/provenance filterin
 fixed patch hashes. Real model quality, P95/max latency and official scores must be returned from the
 Huawei tuning machine before the final candidate can claim them.
 
+B07 adds composed recovery/reconciliation evidence without changing production behavior. B08 adds
+a three-phase public HTTP verifier for exercise, restart persistence and sanitized resource
+observations. Its deterministic candidate is accepted, but those live phases have not been executed
+on this development machine and are not claimed as passed.
+
 ## 12. Known limitations
 
 1. Same-user Add FIFO is process-local; multiple memory-api workers/replicas are forbidden.
@@ -198,3 +203,19 @@ Huawei tuning machine before the final candidate can claim them.
 6. Docker host-port/cgroup proof remains a tuning-machine/P4 task; the native path is fully supported.
 7. Deferred BM25/full-text paths are explicitly disabled in R1 and require an additional log-
    sanitization patch/canary before they may be enabled.
+
+## 13. Reproducible delivery
+
+B09 adds a deterministic standard-library artifact builder with separate `handoff` and `submission`
+allowlists. Both modes reject links and unsafe paths, exclude Git/cache/runtime/secret material,
+normalize ZIP metadata, embed file-level SHA-256 records and emit an external full-archive hash.
+
+The handoff artifact carries tests, public evaluation assets, verification runbooks and two-machine
+templates for the tuning machine. The formal submission artifact contains `INSTRUCTION.md`, this
+SDD, third-party notices/licenses and the complete runtime/build source under `solution/code/`; it
+does not carry the public evaluation dataset or internal Batch history.
+
+Package reproducibility does not certify a real model, official score or live-system behavior. The
+tuning machine must validate the received handoff hash, complete the B08 phases, run the real
+baseline/tuning sequence, freeze its final non-secret configuration, and return the final ZIP plus
+source/config differences and evidence.

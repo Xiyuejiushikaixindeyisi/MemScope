@@ -1,6 +1,6 @@
 # MemScope Project Context
 
-> Current through B08 Gate 2 acceptance and B09 Gate 1 entry on 2026-09-04. B00–B08 are
+> Current through B08 Gate 2 acceptance and approved B09 Gate 1 implementation on 2026-09-04. B00–B08 are
 > `Accepted/Frozen`; B08 uses a named tuning-machine live-evidence transfer exception.
 > B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
 > machine under explicit handoff conditions. The accepted B06 implementation commit is
@@ -156,4 +156,6 @@ verifier/system-test candidate is complete without production changes. The user 
 accepted/froze B08 Gate 2 on 2026-09-04 under the named tuning-machine live-evidence transfer
 exception. The missing `exercise`, restart-persistence and resource evidence remains a transferred
 obligation, not a passed claim. The user also entered B09 Gate 1; B09 implementation requires
-separate explicit approval of its plan.
+no product behavior change. The user then explicitly approved its plan for organizer instructions,
+lock/license audit, deterministic delivery packaging and two-machine identity closure; Gate 2
+remains a separate explicit decision.

@@ -37,6 +37,7 @@
 | `docs/batches/B05/NATIVE_DEPLOYMENT.md` | First-class host-process deployment fallback when Docker is unavailable | Python 3.11, Neo4j, Qdrant |
 | `scripts/verify_b06_candidate.py` | Public Health/Add/Search/replay/cross-user candidate smoke without content output | running memory-api, Python standard library |
 | `scripts/verify_b08_system.py` | Three-phase public exercise/restart verifier with sanitized timing and failure evidence | running memory-api, Python standard library |
+| `scripts/build_b09_delivery.py` | Deterministic allowlisted handoff/submission ZIP builder and verifier | clean source tree, Python standard library |
 | `docs/batches/B06/ORGANIZER_DEPLOYMENT.md` | Organizer-facing Docker/native deployment gates and storage initialization controls | Compose, MemOS, Neo4j, Qdrant |
 | `docs/batches/B06/NATIVE_DEPLOYMENT.md` | Organizer-facing non-Docker Add + Search + Health deployment path | Python 3.11, MemOS, Neo4j, Qdrant |
 | `SDD.md` | Implemented memory architecture, capabilities and explicit limitations | accepted contracts and current source |
@@ -46,6 +47,7 @@
 | `tests/component/` | SQLite migration, persistence, restart, concurrency, cancellation and fault behavior | Public RawStore interface and temporary databases |
 | `tests/component/test_b07_reliability_boundary.py` | Composed Raw/receipt/Real Gateway restart, reconciliation, fail-closed and no-retry evidence | Temporary SQLite databases and HTTPX MockTransport |
 | `tests/system/test_b08_public_system.py` | Public ASGI concurrency, isolation, restart and typed failure evidence over real components | Temporary SQLite databases and HTTPX transports |
+| `tests/unit/test_b09_delivery.py` | Archive determinism, content separation, secret/link/path rejection and manifest integrity | Temporary source/output trees |
 | `tests/contract/` | Contest HTTP, reusable Gateway, explicit Fake path and Mock Model contracts | Public ports and app factories |
 | `tests/smoke/` | Default/Fake ASGI paths and real default/Mock Uvicorn processes | Installed project and locked test dependencies |
 
@@ -90,9 +92,9 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
   deterministic recovery evidence and document reconciliation only; production modules, contracts
   and schemas remain unchanged.
 - B08 is Accepted/Frozen at deterministic candidate `44ce4a7` under the named tuning-machine
-  live-evidence transfer exception; no live-system pass is claimed. B09 Gate 1 planning is open and
-  owns locks, licensing, clean build, two-machine evidence and delivery/baseline closure, but its
-  implementation is not yet authorized.
+  live-evidence transfer exception; no live-system pass is claimed. B09 Gate 1 is approved and owns
+  instructions, locks/licensing, reproducible archives and two-machine evidence identity. It does
+  not own product algorithms, and its Gate 2 remains pending.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 
