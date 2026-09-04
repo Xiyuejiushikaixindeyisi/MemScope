@@ -1,8 +1,9 @@
 # MemScope Project Context
 
-> Current through B05 Gate 2 acceptance on 2026-09-03. B00–B05 are `Accepted/Frozen`; B05 Docker
-> host-port/cgroup validation is transferred to a capable tuning-machine daemon. B06 has not started
-> and must begin in a new Session at Gate 0.
+> Current through B06 Gate 2 acceptance on 2026-09-04. B00–B06 are `Accepted/Frozen`;
+> B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
+> machine under explicit handoff conditions. The accepted B06 worktree still requires an authorized
+> implementation commit before a B07 branch is created.
 
 ## Objective
 
@@ -24,9 +25,11 @@ through Search. The organizer owns final answer generation and judging.
   Add Gateway, durable receipts, same-user lanes, deadline propagation, guarded fixed-source
   patches, public runtime composition and deterministic verification fixtures.
 
-The default `core` profile remains unavailable/503. The explicit `memos_add` profile serves Real Add
-but deliberately leaves public Health/Search unavailable until B06. Semantic quality and real model
-capability are not yet verified.
+The default `core` profile remains unavailable/503. The explicit `memos_add` profile now provides
+the accepted B06 Real Add + Search and complete readiness baseline: single-Cube Product Search,
+strict active/provenance filtering, stable exact deduplication and a 55-second Search deadline.
+Semantic quality and real model capability are transferred verification items, not claims made by
+the development machine.
 
 ## B04 accepted evidence
 
@@ -130,8 +133,9 @@ baseline or tuning run. The Add tuning authority is
 
 ## Next authorized state
 
-B05 is frozen under `docs/batches/B05/HANDOFF.md`. The tuning machine owns the transferred Docker
-host-port/cgroup check, but it remains non-blocking to model/evaluation tuning. B06 remains unopened
-and requires a new Session. Its first authorized action is the read-only Pre-Gate Context Review in
-`docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md`; only explicit user confirmation may advance it
-to Gate 0.
+B05 and B06 are frozen under their respective `HANDOFF.md` files. B06 Gate 2 was explicitly
+accepted by the user on 2026-09-04; real model/latency/score and optional Docker P4 evidence remain
+tuning-machine tasks. The accepted B06 changes are still an uncommitted working tree at the time of
+this update, so no B07 branch may be created until the user separately authorizes the implementation
+commit. A new Session must first complete the read-only B07–B09 closure context review in
+`docs/batches/B07/PRE_GATE_CONTEXT_REVIEW_PROMPT.md` and wait for explicit approval.

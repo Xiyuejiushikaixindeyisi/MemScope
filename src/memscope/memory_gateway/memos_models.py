@@ -1,10 +1,13 @@
 """Strict parsing helpers for the pinned MemOS Product API responses."""
 
 from dataclasses import dataclass
+from datetime import datetime
+from math import isfinite
 from typing import Any
 from uuid import UUID
 
 from memscope.memory_gateway.errors import GatewayProtocolError
+from memscope.memory_gateway.models import GatewayEvidence
 
 SUPPORTED_MEMORY_TYPES = frozenset(
     {
@@ -20,6 +23,8 @@ SUPPORTED_MEMORY_TYPES = frozenset(
         "Context",
     }
 )
+
+SEARCH_MEMORY_TYPES = frozenset({"WorkingMemory", "LongTermMemory", "UserMemory"})
 
 
 def _object(value: Any) -> dict[str, Any]:
@@ -189,3 +194,107 @@ def memories_from_filtered_get(data: Any, *, cube_id: str) -> tuple[ProviderMemo
             raise GatewayProtocolError()
         values.extend(parse_provider_memory(value) for value in memories)
     return tuple(values)
+
+
+def _search_time(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    rendered = value.strip()
+    if rendered.endswith("Z"):
+        rendered = f"{rendered[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(rendered)
+    except ValueError:
+        return None
+    if parsed.utcoffset() is None:
+        return None
+    return parsed
+
+
+def _valid_search_provenance(metadata: dict[str, Any]) -> bool:
+    payload_sha256 = metadata.get("memscope_payload_sha256")
+    index = metadata.get("memscope_result_index")
+    count = metadata.get("memscope_result_count")
+    return (
+        isinstance(payload_sha256, str)
+        and len(payload_sha256) == 64
+        and all(character in "0123456789abcdef" for character in payload_sha256)
+        and not isinstance(index, bool)
+        and isinstance(index, int)
+        and index >= 0
+        and not isinstance(count, bool)
+        and isinstance(count, int)
+        and count > 0
+        and index < count
+        and metadata.get("vector_sync") == "success"
+    )
+
+
+def evidence_from_search(
+    data: Any,
+    *,
+    user_id: str,
+    cube_id: str,
+) -> tuple[GatewayEvidence, ...]:
+    """Return trusted text evidence while preserving the Product Search order."""
+
+    body = _object(data)
+    groups = body.get("text_mem")
+    if not isinstance(groups, list):
+        raise GatewayProtocolError()
+
+    results: list[GatewayEvidence] = []
+    observed_ids: dict[str, str] = {}
+    accepted_ids: set[str] = set()
+    seen_content: set[str] = set()
+    for raw_group in groups:
+        group = _object(raw_group)
+        actual_cube = _nonblank(group.get("cube_id"))
+        memories = group.get("memories")
+        if not isinstance(memories, list):
+            raise GatewayProtocolError()
+        if actual_cube != cube_id:
+            continue
+        for raw_item in memories:
+            item = _object(raw_item)
+            memory_id = _nonblank(item.get("id"))
+            content = _nonblank(item.get("memory"))
+            previous = observed_ids.get(memory_id)
+            if previous is not None and previous != content:
+                raise GatewayProtocolError()
+            observed_ids.setdefault(memory_id, content)
+            metadata = _object(item.get("metadata"))
+            score_value = metadata.get("relativity")
+            if score_value is not None and (
+                isinstance(score_value, bool)
+                or not isinstance(score_value, int | float)
+                or not isfinite(score_value)
+            ):
+                continue
+            if (
+                metadata.get("user_id") != user_id
+                or metadata.get("memscope_cube_id") != cube_id
+                or metadata.get("status") != "activated"
+                or metadata.get("memory_type") not in SEARCH_MEMORY_TYPES
+                or not _valid_search_provenance(metadata)
+            ):
+                continue
+
+            normalized_content = content.strip()
+            if memory_id in accepted_ids:
+                continue
+            accepted_ids.add(memory_id)
+            if normalized_content in seen_content:
+                continue
+            seen_content.add(normalized_content)
+            results.append(
+                GatewayEvidence(
+                    id=memory_id,
+                    content=content,
+                    user_id=user_id,
+                    cube_id=cube_id,
+                    score=float(score_value) if score_value is not None else None,
+                    created_at=_search_time(metadata.get("created_at")),
+                )
+            )
+    return tuple(results)

@@ -42,15 +42,21 @@ services:
       MEMOS_DEADLINE_RESERVE_SECONDS: "${MEMOS_DEADLINE_RESERVE_SECONDS:-5}"
       MEMOS_CONNECT_TIMEOUT_SECONDS: "${MEMOS_CONNECT_TIMEOUT_SECONDS:-3}"
       MEMOS_RESPONSE_MAX_BYTES: "${MEMOS_RESPONSE_MAX_BYTES:-1048576}"
+      SEARCH_DEADLINE_SECONDS: "${SEARCH_DEADLINE_SECONDS:-55}"
+      SEARCH_WARN_SECONDS: "${SEARCH_WARN_SECONDS:-50}"
+      MEMOS_SEARCH_MODE: "${MEMOS_SEARCH_MODE:-fast}"
+      MEMOS_SEARCH_RELATIVITY: "${MEMOS_SEARCH_RELATIVITY:-0.0}"
+      MEMOS_SEARCH_DEDUP: "${MEMOS_SEARCH_DEDUP:-exact}"
+      MEMOS_SEARCH_RERANK: "${MEMOS_SEARCH_RERANK:-true}"
     healthcheck:
       test:
         - CMD
         - python
         - -c
         - >-
-          import socket;
-          s=socket.create_connection(('127.0.0.1',8080),timeout=2);
-          s.close()
+          import json,urllib.request;
+          r=urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=2);
+          assert r.status==200 and json.load(r)=={'status':'ok'}
       interval: 3s
       timeout: 3s
       retries: 20
@@ -168,6 +174,10 @@ services:
       MEM_READER_REMOVE_PROMPT_EXAMPLE: "${MEM_READER_REMOVE_PROMPT_EXAMPLE:-false}"
       SIMPLE_STRUCT_ADD_FILTER: "false"
       MEM_READER_SAVE_RAWFILENODE: "false"
+      FAST_GRAPH: "false"
+      BM25_CALL: "false"
+      VEC_COT_CALL: "false"
+      FULLTEXT_CALL: "false"
       MOS_RERANKER_BACKEND: cosine_local
       MOS_FEEDBACK_RERANKER_BACKEND: cosine_local
       HF_HUB_OFFLINE: "1"

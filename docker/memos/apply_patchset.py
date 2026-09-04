@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the B04+B05 patchset to one exact extracted MemOS v2.0.32 tree."""
+"""Apply the B04+B05+B06 patchset to one exact extracted MemOS v2.0.32 tree."""
 
 import argparse
 import hashlib
@@ -371,6 +371,176 @@ def _single_cube(text: str) -> str:
         'with timed_stage("add", "schedule", cube_configured=True)',
     )
     text = _replace(text, "            cube_id=self.cube_id,", "            cube_configured=True,")
+    text = _replace(
+        text,
+        '        logger.info(f"Found {len(formatted_memories)} memories for user {search_req.user_id}")',
+        '        logger.info("Found %s memories", len(formatted_memories))',
+    )
+    text = _replace(
+        text,
+        '                logger.info(f"Triggering additional search with hint: {missing_info_hint}")',
+        '                logger.info("Triggering additional Search")',
+    )
+    text = _replace(
+        text,
+        "                    f\"[add_before_search] Search error for memory '{mem.memory}': {e}\"",
+        '                    "[add_before_search] Search failed"',
+    )
+    text = _replace(
+        text,
+        """        try:
+            if search_mode == SearchMode.FAST:
+                text_memories = self._fast_search(search_req, user_context)
+            elif search_mode == SearchMode.FINE:
+                text_memories = self._fine_search(search_req, user_context)
+            elif search_mode == SearchMode.MIXTURE:
+                text_memories = self._mix_search(search_req, user_context)
+            else:
+                self.logger.error(f"Unsupported search mode: {search_mode}")
+                return []
+            return text_memories
+
+        except Exception as e:
+            self.logger.error("Error in search_text: %s; traceback: %s", e, traceback.format_exc())
+            return []
+""",
+        """        if search_mode == SearchMode.FAST:
+            return self._fast_search(search_req, user_context)
+        if search_mode == SearchMode.FINE:
+            return self._fine_search(search_req, user_context)
+        if search_mode == SearchMode.MIXTURE:
+            return self._mix_search(search_req, user_context)
+        raise ValueError("unsupported Search mode")
+""",
+    )
+    text = _replace(text, "import traceback\n", "")
+    return text
+
+
+def _searcher(text: str) -> str:
+    text = _replace(
+        text,
+        """        logger.info(
+            f"[RECALL] Start query='{query}', top_k={top_k}, mode={mode}, memory_type={memory_type}, user_name={user_name}"
+        )
+""",
+        """        logger.info(
+            "[RECALL] Start query_chars=%s top_k=%s mode=%s memory_type=%s",
+            len(query),
+            top_k,
+            mode,
+            memory_type,
+        )
+""",
+    )
+    text = _replace(
+        text,
+        '            logger.debug(f"[SEARCH] Received info dict: {info}")',
+        '            logger.debug("[SEARCH] Received bounded request metadata")',
+    )
+    text = _replace(
+        text,
+        '                    logger.error(f"[SEARCH] Error during search: {traceback.format_exc()}")',
+        '                    logger.error("[SEARCH] Candidate conversion failed")',
+    )
+    text = _replace(
+        text,
+        '            logger.info(f"[SEARCH] Retrieve from plugin: {query}")',
+        '            logger.info("[SEARCH] Retrieve from plugin query_chars=%s", len(query))',
+    )
+    text = _replace(
+        text,
+        "            logger.info(f\"[PATH-A] '{query}'Skipped (memory_type does not match)\")",
+        '            logger.info("[PATH-A] Skipped (memory_type does not match)")',
+    )
+    for old, new in (
+        (
+            "            logger.info(f\"[PATH-C] '{query}' Skipped (no retriever)\")",
+            '            logger.info("[PATH-C] Skipped (no retriever)")',
+        ),
+        (
+            "            logger.info(f\"[PATH-C] '{query}' Skipped (no retriever, fast mode)\")",
+            '            logger.info("[PATH-C] Skipped (no retriever, fast mode)")',
+        ),
+        (
+            "            logger.info(f\"[PATH-C] '{query}' Skipped (memory_type does not match)\")",
+            '            logger.info("[PATH-C] Skipped (memory_type does not match)")',
+        ),
+        (
+            "        logger.info(f\"[PATH-C] '{query}' Retrieving from internet...\")",
+            '        logger.info("[PATH-C] Retrieving from internet")',
+        ),
+        (
+            "        logger.info(f\"[PATH-C] '{query}' Retrieved from internet {len(items)} items: {items}\")",
+            '        logger.info("[PATH-C] Retrieved from internet count=%s", len(items))',
+        ),
+        (
+            "            logger.info(f\"[PATH-E] '{query}' Skipped (memory_type does not match)\")",
+            '            logger.info("[PATH-E] Skipped (memory_type does not match)")',
+        ),
+        (
+            "            logger.info(f\"[PATH-F] '{query}' Skipped (memory_type does not match)\")",
+            '            logger.info("[PATH-F] Skipped (memory_type does not match)")',
+        ),
+        (
+            '        logger.info(f"[SIMPLESEARCH] Query words: {query_words}")',
+            '        logger.info("[SIMPLESEARCH] Query term count=%s", len(query_words))',
+        ),
+        (
+            '                logger.info("Query: {} COT: {}".format(query, response_json["sub_questions"]))',
+            '                logger.info("COT split count=%s", len(response_json["sub_questions"]))',
+        ),
+        (
+            '        except Exception as e:\n            logger.error(f"[LLM] Exception during chat generation: {e}")',
+            '        except Exception:\n            logger.error("[LLM] Chat generation failed")',
+        ),
+    ):
+        text = _replace(text, old, new)
+    text = _replace(text, "import traceback\n", "")
+    return text
+
+
+def _task_goal_parser(text: str) -> str:
+    text = _replace(
+        text,
+        '            logger.info(f"Parsing Goal... LLM input is {prompt}")',
+        """            logger.info(
+                "Parsing Goal query_chars=%s context_chars=%s conversation_count=%s",
+                len(query),
+                len(context),
+                len(conversation or []),
+            )""",
+    )
+    text = _replace(
+        text,
+        '            logger.info(f"Parsing Goal... LLM Response is {response}")',
+        '            logger.info("Parsing Goal response received")',
+    )
+    text = _replace(
+        text,
+        '            logger.warning(f"Fail to fine-parse query {query}: {traceback.format_exc()}")',
+        '            logger.warning("Fine goal parsing failed; using fast mode")',
+    )
+    text = _replace(
+        text,
+        '                        f"Failed to parse LLM output: {e}\\nRaw response:\\n{response} retried: {attempt_times + 1}/{attempts}"',
+        '                        f"Failed to parse LLM output after {attempt_times + 1}/{attempts} attempts"',
+    )
+    text = _replace(text, "import traceback\n\n", "")
+    return text
+
+
+def _retrieve_utils(text: str) -> str:
+    text = _replace(
+        text,
+        '    except json.JSONDecodeError as e:\n        logger.error(f"[JSONParse] Failed to decode JSON: {e}\\nRaw:\\n{response_text}")',
+        '    except json.JSONDecodeError:\n        logger.error("[JSONParse] Failed to decode JSON response")',
+    )
+    text = _replace(
+        text,
+        '    except Exception as e:\n        logger.error(f"[JSONParse] Unexpected error: {e}")',
+        '    except Exception:\n        logger.error("[JSONParse] Unexpected response parsing error")',
+    )
     return text
 
 
@@ -558,6 +728,9 @@ def _rabbitmq(text: str) -> str:
 PATCHES: dict[str, Callable[[str], str]] = {
     "src/memos/mem_reader/simple_struct.py": _simple_struct,
     "src/memos/multi_mem_cube/single_cube.py": _single_cube,
+    "src/memos/memories/textual/tree_text_memory/retrieve/searcher.py": _searcher,
+    "src/memos/memories/textual/tree_text_memory/retrieve/task_goal_parser.py": (_task_goal_parser),
+    "src/memos/memories/textual/tree_text_memory/retrieve/retrieve_utils.py": (_retrieve_utils),
     "src/memos/memories/textual/tree_text_memory/organize/manager.py": _manager,
     "src/memos/llms/openai.py": _openai,
     "src/memos/configs/llm.py": _llm_config,

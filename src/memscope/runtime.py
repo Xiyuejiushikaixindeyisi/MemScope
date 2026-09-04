@@ -45,11 +45,15 @@ async def open_runtime(settings: AppSettings) -> RuntimeResources:
             receipt_store=receipt_store,
             connect_timeout_seconds=settings.memos_connect_timeout_seconds,
             response_max_bytes=settings.memos_response_max_bytes,
+            search_mode=settings.memos_search_mode.value,
+            search_relativity=settings.memos_search_relativity,
+            search_dedup=settings.memos_search_dedup.value,
+            search_rerank=settings.memos_search_rerank,
         )
         await gateway.verify_upstream(
             timeout_seconds=min(
-                settings.memos_connect_timeout_seconds + 2,
-                settings.add_deadline_seconds - settings.memos_deadline_reserve_seconds,
+                10,
+                settings.search_deadline_seconds,
             )
         )
         operations = MemoryOperations(
@@ -57,6 +61,8 @@ async def open_runtime(settings: AppSettings) -> RuntimeResources:
             gateway=gateway,
             add_deadline_seconds=settings.add_deadline_seconds,
             add_warn_seconds=settings.add_warn_seconds,
+            search_deadline_seconds=settings.search_deadline_seconds,
+            search_warn_seconds=settings.search_warn_seconds,
             gateway_reserve_seconds=settings.memos_deadline_reserve_seconds,
         )
         return RuntimeResources(operations=operations, raw_store=raw_store, gateway=gateway)

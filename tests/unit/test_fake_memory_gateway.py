@@ -59,7 +59,7 @@ async def test_add_search_exact_replay_order_score_and_timestamp() -> None:
     await gateway.add(first)
     await gateway.add(first)
     await gateway.add(second)
-    evidence = await gateway.search(_search())
+    evidence = await gateway.search(_search(), timeout_seconds=5)
 
     assert [item.id for item in evidence] == ["message-1", "message-2"]
     assert [item.score for item in evidence] == [1.0, 0.5]
@@ -74,9 +74,13 @@ async def test_search_isolated_empty_stable_tie_and_top_k() -> None:
     await gateway.add(_add(request_id="r2", content="alpha", message_id="m2"))
     await gateway.add(_add(request_id="other", user_id="user-2", cube_id="cube-2", message_id="m3"))
 
-    assert [item.id for item in await gateway.search(_search(query="alpha", top_k=1))] == ["m1"]
-    assert await gateway.search(_search(query="!!!")) == ()
-    assert await gateway.search(_search(user_id="user-2", cube_id="cube-1")) == ()
+    assert [
+        item.id for item in await gateway.search(_search(query="alpha", top_k=1), timeout_seconds=5)
+    ] == ["m1"]
+    assert await gateway.search(_search(query="!!!"), timeout_seconds=5) == ()
+    assert (
+        await gateway.search(_search(user_id="user-2", cube_id="cube-1"), timeout_seconds=5) == ()
+    )
 
 
 async def test_search_skips_nonmatching_content_and_shared_exact_message_is_not_duplicated() -> (
@@ -90,7 +94,9 @@ async def test_search_skips_nonmatching_content_and_shared_exact_message_is_not_
     await gateway.add(shared)
     await gateway.add(irrelevant)
 
-    assert [item.id for item in await gateway.search(_search(query="alpha"))] == ["message-1"]
+    assert [
+        item.id for item in await gateway.search(_search(query="alpha"), timeout_seconds=5)
+    ] == ["message-1"]
 
 
 @pytest.mark.parametrize(
@@ -109,7 +115,7 @@ async def test_add_identity_conflicts_are_fail_closed(changed: GatewayAdd) -> No
     with pytest.raises(GatewayConflictError):
         await gateway.add(changed)
 
-    assert [item.id for item in await gateway.search(_search())] == ["message-1"]
+    assert [item.id for item in await gateway.search(_search(), timeout_seconds=5)] == ["message-1"]
 
 
 async def test_concurrent_exact_add_is_unique_and_close_is_idempotent() -> None:
@@ -117,14 +123,14 @@ async def test_concurrent_exact_add_is_unique_and_close_is_idempotent() -> None:
     request = _add()
     await asyncio.gather(*(gateway.add(request) for _ in range(20)))
 
-    assert len(await gateway.search(_search())) == 1
+    assert len(await gateway.search(_search(), timeout_seconds=5)) == 1
     await gateway.close()
     await gateway.close()
     assert await gateway.is_ready() is False
     with pytest.raises(GatewayUnavailableError):
         await gateway.add(_add(request_id="later"))
     with pytest.raises(GatewayUnavailableError):
-        await gateway.search(_search())
+        await gateway.search(_search(), timeout_seconds=5)
 
 
 @pytest.mark.parametrize(
@@ -149,7 +155,7 @@ async def test_fault_injector_preserves_typed_error(
         elif operation is GatewayOperation.ADD:
             await gateway.add(_add())
         else:
-            await gateway.search(_search())
+            await gateway.search(_search(), timeout_seconds=5)
 
 
 async def test_extreme_timestamp_is_reported_as_protocol_error() -> None:
@@ -157,4 +163,10 @@ async def test_extreme_timestamp_is_reported_as_protocol_error() -> None:
     await gateway.add(_add(timestamp_ms=2**63 - 1))
 
     with pytest.raises(GatewayProtocolError):
-        await gateway.search(_search())
+        await gateway.search(_search(), timeout_seconds=5)
+
+
+@pytest.mark.parametrize("invalid", [0, -1, float("nan"), float("inf"), True])
+async def test_search_rejects_invalid_timeout(invalid: float) -> None:
+    with pytest.raises(ValueError):
+        await FakeMemoryGateway().search(_search(), timeout_seconds=invalid)

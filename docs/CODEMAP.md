@@ -22,19 +22,23 @@
 | `src/memscope/memory_gateway/models.py` | Strict provider-independent Add/Search/evidence provenance values | Python standard library |
 | `src/memscope/memory_gateway/protocol.py` | Replaceable async memory-provider port | Gateway models |
 | `src/memscope/memory_gateway/fake.py` | Non-durable deterministic Gateway contract Fake and typed fault injection | Gateway contract, asyncio |
-| `src/memscope/memory_gateway/memos.py` | Strict async MemOS Product Add adapter, tenant/digest readback and deadline/error translation | Gateway contract, HTTPX, receipt store |
+| `src/memscope/memory_gateway/memos.py` | Strict async MemOS Product Add/Search adapter, readback, filtering, readiness and deadline/error translation | Gateway contract, HTTPX, receipt store |
 | `src/memscope/memory_gateway/receipt_store.py` | Durable provider-delivery idempotency receipts | SQLite/asyncio |
 | `src/memscope/application/memory_operations.py` | Deadline-bounded NEW/PENDING/COMPLETED Add orchestration and Search isolation | Contest operations, RawStore, MemoryGateway and user lanes |
 | `src/memscope/application/user_lanes.py` | FIFO same-user serialization with cross-user concurrency and cancellation cleanup | asyncio |
 | `src/memscope/runtime.py` | Lifespan-owned `memos_add` resource composition and reverse cleanup | Settings, Raw Store, Real Gateway |
 | `src/memscope/mock_model_api/` | Independent deterministic Chat/Embedding HTTP subset | FastAPI/Pydantic and standard library |
-| `compose.yaml` | B05 public memory-api plus MemOS/Neo4j/Qdrant topology, health ordering, networks and volumes | Docker Compose v2 |
+| `compose.yaml` | B06 public Add/Search memory-api plus MemOS/Neo4j/Qdrant topology, complete health ordering, networks and volumes | Docker Compose v2 |
 | `docker/memory-api/` | Builds/runs the non-root public Adapter process | locked MemScope runtime dependencies |
-| `docker/memos/` | Builds/runs fixed MemOS with hash-guarded B04/B05 compatibility patches | pinned Python image, bundled source |
+| `docker/memos/` | Builds/runs fixed MemOS with hash-guarded B04/B05/B06 compatibility patches | pinned Python image, bundled source |
 | `third_party/memos/` | Complete MemOS archive, source/image lock, checksum and upstream license | fixed upstream commit |
 | `scripts/verify_b04_runtime.py` | Disposable clean-room build, readiness, restart persistence and fault-recovery evidence | Docker Engine/Compose v2 |
 | `scripts/verify_b05_runtime.py` | Optional clean-room no-key Add/replay/isolation/deadline/runtime evidence | Docker Engine/Compose v2 |
 | `docs/batches/B05/NATIVE_DEPLOYMENT.md` | First-class host-process deployment fallback when Docker is unavailable | Python 3.11, Neo4j, Qdrant |
+| `scripts/verify_b06_candidate.py` | Public Health/Add/Search/replay/cross-user candidate smoke without content output | running memory-api, Python standard library |
+| `docs/batches/B06/ORGANIZER_DEPLOYMENT.md` | Organizer-facing Docker/native deployment gates and storage initialization controls | Compose, MemOS, Neo4j, Qdrant |
+| `docs/batches/B06/NATIVE_DEPLOYMENT.md` | Organizer-facing non-Docker Add + Search + Health deployment path | Python 3.11, MemOS, Neo4j, Qdrant |
+| `SDD.md` | Implemented memory architecture, capabilities and explicit limitations | accepted contracts and current source |
 | `docs/acceptance/` | Verified contest requirements, project gates and explicitly pending facts | Formal task/API materials and user approvals |
 | `docs/collaboration/` | Two-machine workflow, human/AI rules and transfer/tuning templates | Current project context and Git identities |
 | `tests/unit/` | Settings, errors, logging, HTTP models, identity and persistence value behavior | Public module surfaces |
@@ -72,13 +76,16 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
 
 ## Batch ownership
 
-- B00–B05: accepted and frozen. B04 and B05 evidence is recorded in their respective
+- B00–B06: accepted and frozen. B04, B05 and B06 evidence is recorded in their respective
   `HANDOFF.md` files.
 - B05 delivers the Real Gateway, public Add composition, Cube lifecycle and synchronous Add. Its
   remaining Docker host-port/cgroup check belongs to a capable tuning-machine daemon and must not
   displace model/evaluation tuning.
-- B06: Search conversion, isolation, evidence length/ranking and failure policy. Not started; must
-  begin in a separate new Session at Gate 0.
+- B06: Search conversion, isolation, evidence length/ranking and failure policy. Gate 0 R1 and the
+  implementation were accepted/frozen at Gate 2 on 2026-09-04; the implementation commit is still
+  pending explicit authorization.
+- B07–B09: closure scope must first be reconciled against the accepted B05/B06 invariants. The old
+  master-plan references to automatic retry and Raw fallback are not implementation authorization.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 

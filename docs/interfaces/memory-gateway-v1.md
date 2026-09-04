@@ -1,6 +1,6 @@
 # Memory Gateway Interface v1
 
-> Owner: B03 contract; B05 Real Add implementation
+> Owner: B03 contract; B05 Real Add; B06 Real Search implementation candidate
 > Scope: internal provider boundary; not an evaluator-facing API
 
 ## Purpose
@@ -12,7 +12,7 @@ The B03 implementation is an in-process Fake. B05 adds a real MemOS adapter whil
 HTTP DTOs behind this interface.
 
 The async port exposes `is_ready()`, idempotent synchronous `add(GatewayAdd)`, isolated
-`search(GatewaySearch)`, and idempotent `close()`.
+`search(GatewaySearch, timeout_seconds=remaining)`, and idempotent `close()`.
 
 ## Add contract
 
@@ -38,9 +38,23 @@ Search receives exact query, user, logical Cube, `top_k` and optional answer opt
 most `top_k` ranked evidence items with exact content and mandatory user/Cube provenance. It does
 not select an option, generate an answer, filter by session or consult gold data.
 
-The application recomputes the expected logical Cube and drops evidence with foreign provenance.
-Ranking algorithm and score calibration are implementation-specific. Consequently, the shared
-contract tests isolation, ordering, visibility and bounds—not semantic retrieval quality.
+The caller must supply a finite positive remaining budget. The Real Gateway performs one
+`POST /product/search`, with the query and user unchanged, exactly one `readable_cube_ids` value and
+no `session_id` or options. The conservative defaults are `fast`, `relativity=0`, exact-text dedup
+(`dedup=null`) and the fixed local cosine reranker. Preference/tool/skill, internet and neighbor
+recall are disabled. Search has no retry or Raw Store fallback.
+
+Only `text_mem` items whose bucket, metadata user and `memscope_cube_id` match the expected logical
+Cube can cross the provider boundary. Items must also be `activated`, use an approved general text
+memory type, carry valid B05 payload/result/vector provenance, and have a missing or finite score.
+`resolving`, archived/deleted/unknown states and incomplete provenance are discarded. A timestamp
+is emitted only when timezone-aware. Exact ID/content duplicates are removed stably without
+resorting; one ID with conflicting content is a protocol failure.
+
+The application independently recomputes the logical Cube, drops foreign evidence, preserves
+provider order and truncates again. `top_k` is an upper bound, not a fill target. Ranking quality and
+score calibration remain tuning-machine facts, so shared tests prove isolation, ordering,
+visibility, failure and bounds—not semantic accuracy.
 
 ## Safe errors
 
@@ -53,9 +67,18 @@ contract tests isolation, ordering, visibility and bounds—not semantic retriev
 | `gateway.request_conflict` | no | Stable request/message identity was reused inconsistently |
 
 Errors do not carry URLs, provider bodies, IDs, content, queries or underlying exception text.
-The Fake itself adds no timeout, retry, fallback, circuit breaker or background recovery policy.
-The B05 application supplies the one-shot remaining Add budget to the real adapter; it performs no
-automatic HTTP retry.
+The Fake itself adds no retry, fallback, circuit breaker or background recovery policy. It validates
+the Search budget but does not simulate elapsed time. The application supplies one-shot remaining
+Add and Search budgets to the real adapter; it performs no automatic HTTP retry. Search also has a
+55-second application hard deadline and rejects results that finish processing after that deadline.
+
+## Readiness
+
+The Real Gateway is ready only after startup completes a shared-budget MemOS health check plus a
+no-write Product Search capability probe against a dedicated nonexistent Cube. Runtime readiness
+then requires the cached capability result, an open/valid receipt store and current MemOS health.
+`MemoryOperations` combines that with Raw Store readiness. Public Health does not rerun the Search
+embedding probe, and a real Add/Search deployment smoke remains required before release.
 
 ## Fake behavior and limits
 

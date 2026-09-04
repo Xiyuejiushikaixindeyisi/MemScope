@@ -151,12 +151,110 @@ async def test_real_gateway_add_maps_payload_verifies_readback_and_replays(tmp_p
 
     assert calls == ["/product/get_memory", "/product/add", "/product/get_memory"]
     assert await gateway.is_ready() is False
-    with pytest.raises(GatewayUnavailableError):
-        await gateway.search(GatewaySearch("q", "user-1", "cube-1", 1))
     await gateway.close()
     await gateway.close()
     with pytest.raises(GatewayUnavailableError):
         await gateway.add(_request(), timeout_seconds=5)
+    with pytest.raises(GatewayUnavailableError):
+        await gateway.search(GatewaySearch("q", "user-1", "cube-1", 1), timeout_seconds=5)
+
+
+async def test_real_gateway_search_maps_conservative_payload_and_trusted_results(
+    tmp_path: Path,
+) -> None:
+    observed: dict[str, Any] = {}
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/product/search"
+        observed.update(json.loads(request.content))
+        memory = _provider_memory()
+        memory["metadata"].update({"relativity": 0.91, "created_at": "2026-09-04T12:00:00Z"})
+        return _json_response(
+            _envelope({"text_mem": [{"cube_id": "cube-1", "memories": [memory]}]})
+        )
+
+    gateway = await _gateway(tmp_path, httpx.MockTransport(handle))
+    result = await gateway.search(
+        GatewaySearch("exact query", "user-1", "cube-1", 7, ("A", "B")),
+        timeout_seconds=5,
+    )
+    assert observed == {
+        "query": "exact query",
+        "user_id": "user-1",
+        "readable_cube_ids": ["cube-1"],
+        "mode": "fast",
+        "top_k": 7,
+        "relativity": 0.0,
+        "dedup": None,
+        "rerank": True,
+        "search_memory_type": "All",
+        "include_preference": False,
+        "search_tool_memory": False,
+        "include_skill_memory": False,
+        "internet_search": False,
+        "neighbor_discovery": False,
+    }
+    assert len(result) == 1
+    assert result[0].id == _MEMORY_ID
+    assert result[0].score == 0.91
+    assert "session_id" not in observed
+    assert "options" not in observed
+    await gateway.close()
+
+
+async def test_search_runtime_configuration_is_mapped_without_defaults(tmp_path: Path) -> None:
+    observed: dict[str, Any] = {}
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        observed.update(json.loads(request.content))
+        return _json_response(_envelope({"text_mem": []}))
+
+    receipt = await GatewayReceiptStore.open(tmp_path / "receipts.db", busy_timeout_ms=5000)
+    gateway = MemosMemoryGateway(
+        base_url="http://memos:8000",
+        receipt_store=receipt,
+        connect_timeout_seconds=3,
+        response_max_bytes=1024,
+        search_mode="mixture",
+        search_relativity=0.42,
+        search_dedup="mmr",
+        search_rerank=False,
+        client=httpx.AsyncClient(
+            transport=httpx.MockTransport(handle), base_url="http://memos:8000"
+        ),
+    )
+    assert await gateway.search(GatewaySearch("q", "user-1", "cube-1", 1), timeout_seconds=1) == ()
+    assert observed["mode"] == "mixture"
+    assert observed["relativity"] == 0.42
+    assert observed["dedup"] == "mmr"
+    assert observed["rerank"] is False
+    await gateway.close()
+
+
+async def test_search_rejects_success_that_finishes_after_gateway_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    remaining_calls = 0
+
+    def remaining(deadline: float) -> float:
+        nonlocal remaining_calls
+        del deadline
+        remaining_calls += 1
+        if remaining_calls == 1:
+            return 1.0
+        raise GatewayTimeoutError()
+
+    monkeypatch.setattr(MemosMemoryGateway, "_remaining", staticmethod(remaining))
+    gateway = await _gateway(
+        tmp_path,
+        httpx.MockTransport(lambda request: _json_response(_envelope({"text_mem": []}))),
+    )
+
+    with pytest.raises(GatewayTimeoutError):
+        await gateway.search(GatewaySearch("q", "user-1", "cube-1", 1), timeout_seconds=1)
+    assert remaining_calls == 2
+    await gateway.close()
 
 
 async def test_pending_receipt_reconciles_provider_without_duplicate_add(tmp_path: Path) -> None:
@@ -231,6 +329,11 @@ async def test_real_gateway_rejects_invalid_timeout(tmp_path: Path, invalid_budg
     )
     with pytest.raises(ValueError):
         await gateway.add(_request(), timeout_seconds=invalid_budget)
+    with pytest.raises(ValueError):
+        await gateway.search(
+            GatewaySearch("q", "user-1", "cube-1", 1),
+            timeout_seconds=invalid_budget,
+        )
     await gateway.close()
 
 
@@ -241,6 +344,11 @@ async def test_health_and_extreme_timestamp_mapping(tmp_path: Path) -> None:
         observed.append(request)
         if request.url.path == "/health":
             return _json_response({"status": "healthy"})
+        if request.url.path == "/product/search":
+            payload = json.loads(request.content)
+            assert payload["readable_cube_ids"] == ["memscope-readiness-nonexistent-cube"]
+            assert payload["top_k"] == 1
+            return _json_response(_envelope({"text_mem": []}))
         if request.url.path == "/product/get_memory":
             return _json_response(
                 _envelope({"text_mem": [{"cube_id": "cube-1", "memories": [], "total_nodes": 0}]})
@@ -249,6 +357,7 @@ async def test_health_and_extreme_timestamp_mapping(tmp_path: Path) -> None:
 
     gateway = await _gateway(tmp_path, httpx.MockTransport(handle))
     await gateway.verify_upstream(timeout_seconds=1)
+    assert await gateway.is_ready() is True
     await gateway.add(_request(timestamp_ms=2**63 - 1), timeout_seconds=5)
     add_payload = json.loads(
         next(item for item in observed if item.url.path == "/product/add").content
@@ -285,6 +394,13 @@ async def test_malformed_provider_response_fails_closed(
         ("response_max_bytes", True),
         ("response_max_bytes", 0),
         ("response_max_bytes", 1.5),
+        ("search_mode", "slow"),
+        ("search_relativity", True),
+        ("search_relativity", -0.1),
+        ("search_relativity", 1.1),
+        ("search_relativity", float("nan")),
+        ("search_dedup", "fuzzy"),
+        ("search_rerank", "yes"),
     ],
 )
 async def test_gateway_constructor_rejects_invalid_boundaries(
@@ -354,6 +470,53 @@ async def test_upstream_health_requires_exact_healthy_object(tmp_path: Path, hea
     )
     with pytest.raises(GatewayProtocolError):
         await gateway.verify_upstream(timeout_seconds=1)
+    await gateway.close()
+
+
+async def test_readiness_requires_startup_probe_receipt_and_current_health(tmp_path: Path) -> None:
+    healthy = True
+    search_calls = 0
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        nonlocal search_calls
+        if request.url.path == "/health":
+            return _json_response({"status": "healthy" if healthy else "starting"})
+        assert request.url.path == "/product/search"
+        search_calls += 1
+        return _json_response(_envelope({"text_mem": []}))
+
+    gateway = await _gateway(tmp_path, httpx.MockTransport(handle))
+    assert await gateway.is_ready() is False
+    await gateway.verify_upstream(timeout_seconds=1)
+    assert await gateway.is_ready() is True
+    assert search_calls == 1
+    healthy = False
+    assert await gateway.is_ready() is False
+    assert search_calls == 1
+    await gateway.close()
+
+
+async def test_failed_search_probe_keeps_gateway_unready_and_can_recover(
+    tmp_path: Path,
+) -> None:
+    search_available = False
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/health":
+            return _json_response({"status": "healthy"})
+        assert request.url.path == "/product/search"
+        if not search_available:
+            return _json_response({}, status=500)
+        return _json_response(_envelope({"text_mem": []}))
+
+    gateway = await _gateway(tmp_path, httpx.MockTransport(handle))
+    with pytest.raises(GatewayUnavailableError):
+        await gateway.verify_upstream(timeout_seconds=1)
+    assert await gateway.is_ready() is False
+
+    search_available = True
+    await gateway.verify_upstream(timeout_seconds=1)
+    assert await gateway.is_ready() is True
     await gateway.close()
 
 

@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Sequence
 from dataclasses import replace
 from datetime import UTC, datetime
+from typing import Any
 
 import pytest
 
@@ -11,6 +12,7 @@ from memscope.application.memory_operations import (
     AddTimeoutError,
     MemoryOperationInvariantError,
     MemoryOperations,
+    SearchTimeoutError,
 )
 from memscope.memory_gateway import (
     GatewayAdd,
@@ -103,14 +105,18 @@ class StubGateway:
         add_error: Exception | None = None,
         search_result: Sequence[GatewayEvidence] | Exception = (),
         add_gate: asyncio.Event | None = None,
+        search_gate: asyncio.Event | None = None,
     ) -> None:
         self.ready = ready
         self.add_error = add_error
         self.search_result = search_result
         self.add_gate = add_gate
+        self.search_gate = search_gate
         self.add_started = asyncio.Event()
+        self.search_started = asyncio.Event()
         self.add_calls: list[GatewayAdd] = []
         self.search_calls: list[GatewaySearch] = []
+        self.search_budgets: list[float] = []
 
     async def is_ready(self) -> bool:
         if isinstance(self.ready, Exception):
@@ -126,8 +132,17 @@ class StubGateway:
         if self.add_error is not None:
             raise self.add_error
 
-    async def search(self, request: GatewaySearch) -> Sequence[GatewayEvidence]:
+    async def search(
+        self,
+        request: GatewaySearch,
+        *,
+        timeout_seconds: float,
+    ) -> Sequence[GatewayEvidence]:
         self.search_calls.append(request)
+        self.search_budgets.append(timeout_seconds)
+        self.search_started.set()
+        if self.search_gate is not None:
+            await self.search_gate.wait()
         if isinstance(self.search_result, Exception):
             raise self.search_result
         return self.search_result
@@ -234,6 +249,8 @@ async def test_search_filters_foreign_provenance_preserves_order_and_maps_fields
         ("second", "exact 2", 0.5, None),
     ]
     assert gateway.search_calls == [GatewaySearch("question", "user-1", cube, 2, ("A",))]
+    assert len(gateway.search_budgets) == 1
+    assert 54 < gateway.search_budgets[0] <= 55
 
 
 async def test_search_propagates_typed_gateway_error() -> None:
@@ -242,6 +259,68 @@ async def test_search_propagates_typed_gateway_error() -> None:
             raw_store=StubRawStore(_prepared()),
             gateway=StubGateway(search_result=GatewayTimeoutError()),
         ).search(SearchQuery("q", "user-1", 1))
+
+
+async def test_search_fails_before_gateway_when_budget_is_exhausted() -> None:
+    readings = iter((0.0, 60.0))
+    gateway = StubGateway()
+    operations = MemoryOperations(
+        raw_store=StubRawStore(_prepared()),
+        gateway=gateway,
+        clock=lambda: next(readings),
+    )
+
+    with pytest.raises(SearchTimeoutError) as captured:
+        await operations.search(SearchQuery("q", "user-1", 1))
+    assert captured.value.code == "search.timeout"
+    assert captured.value.retryable is True
+    assert gateway.search_calls == []
+
+
+async def test_search_rejects_success_that_finishes_after_application_deadline() -> None:
+    readings = iter((0.0, 0.0, 60.0))
+    gateway = StubGateway()
+    operations = MemoryOperations(
+        raw_store=StubRawStore(_prepared()),
+        gateway=gateway,
+        clock=lambda: next(readings),
+    )
+
+    with pytest.raises(SearchTimeoutError):
+        await operations.search(SearchQuery("q", "user-1", 1))
+    assert len(gateway.search_calls) == 1
+
+
+async def test_search_total_deadline_cancels_slow_gateway(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gate = asyncio.Event()
+    gateway = StubGateway(search_gate=gate)
+    operations = MemoryOperations(
+        raw_store=StubRawStore(_prepared()),
+        gateway=gateway,
+        search_deadline_seconds=0.04,
+        search_warn_seconds=0.01,
+    )
+
+    with pytest.raises(SearchTimeoutError):
+        await operations.search(SearchQuery("q", "user-1", 1))
+    assert any(
+        record.message == "memory_operation_slow"
+        and getattr(record, "component_operation", None) == "search"
+        for record in caplog.records
+    )
+
+
+async def test_search_cancellation_propagates() -> None:
+    gate = asyncio.Event()
+    gateway = StubGateway(search_gate=gate)
+    operations = MemoryOperations(raw_store=StubRawStore(_prepared()), gateway=gateway)
+    task = asyncio.create_task(operations.search(SearchQuery("q", "user-1", 1)))
+    await gateway.search_started.wait()
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
 
 
 @pytest.mark.parametrize(
@@ -296,6 +375,28 @@ def test_add_rejects_invalid_timing_configuration(
             add_deadline_seconds=deadline,
             add_warn_seconds=warning,
             gateway_reserve_seconds=reserve,
+        )
+
+
+@pytest.mark.parametrize(
+    ("deadline", "warning"),
+    [
+        (55, 0),
+        (55, 55),
+        (60, 50),
+        (float("inf"), 50),
+        (True, 0.5),
+        (55, True),
+        ("55", 50),
+    ],
+)
+def test_search_rejects_invalid_timing_configuration(deadline: Any, warning: Any) -> None:
+    with pytest.raises(ValueError):
+        MemoryOperations(
+            raw_store=StubRawStore(_prepared()),
+            gateway=StubGateway(),
+            search_deadline_seconds=deadline,
+            search_warn_seconds=warning,
         )
 
 

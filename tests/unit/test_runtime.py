@@ -99,11 +99,15 @@ async def test_open_runtime_wires_settings_and_closes_in_reverse_order(
         "receipt_store": receipt,
         "connect_timeout_seconds": 3.0,
         "response_max_bytes": 1_048_576,
+        "search_mode": "fast",
+        "search_relativity": 0.0,
+        "search_dedup": "exact",
+        "search_rerank": True,
     }
-    assert events == ["gateway.verify:5.0"]
+    assert events == ["gateway.verify:10"]
 
     await resources.close()
-    assert events == ["gateway.verify:5.0", "gateway.close", "receipt.close", "raw.close"]
+    assert events == ["gateway.verify:10", "gateway.close", "receipt.close", "raw.close"]
 
 
 @pytest.mark.parametrize("profile", ["core"])
@@ -187,7 +191,7 @@ async def test_gateway_verification_failure_closes_gateway_and_raw(
 
     with pytest.raises(RuntimeError, match="health"):
         await runtime.open_runtime(_settings(tmp_path))
-    assert events == ["gateway.verify:5.0", "gateway.close", "receipt.close", "raw.close"]
+    assert events == ["gateway.verify:10", "gateway.close", "receipt.close", "raw.close"]
 
 
 async def _async_value(value: Any) -> Any:

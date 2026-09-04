@@ -33,6 +33,23 @@ class ContestAuthMode(StrEnum):
     SHARED_KEY = "shared_key"
 
 
+class MemosSearchMode(StrEnum):
+    """Pinned Product Search execution modes."""
+
+    FAST = "fast"
+    FINE = "fine"
+    MIXTURE = "mixture"
+
+
+class MemosSearchDedup(StrEnum):
+    """Pinned Product Search candidate deduplication modes."""
+
+    EXACT = "exact"
+    NO = "no"
+    SIM = "sim"
+    MMR = "mmr"
+
+
 class AppSettings(BaseSettings):
     """Validated settings for the MemScope application."""
 
@@ -61,6 +78,12 @@ class AppSettings(BaseSettings):
     memos_deadline_reserve_seconds: float = 5.0
     memos_connect_timeout_seconds: float = 3.0
     memos_response_max_bytes: int = Field(default=1_048_576, ge=1024, le=16_777_216)
+    search_deadline_seconds: float = 55.0
+    search_warn_seconds: float = 50.0
+    memos_search_mode: MemosSearchMode = MemosSearchMode.FAST
+    memos_search_relativity: float = 0.0
+    memos_search_dedup: MemosSearchDedup = MemosSearchDedup.EXACT
+    memos_search_rerank: bool = True
 
     @field_validator("host")
     @classmethod
@@ -132,11 +155,29 @@ class AppSettings(BaseSettings):
             raise ValueError("MemOS base URL must be an HTTP(S) origin")
         return normalized
 
+    @field_validator("memos_search_relativity", mode="before")
+    @classmethod
+    def reject_boolean_relativity(cls, value: Any) -> Any:
+        if isinstance(value, bool):
+            raise ValueError("Search relativity must be numeric")
+        return value
+
+    @field_validator("memos_search_rerank", mode="before")
+    @classmethod
+    def validate_search_rerank(cls, value: Any) -> bool | str:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str) and value.strip().lower() in {"true", "false"}:
+            return value
+        raise ValueError("Search rerank must be true or false")
+
     @field_validator(
         "add_deadline_seconds",
         "add_warn_seconds",
         "memos_deadline_reserve_seconds",
         "memos_connect_timeout_seconds",
+        "search_deadline_seconds",
+        "search_warn_seconds",
     )
     @classmethod
     def validate_finite_positive(cls, value: float) -> float:
@@ -154,6 +195,14 @@ class AppSettings(BaseSettings):
             raise ValueError("Add timing must satisfy warning < deadline < 120")
         if self.memos_deadline_reserve_seconds >= self.add_deadline_seconds:
             raise ValueError("MemOS deadline reserve must be below Add deadline")
+        if not self.search_warn_seconds < self.search_deadline_seconds < 60:
+            raise ValueError("Search timing must satisfy warning < deadline < 60")
+        if (
+            isinstance(self.memos_search_relativity, bool)
+            or not isfinite(self.memos_search_relativity)
+            or not 0 <= self.memos_search_relativity <= 1
+        ):
+            raise ValueError("Search relativity must be finite and between zero and one")
         if self.app_profile is AppProfile.MEMOS_ADD and self.memos_base_url is None:
             raise ValueError("memos_add profile requires a MemOS base URL")
         if (
@@ -188,6 +237,12 @@ class AppSettings(BaseSettings):
             "memos_deadline_reserve_seconds": self.memos_deadline_reserve_seconds,
             "memos_connect_timeout_seconds": self.memos_connect_timeout_seconds,
             "memos_response_max_bytes": self.memos_response_max_bytes,
+            "search_deadline_seconds": self.search_deadline_seconds,
+            "search_warn_seconds": self.search_warn_seconds,
+            "memos_search_mode": self.memos_search_mode.value,
+            "memos_search_relativity": self.memos_search_relativity,
+            "memos_search_dedup": self.memos_search_dedup.value,
+            "memos_search_rerank": self.memos_search_rerank,
         }
 
 

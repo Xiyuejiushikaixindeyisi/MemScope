@@ -19,7 +19,12 @@ class MemoryGateway(Protocol):
 
         ...  # pragma: no cover - structural protocol signature
 
-    async def search(self, request: GatewaySearch) -> Sequence[GatewayEvidence]:
+    async def search(
+        self,
+        request: GatewaySearch,
+        *,
+        timeout_seconds: float,
+    ) -> Sequence[GatewayEvidence]:
         """Return ranked evidence for exactly one user and logical Cube."""
 
         ...  # pragma: no cover - structural protocol signature

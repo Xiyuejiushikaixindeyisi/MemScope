@@ -7,7 +7,14 @@ import pytest
 from pydantic import ValidationError
 
 from memscope.errors import ConfigurationError
-from memscope.settings import AppProfile, ContestAuthMode, LogFormat, load_settings
+from memscope.settings import (
+    AppProfile,
+    ContestAuthMode,
+    LogFormat,
+    MemosSearchDedup,
+    MemosSearchMode,
+    load_settings,
+)
 from tests.support import make_settings
 
 
@@ -27,6 +34,12 @@ def test_settings_defaults_are_safe_for_core_profile() -> None:
     assert settings.memos_gateway_receipt_path == Path("data/gateway-receipts.db")
     assert settings.add_deadline_seconds == 115
     assert settings.add_warn_seconds == 105
+    assert settings.search_deadline_seconds == 55
+    assert settings.search_warn_seconds == 50
+    assert settings.memos_search_mode is MemosSearchMode.FAST
+    assert settings.memos_search_relativity == 0
+    assert settings.memos_search_dedup is MemosSearchDedup.EXACT
+    assert settings.memos_search_rerank is True
 
 
 def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -71,6 +84,14 @@ def test_settings_load_environment_and_normalize(monkeypatch: pytest.MonkeyPatch
         ("memos_gateway_receipt_path", ":memory:"),
         ("add_deadline_seconds", float("inf")),
         ("memos_response_max_bytes", 100),
+        ("search_deadline_seconds", float("nan")),
+        ("memos_search_mode", "slow"),
+        ("memos_search_dedup", "fuzzy"),
+        ("memos_search_relativity", float("nan")),
+        ("memos_search_relativity", True),
+        ("memos_search_relativity", -0.1),
+        ("memos_search_relativity", 1.1),
+        ("memos_search_rerank", "yes"),
     ],
 )
 def test_settings_reject_invalid_values(field: str, value: Any) -> None:
@@ -144,6 +165,12 @@ def test_safe_summary_is_an_explicit_non_secret_allowlist() -> None:
         "memos_deadline_reserve_seconds": 5.0,
         "memos_connect_timeout_seconds": 3.0,
         "memos_response_max_bytes": 1048576,
+        "search_deadline_seconds": 55.0,
+        "search_warn_seconds": 50.0,
+        "memos_search_mode": "fast",
+        "memos_search_relativity": 0.0,
+        "memos_search_dedup": "exact",
+        "memos_search_rerank": True,
     }
 
 
@@ -187,6 +214,8 @@ def test_memos_add_profile_requires_origin_and_separate_databases() -> None:
         {"add_deadline_seconds": 120},
         {"memos_deadline_reserve_seconds": 115},
         {"memos_connect_timeout_seconds": 0},
+        {"search_warn_seconds": 55},
+        {"search_deadline_seconds": 60},
     ],
 )
 def test_settings_reject_invalid_deadline_relationships(overrides: dict[str, object]) -> None:

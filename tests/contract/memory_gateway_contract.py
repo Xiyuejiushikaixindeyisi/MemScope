@@ -40,7 +40,9 @@ async def assert_memory_gateway_contract(factory: GatewayFactory) -> None:
     await gateway.add(request, timeout_seconds=5)
     await gateway.add(other, timeout_seconds=5)
 
-    evidence = await gateway.search(GatewaySearch("alpha", "contract-user", "contract-cube", 10))
+    evidence = await gateway.search(
+        GatewaySearch("alpha", "contract-user", "contract-cube", 10), timeout_seconds=5
+    )
     assert [(item.id, item.content) for item in evidence] == [("contract-message", "alpha beta")]
     assert all(
         item.user_id == "contract-user" and item.cube_id == "contract-cube" for item in evidence

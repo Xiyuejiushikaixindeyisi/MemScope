@@ -3,9 +3,10 @@
 MemScope is an independently deployable long-term memory service for the Agent Memory
 competition. B01 provides the contest HTTP contract, B02 the transactional Raw Store, and B03 a
 provider-independent Memory Gateway plus deterministic no-key substitutes. B04 adds the pinned
-MemOS/Neo4j/Qdrant runtime infrastructure. B00–B05 are accepted/frozen; B05 delivers synchronous
-Real Add, with Docker host-port/cgroup validation transferred to a capable tuning-machine daemon.
-B06 remains unopened. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+MemOS/Neo4j/Qdrant runtime infrastructure. B00–B06 are accepted/frozen; B05 delivers synchronous
+Real Add and B06 delivers Real Search plus complete readiness. B05/B06 real-model and Docker
+host-port/cgroup validation is transferred to a capable tuning machine under the accepted handoff
+conditions. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -106,7 +107,7 @@ It exposes health plus a small non-streaming Chat/Embedding subset, requires no 
 enabled in an organizer profile. See `docs/interfaces/memory-gateway-v1.md` and
 `docs/interfaces/mock-model-api-v1.md` for exact contracts and non-compatibility boundaries.
 
-## B04/B05 runtime
+## B04–B06 runtime
 
 B04 uses one Compose entry with three internal services: fixed MemOS `v2.0.32`, Neo4j Community
 and Qdrant. It exposes no host port and deliberately has no usable model endpoint, so it is an
@@ -125,10 +126,15 @@ passed on 2026-09-03; evidence and accepted exceptions are in `docs/batches/B04/
 `/health` as Add/Search/model readiness.
 
 B05 adds the public `memory-api`, real MemOS Add wiring and a deterministic no-key runtime fixture.
-The images build successfully, but full host-port and cgroup proof is environment-dependent. If
-Docker/Compose is unavailable or unproductive, use
-`docs/batches/B05/NATIVE_DEPLOYMENT.md`; do not postpone model/evaluation tuning to repair an
-optional container runtime.
+The images build successfully, but full host-port and cgroup proof is environment-dependent. Use
+`docs/batches/B06/ORGANIZER_DEPLOYMENT.md` to select and gate the Compose or native path; complete
+native commands are in `docs/batches/B06/NATIVE_DEPLOYMENT.md`. Do not postpone model/evaluation
+tuning to repair an optional container runtime.
+
+B06 adds real Product Search, strict active/provenance filtering, stable exact deduplication,
+55-second end-to-end Search budgeting and complete public readiness. The fixed Search baseline is
+`fast + cosine_local`; it does not select answers or default-enable MMR/BM25/full-text/external
+reranking. Development-machine tests do not substitute for a Huawei-model Add/Search smoke.
 
 ## Development and tuning workflow
 
@@ -155,13 +161,17 @@ Start with `docs/README.md`, `docs/acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` a
 `docs/collaboration/TWO_MACHINE_WORKFLOW.md`. B05 Gate 0 R1 is recorded in
 `docs/batches/B05/GATE0.md`; its approved Gate 1 implementation plan is
 `docs/batches/B05/PLAN.md`, and the native deployment fallback is
-`docs/batches/B05/NATIVE_DEPLOYMENT.md`. B06 must begin in a separate new Session with a
-user-approved Gate 0 algorithm review.
+`docs/batches/B05/NATIVE_DEPLOYMENT.md`. B06 Gate 0 R1 is recorded in
+`docs/batches/B06/GATE0.md`; its approved Gate 1 plan is `docs/batches/B06/PLAN.md`, the unified
+organizer deployment gate is `docs/batches/B06/ORGANIZER_DEPLOYMENT.md`, and the complete native
+path is `docs/batches/B06/NATIVE_DEPLOYMENT.md`.
 
 ## Current boundaries
 
-B05 implements Real Add only. It does not implement public Search/readiness, semantic retrieval,
-quality results, outbox workers, production retries/fallback or final-answer generation. See
+B06 implements Real Add + Search + complete readiness and was accepted/frozen at Gate 2 on
+2026-09-04. It does not claim a final model, semantic score, reliable natural-language
+update/forget publication, outbox workers,
+production retries/fallback or final-answer generation. See
 `docs/interfaces/contest-http-v1.md`,
 `docs/interfaces/raw-store-v1.md`, `docs/PROJECT_CONTEXT.md`, `docs/CODEMAP.md`, and the active Batch
 documents for the current contracts and scope.

@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from collections.abc import Sequence
+from math import isfinite
 from time import perf_counter
 from typing import Any, Protocol
 
@@ -42,6 +43,17 @@ class AddTimeoutError(MemScopeError):
         )
 
 
+class SearchTimeoutError(MemScopeError):
+    """The complete Search operation exhausted its accepted time budget."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            code="search.timeout",
+            message="Search operation timed out",
+            retryable=True,
+        )
+
+
 class MemoryOperationInvariantError(MemScopeError):
     """A composed dependency violated its accepted application contract."""
 
@@ -63,6 +75,8 @@ class MemoryOperations:
         gateway: MemoryGateway,
         add_deadline_seconds: float = 115.0,
         add_warn_seconds: float = 105.0,
+        search_deadline_seconds: float = 55.0,
+        search_warn_seconds: float = 50.0,
         gateway_reserve_seconds: float = 5.0,
         clock: MonotonicClock = perf_counter,
         user_lanes: UserLanes | None = None,
@@ -71,11 +85,22 @@ class MemoryOperations:
             raise ValueError("Add timing must satisfy 0 < warning < deadline < 120")
         if not 0 < gateway_reserve_seconds < add_deadline_seconds:
             raise ValueError("Gateway reserve must be positive and below the Add deadline")
+        search_timings = (search_warn_seconds, search_deadline_seconds)
+        if (
+            any(
+                isinstance(value, bool) or not isinstance(value, int | float) or not isfinite(value)
+                for value in search_timings
+            )
+            or not 0 < search_warn_seconds < search_deadline_seconds < 60
+        ):
+            raise ValueError("Search timing must satisfy 0 < warning < deadline < 60")
         self._raw_store = raw_store
         self._gateway = gateway
         self._add_deadline_seconds = add_deadline_seconds
         self._add_warn_seconds = add_warn_seconds
         self._gateway_reserve_seconds = gateway_reserve_seconds
+        self._search_deadline_seconds = search_deadline_seconds
+        self._search_warn_seconds = search_warn_seconds
         self._clock = clock
         self._user_lanes = user_lanes or UserLanes()
 
@@ -94,7 +119,7 @@ class MemoryOperations:
         started = perf_counter()
         deadline = self._clock() + self._add_deadline_seconds
         loop = asyncio.get_running_loop()
-        warning = loop.call_later(self._add_warn_seconds, self._log_warning)
+        warning = loop.call_later(self._add_warn_seconds, self._log_warning, "add")
         try:
             async with asyncio.timeout(self._add_deadline_seconds):
                 async with self._user_lanes.acquire(command.user_id):
@@ -165,38 +190,54 @@ class MemoryOperations:
         self._log("add", prepared.disposition.value, started)
 
     @staticmethod
-    def _log_warning() -> None:
+    def _log_warning(operation: str) -> None:
         _LOGGER.warning(
             "memory_operation_slow",
-            extra={"component_operation": "add", "component_result": "warning"},
+            extra={"component_operation": operation, "component_result": "warning"},
         )
 
     async def search(self, query: SearchQuery) -> Sequence[MemoryEvidence]:
         started = perf_counter()
+        deadline = self._clock() + self._search_deadline_seconds
         cube_id = cube_id_for_user(query.user_id)
+        loop = asyncio.get_running_loop()
+        warning = loop.call_later(self._search_warn_seconds, self._log_warning, "search")
         try:
-            gateway_evidence = await self._gateway.search(
-                GatewaySearch(
-                    query=query.query,
-                    user_id=query.user_id,
-                    cube_id=cube_id,
-                    top_k=query.top_k,
-                    options=query.options,
+            async with asyncio.timeout(self._search_deadline_seconds):
+                remaining = deadline - self._clock()
+                if remaining <= 0:
+                    raise TimeoutError
+                gateway_evidence = await self._gateway.search(
+                    GatewaySearch(
+                        query=query.query,
+                        user_id=query.user_id,
+                        cube_id=cube_id,
+                        top_k=query.top_k,
+                        options=query.options,
+                    ),
+                    timeout_seconds=remaining,
                 )
-            )
+                result = tuple(
+                    MemoryEvidence(
+                        id=evidence.id,
+                        content=evidence.content,
+                        score=(float(evidence.score) if evidence.score is not None else None),
+                        created_at=evidence.created_at,
+                    )
+                    for evidence in gateway_evidence
+                    if evidence.user_id == query.user_id and evidence.cube_id == cube_id
+                )[: query.top_k]
+                if deadline - self._clock() <= 0:
+                    raise TimeoutError
+        except TimeoutError as error:
+            timeout = SearchTimeoutError()
+            self._log("search", "timeout", started, timeout)
+            raise timeout from error
         except MemScopeError as error:
             self._log("search", "failed", started, error)
             raise
-        result = tuple(
-            MemoryEvidence(
-                id=evidence.id,
-                content=evidence.content,
-                score=float(evidence.score) if evidence.score is not None else None,
-                created_at=evidence.created_at,
-            )
-            for evidence in gateway_evidence
-            if evidence.user_id == query.user_id and evidence.cube_id == cube_id
-        )[: query.top_k]
+        finally:
+            warning.cancel()
         self._log(
             "search",
             "filtered" if len(result) != len(gateway_evidence) else "success",

@@ -1,5 +1,6 @@
 """Real asynchronous Gateway for the pinned MemOS Product API."""
 
+import asyncio
 import json
 import math
 import time
@@ -18,6 +19,7 @@ from memscope.memory_gateway.memos_models import (
     AddResult,
     ProviderMemory,
     envelope_data,
+    evidence_from_search,
     memories_from_filtered_get,
     parse_add_results,
 )
@@ -26,7 +28,7 @@ from memscope.memory_gateway.receipt_store import GatewayReceiptStore, ReceiptSt
 
 
 class MemosMemoryGateway:
-    """Synchronous Add-only MemOS adapter with durable replay receipts."""
+    """Synchronous MemOS Add/Search adapter with durable Add receipts."""
 
     def __init__(
         self,
@@ -35,6 +37,10 @@ class MemosMemoryGateway:
         receipt_store: GatewayReceiptStore,
         connect_timeout_seconds: float,
         response_max_bytes: int,
+        search_mode: str = "fast",
+        search_relativity: float = 0.0,
+        search_dedup: str = "exact",
+        search_rerank: bool = True,
         client: httpx.AsyncClient | None = None,
     ) -> None:
         if not isinstance(base_url, str) or not base_url.strip():
@@ -52,23 +58,73 @@ class MemosMemoryGateway:
             or response_max_bytes <= 0
         ):
             raise ValueError("response_max_bytes must be positive")
+        if search_mode not in {"fast", "fine", "mixture"}:
+            raise ValueError("unsupported Search mode")
+        if (
+            isinstance(search_relativity, bool)
+            or not isinstance(search_relativity, int | float)
+            or not math.isfinite(search_relativity)
+            or not 0 <= search_relativity <= 1
+        ):
+            raise ValueError("Search relativity must be finite and between zero and one")
+        if search_dedup not in {"exact", "no", "sim", "mmr"}:
+            raise ValueError("unsupported Search dedup mode")
+        if not isinstance(search_rerank, bool):
+            raise ValueError("Search rerank must be a boolean")
         self._receipt_store = receipt_store
         self._connect_timeout_seconds = connect_timeout_seconds
         self._response_max_bytes = response_max_bytes
+        self._search_mode = search_mode
+        self._search_relativity = float(search_relativity)
+        self._search_dedup = search_dedup
+        self._search_rerank = search_rerank
         self._client = client or httpx.AsyncClient(base_url=base_url.rstrip("/"))
         self._closed = False
+        self._search_verified = False
 
     async def verify_upstream(self, *, timeout_seconds: float) -> None:
-        """Verify only MemOS process health during application startup."""
+        """Verify MemOS health and a bounded, no-write Product Search at startup."""
 
-        body = await self._post_json("/health", None, timeout_seconds=timeout_seconds, method="GET")
+        self._ensure_open()
+        self._validate_timeout(timeout_seconds)
+        deadline = time.monotonic() + timeout_seconds
+        body = await self._post_json(
+            "/health",
+            None,
+            timeout_seconds=self._remaining(deadline),
+            method="GET",
+        )
         if not isinstance(body, dict) or body.get("status") != "healthy":
             raise GatewayProtocolError()
+        probe = GatewaySearch(
+            query="memscope readiness capability probe",
+            user_id="memscope-readiness-probe",
+            cube_id="memscope-readiness-nonexistent-cube",
+            top_k=1,
+        )
+        search_body = await self._post_json(
+            "/product/search",
+            self._search_payload(probe),
+            timeout_seconds=self._remaining(deadline),
+        )
+        evidence_from_search(
+            envelope_data(search_body),
+            user_id=probe.user_id,
+            cube_id=probe.cube_id,
+        )
+        self._search_verified = True
 
     async def is_ready(self) -> bool:
-        """B05 remains publicly unready until the B06 Search path exists."""
+        """Return complete receipt, startup Search and current MemOS readiness."""
 
-        return False
+        if self._closed or not self._search_verified:
+            return False
+        results = await asyncio.gather(
+            self._receipt_store.is_ready(),
+            self._is_upstream_healthy(),
+            return_exceptions=True,
+        )
+        return all(result is True for result in results)
 
     async def add(self, request: GatewayAdd, *, timeout_seconds: float) -> None:
         """Perform or reconcile exactly one synchronous Product Add."""
@@ -110,11 +166,29 @@ class MemosMemoryGateway:
             ordered_ids,
         )
 
-    async def search(self, request: GatewaySearch) -> tuple[GatewayEvidence, ...]:
-        """Search is deliberately unavailable until B06."""
+    async def search(
+        self,
+        request: GatewaySearch,
+        *,
+        timeout_seconds: float,
+    ) -> tuple[GatewayEvidence, ...]:
+        """Return trusted, ordered evidence from Product Search."""
 
-        del request
-        raise GatewayUnavailableError()
+        self._ensure_open()
+        self._validate_timeout(timeout_seconds)
+        deadline = time.monotonic() + timeout_seconds
+        body = await self._post_json(
+            "/product/search",
+            self._search_payload(request),
+            timeout_seconds=self._remaining(deadline),
+        )
+        evidence = evidence_from_search(
+            envelope_data(body),
+            user_id=request.user_id,
+            cube_id=request.cube_id,
+        )[: request.top_k]
+        self._remaining(deadline)
+        return evidence
 
     async def close(self) -> None:
         """Idempotently close owned resources."""
@@ -158,6 +232,18 @@ class MemosMemoryGateway:
             timeout_seconds=self._remaining(deadline),
         )
         return memories_from_filtered_get(envelope_data(body), cube_id=request.cube_id)
+
+    async def _is_upstream_healthy(self) -> bool:
+        try:
+            body = await self._post_json(
+                "/health",
+                None,
+                timeout_seconds=self._connect_timeout_seconds + 2,
+                method="GET",
+            )
+        except (GatewayProtocolError, GatewayTimeoutError, GatewayUnavailableError):
+            return False
+        return isinstance(body, dict) and body.get("status") == "healthy"
 
     @staticmethod
     def _validate_committed(
@@ -226,6 +312,24 @@ class MemosMemoryGateway:
                     (time.time() + max(deadline - time.monotonic(), 0)) * 1000
                 ),
             },
+        }
+
+    def _search_payload(self, request: GatewaySearch) -> dict[str, Any]:
+        return {
+            "query": request.query,
+            "user_id": request.user_id,
+            "readable_cube_ids": [request.cube_id],
+            "mode": self._search_mode,
+            "top_k": request.top_k,
+            "relativity": self._search_relativity,
+            "dedup": None if self._search_dedup == "exact" else self._search_dedup,
+            "rerank": self._search_rerank,
+            "search_memory_type": "All",
+            "include_preference": False,
+            "search_tool_memory": False,
+            "include_skill_memory": False,
+            "internet_search": False,
+            "neighbor_discovery": False,
         }
 
     @staticmethod

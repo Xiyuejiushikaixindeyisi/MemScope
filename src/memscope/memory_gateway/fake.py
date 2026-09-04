@@ -123,7 +123,18 @@ class FakeMemoryGateway:
             raise
         self._log("add", "success", started)
 
-    async def search(self, request: GatewaySearch) -> Sequence[GatewayEvidence]:
+    async def search(
+        self,
+        request: GatewaySearch,
+        *,
+        timeout_seconds: float,
+    ) -> Sequence[GatewayEvidence]:
+        if (
+            isinstance(timeout_seconds, bool)
+            or not isinstance(timeout_seconds, int | float)
+            or not 0 < timeout_seconds < float("inf")
+        ):
+            raise ValueError("timeout_seconds must be finite and positive")
         started = perf_counter()
         try:
             self._inject(GatewayOperation.SEARCH)

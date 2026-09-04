@@ -1,4 +1,4 @@
-# MemOS v2.0.32 B04/B05 source map
+# MemOS v2.0.32 B04/B05/B06 source map
 
 ## Fixed source
 
@@ -69,6 +69,32 @@ Model ID, endpoint, credential, embedding dimension and prompt variants are depl
 inputs. The deterministic Mock profile is verification-only and is rejected by the production
 profile boundary.
 
+## B06 Real Search mapping
+
+| Concern | Fixed upstream symbol/path | B06 use |
+|---|---|---|
+| Product Search request | `product_models.py:APISearchRequest` | exact query/user, one `readable_cube_ids`, no session/options, configurable mode/relativity/dedup/rerank |
+| Search orchestration | `api/handlers/search_handler.py:handle_search_memories` | ordered `text_mem`; baseline avoids `sim/mmr` candidate expansion |
+| Cube execution | `multi_mem_cube/single_cube.py:search_memories/_search_text` | guarded patch removes catch-all exception-to-empty success |
+| Candidate recall | `retrieve/recall.py:GraphMemoryRetriever.retrieve` | graph/vector paths remain available; BM25/full-text defaults stay off |
+| Local rerank | `reranker/cosine_local.py:CosineLocalReranker` | baseline keeps local cosine rerank; no external reranker service |
+| Result formatting | `api/handlers/formatters_handler.py:rerank_knowledge_mem` | preserves existing relativity ordering and bucket structure |
+| Status source | `memories/textual/item.py:TextualMemoryMetadata.status` | Gateway exposes only `activated` |
+| Provider provenance | patched Add metadata and Product `text_mem` metadata | user/Cube, payload digest, result index/count and vector success are revalidated |
+| Sensitive logs | Searcher/task parser/JSON parser/fine hint sites | guarded transforms retain counts/stages but remove raw values |
+| Readiness | `GET /health` plus `POST /product/search` | process health alone is insufficient; startup probe is bounded and no-write |
+
+The conservative payload uses `mode=fast`, `relativity=0.0`, `dedup=null`, `rerank=true`,
+`search_memory_type=All`, and disables preference/tool/skill, internet and neighbor recall. Public
+`top_k` passes through but is capped by the contest request model and re-applied after filtering.
+Product Search does not accept public answer `options`, so they are not sent and the service never
+selects a final answer.
+
+The fixed recall branches do not share one uniform status predicate. B06 treats recall as an
+untrusted candidate generator and post-filters every text item for exact user/Cube, `activated`
+status, approved type and committed B05 provenance. A legal zero-hit response remains distinct from
+a technical exception: only the former may become HTTP 200 with an empty evidence array.
+
 ## Health interpretation
 
 MemOS `/health` only reports that the ASGI process responds. The B04 verifier therefore also:
@@ -85,6 +111,12 @@ MemOS `/health` only reports that the ASGI process responds. The B04 verifier th
 
 This aggregate result is Gate 2 evidence; it is not exposed as the contest `/health` endpoint in
 B04.
+
+For the B06 runtime, public `/health` additionally requires Raw Store and Gateway receipt
+readiness, current MemOS health, and a Search capability probe that succeeded during application
+startup. The probe uses a dedicated nonexistent Cube and `top_k=1`; it makes no write. Public Health
+does not repeat the embedding-backed probe on every request, so deployment acceptance still runs a
+real Add + Search smoke.
 
 ## Accepted evidence and remaining risks
 

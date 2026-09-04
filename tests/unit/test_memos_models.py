@@ -8,6 +8,7 @@ import pytest
 from memscope.memory_gateway.errors import GatewayProtocolError
 from memscope.memory_gateway.memos_models import (
     envelope_data,
+    evidence_from_search,
     memories_from_by_ids,
     memories_from_filtered_get,
     parse_add_results,
@@ -43,6 +44,31 @@ def _provider() -> dict[str, Any]:
             "memscope_result_count": 1,
         },
     }
+
+
+def _search_item(
+    *,
+    memory_id: str = ID_1,
+    memory: str = "fact",
+    user_id: str = "user-1",
+    cube_id: str = "cube-1",
+) -> dict[str, Any]:
+    item = _provider()
+    item["id"] = memory_id
+    item["memory"] = memory
+    item["metadata"].update(
+        {
+            "user_id": user_id,
+            "memscope_cube_id": cube_id,
+            "relativity": 0.75,
+            "created_at": "2026-09-04T10:20:30Z",
+        }
+    )
+    return item
+
+
+def _search_data(*items: dict[str, Any], cube_id: str = "cube-1") -> dict[str, Any]:
+    return {"text_mem": [{"cube_id": cube_id, "memories": list(items)}]}
 
 
 @pytest.mark.parametrize(
@@ -179,3 +205,120 @@ def test_filtered_get_flattens_valid_groups() -> None:
         )[0].memory_id
         == ID_1
     )
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        None,
+        {},
+        {"text_mem": None},
+        {"text_mem": [None]},
+        {"text_mem": [{"cube_id": "cube-1", "memories": None}]},
+        _search_data({"id": ID_1, "memory": "fact", "metadata": None}),
+        _search_data({"id": "", "memory": "fact", "metadata": {}}),
+        _search_data({"id": ID_1, "memory": " ", "metadata": {}}),
+    ],
+)
+def test_search_rejects_malformed_structures(value: Any) -> None:
+    with pytest.raises(GatewayProtocolError):
+        evidence_from_search(value, user_id="user-1", cube_id="cube-1")
+
+
+def test_search_maps_order_score_and_timezone_while_ignoring_other_buckets() -> None:
+    second = _search_item(memory_id=ID_2, memory="second")
+    second["metadata"].pop("relativity")
+    second["metadata"]["created_at"] = "not-a-time"
+    parsed = evidence_from_search(
+        {
+            "text_mem": [{"cube_id": "cube-1", "memories": [_search_item(), second]}],
+            "pref_mem": [{"cube_id": "cube-1", "memories": [_search_item()]}],
+        },
+        user_id="user-1",
+        cube_id="cube-1",
+    )
+    assert [item.id for item in parsed] == [ID_1, ID_2]
+    assert parsed[0].score == 0.75
+    assert parsed[0].created_at is not None
+    assert parsed[0].created_at.utcoffset() is not None
+    assert parsed[1].score is None
+    assert parsed[1].created_at is None
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid"),
+    [
+        ("user_id", "other"),
+        ("memscope_cube_id", "other"),
+        ("status", "resolving"),
+        ("status", "archived"),
+        ("status", "deleted"),
+        ("status", "unknown"),
+        ("memory_type", "PreferenceMemory"),
+        ("vector_sync", "failed"),
+        ("memscope_payload_sha256", None),
+        ("memscope_payload_sha256", "short"),
+        ("memscope_result_index", True),
+        ("memscope_result_index", -1),
+        ("memscope_result_count", 0),
+        ("relativity", float("nan")),
+        ("relativity", float("inf")),
+        ("relativity", True),
+    ],
+)
+def test_search_drops_untrusted_candidates(field: str, invalid: Any) -> None:
+    value = _search_item()
+    value["metadata"][field] = invalid
+    assert evidence_from_search(_search_data(value), user_id="user-1", cube_id="cube-1") == ()
+
+
+def test_search_drops_foreign_bucket_and_deduplicates_stably() -> None:
+    parsed = evidence_from_search(
+        {
+            "text_mem": [
+                {"cube_id": "foreign", "memories": [_search_item()]},
+                {
+                    "cube_id": "cube-1",
+                    "memories": [
+                        _search_item(),
+                        _search_item(),
+                        _search_item(memory_id=ID_2, memory=" fact "),
+                    ],
+                },
+            ]
+        },
+        user_id="user-1",
+        cube_id="cube-1",
+    )
+    assert [item.id for item in parsed] == [ID_1]
+
+
+def test_search_rejects_same_id_with_conflicting_content() -> None:
+    with pytest.raises(GatewayProtocolError):
+        evidence_from_search(
+            _search_data(_search_item(), _search_item(memory="different")),
+            user_id="user-1",
+            cube_id="cube-1",
+        )
+
+
+def test_search_rejects_conflicting_id_even_when_first_candidate_is_untrusted() -> None:
+    untrusted = _search_item(memory="foreign content", user_id="other")
+    with pytest.raises(GatewayProtocolError):
+        evidence_from_search(
+            _search_data(untrusted, _search_item()),
+            user_id="user-1",
+            cube_id="cube-1",
+        )
+
+
+@pytest.mark.parametrize(
+    "created_at",
+    [None, "", "not-a-time", "2026-09-04T10:20:30"],
+)
+def test_search_omits_missing_invalid_or_naive_created_at(created_at: Any) -> None:
+    item = _search_item()
+    item["metadata"]["created_at"] = created_at
+    parsed = evidence_from_search(_search_data(item), user_id="user-1", cube_id="cube-1")
+    assert len(parsed) == 1
+    assert parsed[0].created_at is None
