@@ -2,10 +2,13 @@
 
 ```yaml
 batch: B09
-status: implementation_candidate_complete_gate_2_ready
+status: gate_2_review_open_not_accepted_not_frozen
 date: 2026-09-04
 gate_1_entry: user_explicit
 gate_1_approval: user_explicit
+gate_2_review_entry: user_explicit
+accepted: false
+frozen: false
 base_commit: 2498c904e97ab36d85a8596898996243460dae6f
 branch: batch/b09-delivery-closure
 candidate_commit: fe246c0ba59a39a108850f6e35126114c0a20716

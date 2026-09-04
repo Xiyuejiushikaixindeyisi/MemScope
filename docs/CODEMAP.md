@@ -94,7 +94,7 @@ Gateway during ASGI lifespan. The B03 Fake remains test-only.
 - B08 is Accepted/Frozen at deterministic candidate `44ce4a7` under the named tuning-machine
   live-evidence transfer exception; no live-system pass is claimed. B09 Gate 1 is approved and owns
   instructions, locks/licensing, reproducible archives and two-machine evidence identity. Candidate
-  `fe246c0` is complete without product changes; Gate 2 remains pending.
+  `fe246c0` is complete without product changes; Gate 2 review is open but not Accepted/Frozen.
 - Real Huawei API probes, semantic baseline and tuning belong to the tuning machine and do not
   become Git facts until their reports and source/config differences are returned.
 

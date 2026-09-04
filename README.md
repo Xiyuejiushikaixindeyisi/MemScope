@@ -9,8 +9,8 @@ host-port/cgroup validation is transferred to a capable tuning machine under the
 conditions. B07 freezes the tests-and-documents reliability closure without changing production
 code. B08's deterministic system-verification candidate at `44ce4a7` is accepted/frozen under the
 tuning-machine live-evidence transfer exception; this is not a live-system pass claim. B09 Gate 1
-is approved and the reproducible-delivery candidate is complete at `fe246c0`; Gate 2 review is
-pending. Docker is an optional delivery accelerator, not a prerequisite for tuning.
+is approved and the reproducible-delivery candidate is complete at `fe246c0`; Gate 2 review is open
+but not Accepted/Frozen. Docker is an optional delivery accelerator, not a prerequisite for tuning.
 
 ## Development environment
 
@@ -188,4 +188,4 @@ tuning-machine live-evidence transfer exception; real exercise/restart/resource 
 transferred item and is not claimed as passed. B09 has entered Gate 1 planning, with no B09
 product change authorized. Its delivery candidate `fe246c0` adds organizer instructions,
 lock/license audit, deterministic handoff/submission packaging and two-machine SHA-256 closure.
-B09 Gate 2 acceptance, final artifact creation and tagging remain pending.
+B09 Gate 2 review is open; acceptance, final artifact creation and tagging remain pending.

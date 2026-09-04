@@ -1,8 +1,10 @@
 # B09 reproducible delivery handoff
 
-> Status: implementation candidate complete; ready for Gate 2 review
+> Status: Gate 2 review open; not Accepted/Frozen
 >
 > Gate 1 approved by explicit user message on 2026-09-04
+>
+> Gate 2 review entered by explicit user message on 2026-09-04
 >
 > Base commit: `2498c904e97ab36d85a8596898996243460dae6f`
 >
@@ -95,8 +97,9 @@ source/config differences and sanitized evidence.
 
 ## 6. Gate 2 decision and post-acceptance action
 
-The development-machine B09 candidate is ready for Gate 2 review. Gate 2 acceptance must not be
-interpreted as external live/baseline acceptance.
+The user explicitly entered B09 Gate 2 review on 2026-09-04. The review is open; entering review is
+not an acceptance or freeze decision. A later Gate 2 acceptance must not be interpreted as external
+live/baseline acceptance.
 
 No final ZIP, release or tag has been created. Only after explicit B09 Gate 2 acceptance should the
 exact frozen commit build the named handoff archive and sidecar. Upload, remote push, final tuning
