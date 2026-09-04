@@ -1,8 +1,10 @@
 # B08 system verification handoff
 
-> Status: deterministic candidate complete; Gate 2 not ready without deployed-system evidence
+> Status: Gate 2 review open; not Accepted/Frozen; deployed-system evidence assigned to tuning machine
 >
 > Gate 1 approved by explicit user message on 2026-09-04
+>
+> Gate 2 review entered by explicit user message on 2026-09-04
 >
 > Base commit: `d281aa03b5b90f9e9903033fd9f1fc822011a490`
 >
@@ -72,17 +74,20 @@ handoff does not claim:
 - live P50/P95/P99/max, CPU/RSS/disk, Qdrant collection or Neo4j index evidence;
 - zero live 429/timeout/5xx/unclassified failures.
 
-Per the approved Gate 1 plan, ordinary B08 Gate 2 remains **NOT READY** until one viable deployment
-runs all three verifier phases and returns the sanitized resource/restart evidence. The user may
-instead explicitly approve a named transfer exception, but deterministic tests cannot silently
-substitute for live system evidence.
+The user explicitly entered Gate 2 review on 2026-09-04 while preserving this limitation. B08
+**cannot be judged Accepted/Frozen under the ordinary standard** because real deployed-system
+`exercise`, restart-persistence and resource evidence is missing. Producing that evidence is
+assigned to the tuning machine. The review therefore remains open; entering review is not an
+acceptance decision, and deterministic tests do not substitute for live system evidence.
 
 ## 6. Next action
 
 Run `SYSTEM_VERIFICATION.md` on the Huawei tuning machine or another admitted native/Compose
-candidate using the exact commit. Return the three JSON reports plus sanitized restart/resource
-observations. Any cross-user evidence, changed replay, lost evidence identity, Add at least 120
-seconds, Search at least 60 seconds or unclassified failure blocks Gate 2 and must not be repaired
-inside B08 without a revised plan.
+candidate using the exact source commit. Return the three JSON reports plus sanitized
+restart/resource observations and their hashes. The development-machine reviewer must validate the
+returned candidate identity and evidence before making a later Accepted/Frozen or rejected
+decision. Any cross-user evidence, changed replay, lost evidence identity, Add at least 120 seconds,
+Search at least 60 seconds or unclassified failure blocks Gate 2 and must not be repaired inside B08
+without a revised plan.
 
-B09 cannot begin before explicit B08 Gate 2 acceptance.
+B09 cannot begin while this review is open and before explicit B08 Gate 2 acceptance.
