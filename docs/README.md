@@ -1,6 +1,6 @@
 # MemScope 文档索引
 
-本文档目录是项目的可审计事实入口。新的开发或调测 Session 不应依赖聊天记忆恢复项目状态。
+本文档目录是项目的可审计事实入口。新的开发或主办方评审 Session 不应依赖聊天记忆恢复状态。
 
 ## 当前状态
 
@@ -16,8 +16,11 @@
 - B09：Gate 1 计划已于 2026-09-04 经用户明确批准；可复现交付候选
   `fe246c0` 已经 Gate 2 验收并 `Accepted/Frozen`。因还需额外开发与版本整理，用户明确
   禁止生成最终 handoff ZIP 及包外 SHA-256；当前无最终包或 tag。
-- 当前 GitHub 主线只代表开发机已审计源码；调测机产生的最终候选必须通过回传清单闭环，避免与
-  GitHub 版本静默分叉。
+- B10：全量只读审计后，用户于 2026-09-05 批准并已完成 Gate 1 实施；候选分支为
+  `batch/b10-baseline-closure`，起点 `ca470eb`。Gate 2、调优、最终 ZIP/四镜像 bundle、合入和 tag
+  均未完成。
+- 当前规则由开发机部署、真实评测、调优和构建最终镜像；主办方评审机只校验、加载、注入配置、
+  Compose 启动和评测。旧 Batch 的“调测机构建/安装”描述只作为历史事实。
 
 ## 权威性顺序
 
@@ -41,7 +44,7 @@
 | 开始一个 Batch | `MEMOS_BASELINE_IMPLEMENTATION_PLAN.md` 第 18～19 节、该 Batch 的 `CONTEXT.md`、`PLAN.md` |
 | 依赖已验收 Batch | 对应 `HANDOFF.md`、公共接口和 ADR；不要重新加载全部历史实现 |
 | 核对比赛要求 | `acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` 及其中引用的正式材料 |
-| 两机开发与调测 | `collaboration/TWO_MACHINE_WORKFLOW.md` |
+| 开发机与主办方评审机协作 | `collaboration/TWO_MACHINE_WORKFLOW.md` |
 | 提交前 48 小时止损规则 | `collaboration/48H_DELIVERY_GUARDRAILS.md` |
 | 总体实现方案与强制快速迭代流程 | `../MEMOS_BASELINE_IMPLEMENTATION_PLAN.md` |
 | 制作或接收交接包 | `collaboration/TRANSFER_MANIFEST_TEMPLATE.md` |
@@ -66,12 +69,14 @@
 | B08 确定性候选与 live 证据缺口 | `batches/B08/HANDOFF.md` |
 | B09 Gate 1 上下文、获批计划与交付手册 | `batches/B09/CONTEXT.md`、`batches/B09/PLAN.md`、`batches/B09/DELIVERY.md` |
 | B09 Gate 2 候选与证据 | `batches/B09/HANDOFF.md` |
+| B10 当前上下文、获批 Gate 1 计划与实现交接 | `batches/B10/CONTEXT.md`、`batches/B10/PLAN.md`、`batches/B10/HANDOFF.md` |
+| 主办方离线镜像启动 / Agent Prompt | `../ORGANIZER_QUICKSTART.md`、`../ORGANIZER_AGENT_PROMPT.md` |
 | 查看固定 MemOS 接线 | `integrations/MEMOS_V2_0_32_MAP.md` |
 
 ## 目录职责
 
 - `acceptance/`：已核实的比赛契约、提交要求和待确认项；不保存实现偏好。
-- `collaboration/`：开发机、调测机和人机协作规则及模板。
+- `collaboration/`：开发机、主办方评审机和人机协作规则及模板。
 - `batches/`：每个 Batch 的方案、上下文和 Gate 2 交接证据。
 - `adr/`：需要长期解释的重要架构决策。
 - `interfaces/`：当前有效的外部和内部契约。

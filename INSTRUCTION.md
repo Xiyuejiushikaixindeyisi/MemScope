@@ -1,198 +1,187 @@
-# MemScope build and run instructions
+# MemScope build, run and evaluation instructions
 
-This document is the non-interactive operator entry point for the MemScope Agent Memory submission.
-The service implements `GET /health`, `POST /add` and `POST /search`; it returns memory evidence and
-does not generate final answers.
+This is the non-interactive entry point for the MemScope Agent Memory submission. The public service
+implements `GET /health`, `POST /add` and `POST /search`; it returns memory evidence and does not
+generate the final answer.
 
-## 1. Package layout
+## 1. Delivery contract
 
-After extracting the formal archive, use:
+The development machine produces these files only after the tuned candidate is frozen:
+
+```text
+solution-<candidate>.zip
+memscope-images-<candidate>-linux-amd64.tar
+delivery-manifest.json
+SHA256SUMS
+```
+
+The image TAR is one transport bundle containing four images. It is not a single-container runtime.
+The organizer loads it and Compose starts `memory-api`, MemOS, Neo4j and Qdrant as four containers
+with five persistent named volumes.
+
+After extracting the ZIP, the operator-facing layout is:
 
 ```text
 solution/
 ├── INSTRUCTION.md
+├── ORGANIZER_QUICKSTART.md
+├── ORGANIZER_AGENT_PROMPT.md
 ├── SDD.md
 ├── THIRD_PARTY_NOTICES.md
+├── LICENSE_STATUS.md
+├── RELEASE_LOCK.tsv
+├── SOURCE_MANIFEST.json
+├── compose.release.yaml
+├── deploy/organizer.env.example
+├── scripts/{run_release.sh,verify_release.sh,stop_release.sh}
 ├── LICENSES/
 └── code/
 ```
 
-Run repository commands from `solution/code`. When using a source checkout directly, run them from
-the repository root instead.
+`compose.release.yaml` contains no `build:` section and applies `pull_policy: never` to every
+service. `RELEASE_LOCK.tsv` binds the four local references to exact Docker image IDs and binds the
+two project images to the candidate Git revision label.
 
-## 2. Fixed requirements
+## 2. Organizer machine: load and run only
 
-- Linux x86_64 and CPython 3.11; the accepted development version is CPython `3.11.16`.
-- `uv 0.12.9` for the locked native memory-api environment.
-- Docker Engine with Compose v2 for the Compose path, or separately managed Neo4j
-  `5.26.6-community`, Qdrant `1.15.3` and MemOS `v2.0.32` for the native path.
-- At least 8 GiB host memory is recommended for the default Compose ceilings.
-- An OpenAI-compatible Chat endpoint and Embedding endpoint reachable from MemOS.
+Required host software is Linux x86_64, Docker Engine, Docker Compose v2, Bash, `unzip` and
+`sha256sum`. At least 10 GiB RAM is recommended because the default service ceilings total 8.5 GiB.
+The organizer does not install Python/uv/pip, build an image or pull an image.
 
-The actual Chat model, Embedding model and Embedding dimension must be probed on the deployment
-machine. Never infer the dimension from a model name and never reuse a Qdrant collection created for
-a different model or dimension.
-
-## 3. Configuration and credentials
-
-Create a private environment file outside the source tree:
+From the directory containing all four delivered files:
 
 ```bash
-install -m 0600 deploy/compose.env.example ./compose.env
+sha256sum -c SHA256SUMS
+unzip solution-<candidate>.zip
 ```
 
-Replace every `replace-with-*` value. Required private/runtime-specific values are:
-
-- `NEO4J_PASSWORD`
-- `MEMRADER_MODEL`, `MEMRADER_API_BASE`, `MEMRADER_API_KEY`
-- `MOS_EMBEDDER_MODEL`, `MOS_EMBEDDER_API_BASE`, `MOS_EMBEDDER_API_KEY`
-- `EMBEDDING_DIMENSION`
-
-The URLs must use HTTPS in the real `gateway` profile by default. A trusted isolated laboratory
-gateway that only exposes HTTP requires the explicit private setting
-`MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true`; never use that exception for an Internet-routable
-endpoint. Do not write credentials into source files, Compose YAML, command-line arguments, reports
-or logs. If inbound authentication is required, add these values only to the private environment
-file:
+Create a private runtime configuration outside the extracted source and replace secret placeholders:
 
 ```bash
-CONTEST_AUTH_MODE=shared_key
-CONTEST_API_KEY=replace-with-organizer-provided-private-key
+umask 077
+cp solution/deploy/organizer.env.example /secure/memscope-organizer.env
+chmod 0600 /secure/memscope-organizer.env
 ```
 
-With `CONTEST_AUTH_MODE=none`, Add and Search require no authorization header. With `shared_key`,
-clients may use the configured key through `Authorization: Bearer`, `Authorization: Token` or
-`X-Api-Key`. Health is always unauthenticated.
+Never put a real Key, IAM token or Neo4j password in source, Compose YAML, an image layer, a command
+argument, a report or a chat transcript. The supplied organizer template records the confirmed
+non-secret Huawei internal model facts and explicitly permits its HTTP endpoints.
 
-## 4. Compose build and startup
-
-### One-command Linux deployment
-
-On a Linux x86_64 host with `uv 0.12.9`, Docker Engine and Compose v2 already installed, validate,
-synchronize, build, start and health-check the complete stack with:
+Load, identity-check and start all four services with one command:
 
 ```bash
-./scripts/deploy_linux.sh
+cd solution
+./scripts/run_release.sh \
+  --image-bundle ../memscope-images-<candidate>-linux-amd64.tar \
+  --sha256-file ../SHA256SUMS \
+  --env-file /secure/memscope-organizer.env
 ```
 
-If the private file does not exist, the script creates its parent directory, installs
-`deploy/compose.env.example` there with mode `0600`, and opens `${VISUAL:-$EDITOR}` or a standard
-terminal editor. Existing files are never overwritten. Before continuing, the file must contain no
-example placeholders, use HTTPS model endpoints or explicitly opt into trusted internal HTTP, and
-specify the exact positive `EMBEDDING_DIMENSION`. The default location is
-`compose.env` in the repository root; it is Git-ignored, and `--env-file PATH` can override it. Both
-the `docker compose` plugin and standalone `docker-compose` command are supported automatically.
-The script does not install Docker, invent model settings, print credentials or remove persistent
-volumes. For staged diagnosis, use `--check-only` or `--build-only`; run
-`./scripts/deploy_linux.sh --help` for all options.
+The script validates hashes and private-file permissions, runs `docker load`, verifies all image
+IDs/revision labels, runs Compose `config --quiet`, and starts with `--no-build --pull never --wait`.
 
-### Manual equivalent
-
-First validate interpolation without printing the resolved configuration:
+Before official evaluation, run the real model smoke:
 
 ```bash
-docker compose -p memscope-final \
-  --env-file ./compose.env config --quiet
+./scripts/verify_release.sh --env-file /secure/memscope-organizer.env
 ```
 
-Build the two local images once from the frozen source candidate:
+The verifier checks four healthy containers, Neo4j and Qdrant readiness, Add replay, cross-session
+Search and cross-user isolation. It runs Python already packaged inside `memory-api`; there is no host
+Python dependency. Output is limited to status, timing and evidence counts. The smoke writes one
+unique synthetic user and calls the real Chat/Embedding endpoints.
+
+Point the organizer's official evaluator at the printed origin, normally
+`http://127.0.0.1:8080`. Do not pass gold answers to `/search` and do not replace the official Judge
+with a package-local implementation. The evaluation client owns batch throttling and bounded 429
+backoff; the service does not automatically replay Add.
+
+Stop containers and preserve all named volumes with:
 
 ```bash
-docker compose -p memscope-final \
-  --env-file ./compose.env build memory-api memos
+./scripts/stop_release.sh --env-file /secure/memscope-organizer.env
 ```
 
-Start the stack non-interactively:
+Never run `down -v`, `docker system prune`, a build or a pull on the organizer machine. Complete
+operator steps and the directly reusable agent prompt are in `ORGANIZER_QUICKSTART.md` and
+`ORGANIZER_AGENT_PROMPT.md`.
+
+## 3. Organizer runtime configuration
+
+The supplied Huawei organizer profile uses:
+
+- Chat base/model: `http://aigateway.huawei.com/v1`, `GLM-V5_1-DX`;
+- Embedding base/model/dimension: `http://aigateway.huawei.com/v1`, `bge-m3`, `1024`;
+- `MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true`, limited to the trusted organizer intranet;
+- local `cosine_local` reranking; the advertised `/v1/reranker` API is not called by this baseline.
+
+The current MemOS clients use OpenAI-compatible Bearer API-key authentication. If the organizer
+provides only an IAM token with different header syntax, obtain the exact rule before deployment;
+never paste the sample alternative syntax itself into a header.
+
+Only `memory-api` publishes a host port. Change `MEMSCOPE_PUBLIC_PORT` in the private env file if
+8080 is unavailable. Add must finish below 120 seconds and Search below 60 seconds. Keep exactly one
+memory-api worker and one MemOS worker.
+
+## 4. Development-machine build and tuning
+
+The development machine—not the organizer—owns Python dependency installation, source changes,
+service deployment against its reachable OpenAI-compatible APIs, baseline evaluation, tuning and
+image construction. The development Compose entry remains `compose.yaml`:
 
 ```bash
-docker compose -p memscope-final \
-  --env-file ./compose.env up -d
-docker compose -p memscope-final \
-  --env-file ./compose.env ps
+uv sync --frozen
+./scripts/deploy_linux.sh --env-file /secure/memscope-development.env
 ```
 
-Only memory-api publishes a host port. The default public origin is `http://127.0.0.1:8080`; set
-`MEMSCOPE_PUBLIC_PORT` in the private environment file when a different host port is required.
-Neo4j, Qdrant and MemOS remain on private Compose networks.
-
-Do not use `docker compose down -v`: the named volumes contain Raw, receipt, graph and vector state.
-A normal stop is:
-
-```bash
-docker compose -p memscope-final \
-  --env-file ./compose.env stop
-```
-
-## 5. Native fallback
-
-Docker is optional and must not block a scoreable native deployment. The complete native procedure
-is in `docs/batches/B06/NATIVE_DEPLOYMENT.md`; storage admission and index/collection checks are in
-`docs/batches/B06/ORGANIZER_DEPLOYMENT.md`.
-
-The required order is:
+Builds use exactly one explicit HTTPS Python package index. Override the default only with a
+credential-free URL in the private development configuration:
 
 ```text
-Neo4j -> Qdrant -> one MemOS worker -> one memory-api worker
+MEMSCOPE_PIP_INDEX_URL=https://approved.example/simple
 ```
 
-The memory-api environment is installed from the frozen lock:
+API URL, Key, model, prompt and Search-threshold changes are runtime/tuning inputs and do not require
+an image rebuild. Iterate with native/source-mounted processes where practical; build the final
+images once after source and non-secret configuration are frozen.
+
+The final builder requires a clean Git checkout whose HEAD equals the literal 40-character candidate
+commit. It either builds the two project images or explicitly reuses images already labeled with that
+commit, verifies the two pinned upstream images, then creates the ZIP, four-image TAR, manifest and
+checksums outside the repository:
 
 ```bash
-UV_PROJECT_ENVIRONMENT=/srv/memscope/venv-api uv sync --frozen --no-dev
+python3 scripts/build_candidate_delivery.py build \
+  --source-root . \
+  --output-dir /secure/memscope-final \
+  --candidate-commit <40-character-commit> \
+  --build-images \
+  --pull-upstream \
+  --package-index https://approved.example/simple
+
+python3 scripts/build_candidate_delivery.py verify \
+  --delivery-dir /secure/memscope-final
 ```
 
-After configuring the two distinct local SQLite paths and the private MemOS origin, start exactly
-one memory-api worker:
+`--pull-upstream` is an explicit development-machine action and fetches only the digest-pinned
+Neo4j/Qdrant references. Use `--reuse-images` only when both project images were already built from
+the exact candidate commit. The builder refuses dirty/mismatched Git state, unsafe paths, in-tree
+output and overwrite. It expands and scans the fixed MemOS source archive; reviewed upstream test
+fixtures are accepted only when both the archive hash and path/classification set remain exact.
 
-```bash
-/srv/memscope/venv-api/bin/python -m uvicorn memscope.main:app \
-  --host 0.0.0.0 --port 8080 --workers 1
-```
+Do not execute the final builder or call an artifact final during B10 Gate 1/Gate 2. Final artifact
+generation occurs only after real development-machine evaluation/tuning and separate user approval.
 
-Use the complete native guide to unpack and verify the bundled MemOS source, apply the locked
-patchset and configure its model and storage dependencies. Do not start memory-api with the
-`memos_add` profile until MemOS, Neo4j and Qdrant are ready.
-
-## 6. Public endpoints and readiness
-
-For an origin `http://HOST:PORT`, the complete URLs are:
-
-- Health: `GET http://HOST:PORT/health`
-- Add: `POST http://HOST:PORT/add`
-- Search: `POST http://HOST:PORT/search`
-
-Readiness requires the exact response:
-
-```bash
-curl -fsS http://127.0.0.1:8080/health
-```
-
-```json
-{"status":"ok"}
-```
-
-Health alone does not prove model writes, Embedding compatibility or Search visibility. Before
-opening the endpoint to evaluation, run the public candidate verifier with an isolated test user:
-
-```bash
-python3 scripts/verify_b06_candidate.py \
-  --base-url http://127.0.0.1:8080 --require-hit
-```
-
-Then execute all three B08 phases from `docs/batches/B08/SYSTEM_VERIFICATION.md`, including an
-operator-controlled restart and sanitized resource observations. Add must remain below 120 seconds,
-Search below 60 seconds, and cross-user evidence must remain zero.
-
-## 7. Failure and recovery rules
+## 5. Failure and recovery rules
 
 - A failed or timed-out Add/Search is not converted to HTTP 200 or an empty successful result.
-- The service does not automatically retry a public request and does not use Raw text as a Search
-  fallback.
-- `request_id` replay must use identical content; conflicting reuse returns HTTP 409.
-- Keep one memory-api worker and one MemOS worker. Multiple workers are unsupported.
-- Preserve candidate-specific Raw, receipt, Neo4j and Qdrant storage across normal restart.
-- If the Embedding model or dimension changes, use a new candidate-specific database/collection or
-  perform an explicitly reviewed migration.
+- Identical `request_id` replay returns the completed result; conflicting reuse returns HTTP 409.
+- Preserve Raw, receipt, MemOS, Neo4j and Qdrant volumes across normal restart.
+- Never reuse vector/graph storage after changing the Embedding model or dimension without an
+  explicitly reviewed migration.
+- On organizer failure, retain containers/volumes and return only commit, hashes, image IDs, health,
+  timings and sanitized error classifications. Do not rebuild or patch the candidate in place.
 
-See `SDD.md` for architecture and known semantic limitations. No development-machine report claims
-a real Huawei model score or successful live-system verification without returned tuning evidence.
+Architecture, persistence and semantic limitations are documented in `SDD.md`. The project does not
+claim an official score or organizer-runtime pass until returned evidence identifies this exact
+candidate and image set.

@@ -1,6 +1,6 @@
 # Agent Memory 赛题验收清单
 
-> 核对日期：2026-09-03
+> 核对日期：2026-09-05
 >
 > 依据：仓库内任务书 1.0、调测指南 1.0、`api_contract.md`，以及用户后续明确约束
 >
@@ -91,18 +91,24 @@ solution/
 
 ## 5. 用户批准的当前部署决策
 
-- 提交物是源码 ZIP，由赛题组构建和启动，不是预构建镜像。
-- B04 使用一份 Compose、三个单职责容器：MemOS、Neo4j、Qdrant；不是单容器多进程。
+- B10 当前交付是源码 ZIP、一个包含四张镜像的 Linux/amd64 离线 TAR、JSON manifest 和
+  `SHA256SUMS`；离线 TAR 是传输 bundle，不是单容器。
+- 开发机负责依赖安装、服务部署、可达 API 基线/调优和最终镜像构建。主办方评审机只校验、
+  `docker load`、注入私有配置、用 Compose 启动四个服务并执行正式评测，不安装 Python 依赖，
+  不构建或拉取镜像。
+- B10 Release Compose 使用四个单职责容器：`memory-api`、MemOS、Neo4j、Qdrant；不是单容器多进程。
 - 平台不提供托管数据库；比赛只依赖同一次部署生命周期内连续 Add→Search。
 - 数据目录和挂载路径可配置；比赛暂不依赖跨重启持久化，但项目会测试 same-host named volume。
-- 开发机不能访问华为 AI Gateway；真实模型/API 和语义质量必须在调测机验证。
-- 当前 Docker 质量口径：MemOS 镜像约 985 MB，用户批准 1 GB；OCI history 元数据差异和已记录的
-  Trivy 高危债务不阻塞 B04，但不能写成漏洞为零。
-- B05、B06 分别在新 Session 开发，均需 Gate 0、Gate 1、Gate 2；B04 通过不授权自动进入 B05。
+- 开发机和主办方评审机使用不同但 OpenAI-compatible 的 API。开发机使用用户提供的可达 API 完成
+  baseline 和调优；主办方评审机用华为内网 API 对最终候选做 Smoke 和正式评分。
+- B04 曾记录约 985 MB 的 MemOS 镜像和已知 Trivy 债务；这只是历史证据，不代表 B10 最终四镜像
+  集的大小或漏洞结论，B10 冻结候选必须重新记录实际值。
+- B00–B09 的 Gate 结论保持历史冻结；B10 Gate 1 已批准，Gate 2、调优和最终 artifact 仍需各自按
+  当前流程推进，不因历史 Batch 结论自动通过。
 
 ## 6. 项目提交前硬检查
 
-- [ ] 干净环境仅按 `INSTRUCTION.md` 可非交互构建和启动
+- [ ] 开发机能按 `INSTRUCTION.md` 构建最终候选；干净主办方评审机仅加载镜像并可非交互启动
 - [ ] `/health` 无鉴权返回 2xx，且不在依赖未就绪时假健康
 - [ ] `/add` HTTP 200、boolean `success=true`、三个 ID 原样、返回前可检索
 - [ ] `/search` 返回 `data` 数组，条目 `id/content` 非空，数量不超过 `top_k`
@@ -117,11 +123,11 @@ solution/
 
 ## 7. 两机验收分工
 
-开发机完成：契约/Mock/组件/故障测试、源码与依赖审计、B05/B06 三道门禁、初版 SDD、B09 调优
-指南及带校验值的调测交接 ZIP。
+开发机完成：契约/Mock/组件/故障测试、源码与依赖审计、真实可达 API 的能力探测、baseline、
+单变量调优、候选冻结，以及最终源码 ZIP/四镜像 bundle/manifest/checksum 构建。
 
-调测机完成：真实 Docker 二次验收、华为网关能力探测、资源和可观测性、Smoke/单样本/数十题/1000
-题基线、单变量调优及最终提交 ZIP。详细流程和回传要求见
+主办方评审机完成：交付 hash 和镜像身份校验、`docker load`、私有运行配置、Compose 一键启动、
+华为内网 Chat/Embedding Smoke 及官方评测。详细流程和回传要求见
 `docs/collaboration/TWO_MACHINE_WORKFLOW.md`。
 
 ## 8. 待确认项
@@ -131,8 +137,8 @@ solution/
 - 正式评测硬件、平台架构、可用磁盘/内存/GPU 和网络白名单；
 - 最终公开端口/入口命令及 Add/Search 是否强制入站鉴权；
 - 是否允许把开源 Embedding/reranker 权重放入 `code/`，以及许可证/上传/镜像大小限制；
-- 正式密钥可调用的 Embedding model ID、维度、限流和真实协议能力；
-- Qwen/GLM 精确订阅 model ID、上下文/输出上限及 tools/JSON 字段组合；
+- 主办方 Huawei API 的限流、上下文/输出上限及 IAM token 的精确 Authorization 语法；
+- 用户已给出的 `GLM-V5_1-DX`、`bge-m3`/1024 之外，开发机可达 API 的最终模型与协议能力；
 - Docker Hub、PyPI 或内网镜像源可达性；
 - `solution.zip` 的正式大小上限。现有正式 Markdown 没有支持“≤5GB”的条款，因此 5GB 只能作为
   未证实信息，不能作为硬门禁。

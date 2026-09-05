@@ -1,11 +1,11 @@
 # MemScope System Design Description
 
-> Version: B09 Gate 2 accepted reproducible-delivery implementation, 2026-09-04.
+> Version: B10 Gate 1 pre-tuning-closure implementation, 2026-09-05.
 >
 > This document describes the implemented baseline, not an official score or a final model choice.
-> B00–B09 are Accepted/Frozen. B08 uses the tuning-machine live-evidence transfer exception;
-> real-model, live-system and semantic-quality evidence remains a tuning-machine responsibility.
-> Final artifact generation is held pending additional development and version consolidation.
+> B00–B09 remain Accepted/Frozen at their historical baseline. B08's live evidence is still an
+> unclosed transferred obligation. B10 Gate 2, development-machine tuning, final artifact generation
+> and organizer evaluation remain pending.
 
 ## 1. Purpose and evaluation role
 
@@ -86,7 +86,7 @@ one 55-second monotonic Search deadline. The Gateway issues exactly one
 
 The pinned stack's normal candidate generation can combine graph and vector recall. BM25/full-text,
 MMR/sim expansion, external rerankers and LLM-heavy Search modes are not baseline defaults. Runtime
-mode, relativity, dedup and local rerank switches are typed so the tuning machine can perform
+mode, relativity, dedup and local rerank switches are typed so the development machine can perform
 single-variable experiments without rebuilding.
 
 MemOS results are untrusted candidates. A public evidence item must come from the expected Cube and
@@ -147,9 +147,11 @@ model for graph/vector indexing and Search. The baseline reranker is MemOS `cosi
 uses embeddings already available in the fixed stack and adds no external reranker service.
 
 Real model IDs, context/tool behavior, Embedding dimension, quotas, relevance distribution and
-accuracy are machine-specific tuning facts. Dimension must be probed before creating/reusing the
-Qdrant collection. Model/URL/Key/threshold changes are environment changes and do not require an
-image rebuild.
+accuracy are environment-specific tuning facts. The organizer profile supplied for B10 uses Chat
+`GLM-V5_1-DX`, Embedding `bge-m3` dimension 1024 and trusted Huawei-intranet HTTP. Those values are
+user-supplied organizer facts, not development-machine reachability evidence. Dimension must be
+probed on development APIs before creating/reusing a Qdrant collection. Model/URL/Key/threshold
+changes are environment changes and do not require an image rebuild.
 
 ## 10. Availability, deadlines and failure policy
 
@@ -171,19 +173,25 @@ smoke.
 
 ## 11. Deployment and verification
 
-The primary time-bounded iteration path is Python tests → native memory-api/source-mounted MemOS →
-reuse Neo4j/Qdrant/MemOS → code freeze → one final image build. Docker is optional and cannot block
-core scoring work. The common Docker/native organizer admission gate is
-[B06 ORGANIZER_DEPLOYMENT](docs/batches/B06/ORGANIZER_DEPLOYMENT.md); complete native commands are in
-[B06 NATIVE_DEPLOYMENT](docs/batches/B06/NATIVE_DEPLOYMENT.md).
+The development-machine iteration path is deterministic tests → native/source-mounted services →
+reachable-API baseline/tuning → code/config freeze → one final image build. The development
+`compose.yaml` may build; its Docker context excludes private env and artifact files and uses one
+explicit HTTPS package index.
+
+The organizer receives a prebuilt four-image Linux/amd64 bundle. `compose.release.yaml` starts
+memory-api, MemOS, Neo4j and Qdrant without a build or pull. `run_release.sh` verifies delivery hashes,
+private env permissions, all four image IDs and custom revision labels. `verify_release.sh` runs
+infrastructure checks plus the existing public Add/Search smoke from Python inside memory-api, so the
+host installs no project runtime. The organizer does not use the historical native-build fallback.
 
 The fixed source/archive/patch map is
 [MEMOS_V2_0_32_MAP](docs/integrations/MEMOS_V2_0_32_MAP.md); the internal contracts are
 [memory-gateway-v1](docs/interfaces/memory-gateway-v1.md) and
 [raw-store-v1](docs/interfaces/raw-store-v1.md). Deterministic tests verify public schemas,
 idempotency, isolation, error propagation, deadlines, status/provenance filtering, readiness and
-fixed patch hashes. Real model quality, P95/max latency and official scores must be returned from the
-Huawei tuning machine before the final candidate can claim them.
+fixed patch hashes. Real model quality, P95/max latency and development scores must be recorded on
+the development machine. Official scores and organizer runtime evidence must be returned from the
+organizer review machine before the final candidate can claim them.
 
 B07 adds composed recovery/reconciliation evidence without changing production behavior. B08 adds
 a three-phase public HTTP verifier for exercise, restart persistence and sanitized resource
@@ -201,22 +209,21 @@ on this development machine and are not claimed as passed.
 4. Search exact dedup does not solve semantic contradiction or optimize evidence diversity.
 5. No real Huawei model capability, accuracy, latency distribution or official evaluation result is
    asserted by this development-machine document.
-6. Docker host-port/cgroup proof remains a tuning-machine/P4 task; the native path is fully supported.
+6. Organizer host-port/resource/restart proof remains pending until the exact final image set runs on
+   the review machine; the organizer has no source-build/native fallback responsibility.
 7. Deferred BM25/full-text paths are explicitly disabled in R1 and require an additional log-
    sanitization patch/canary before they may be enabled.
 
 ## 13. Reproducible delivery
 
-B09 adds a deterministic standard-library artifact builder with separate `handoff` and `submission`
-allowlists. Both modes reject links and unsafe paths, exclude Git/cache/runtime/secret material,
-normalize ZIP metadata, embed file-level SHA-256 records and emit an external full-archive hash.
+B09's historical source-archive builder remains audit evidence. B10 introduces the active final
+candidate builder for the new workflow. From a clean literal Git commit it creates a deterministic
+solution ZIP, a four-image offline TAR, `delivery-manifest.json` and `SHA256SUMS`. The ZIP rejects
+links/unsafe paths, excludes Git/cache/runtime/private env material, records every member hash and
+expanded-scans the fixed MemOS archive against a hash-bound fixture review.
 
-The handoff artifact carries tests, public evaluation assets, verification runbooks and two-machine
-templates for the tuning machine. The formal submission artifact contains `INSTRUCTION.md`, this
-SDD, third-party notices/licenses and the complete runtime/build source under `solution/code/`; it
-does not carry the public evaluation dataset or internal Batch history.
-
-Package reproducibility does not certify a real model, official score or live-system behavior. The
-tuning machine must validate the received handoff hash, complete the B08 phases, run the real
-baseline/tuning sequence, freeze its final non-secret configuration, and return the final ZIP plus
-source/config differences and evidence.
+The manifest binds Linux/amd64, both artifact hashes, four Docker image IDs and the two project image
+revision labels. The extracted `RELEASE_LOCK.tsv` lets a host-Python-free shell entry verify loaded
+images before Compose startup. Package identity does not certify model quality, official score or
+live behavior; final generation is held until development baseline/tuning complete and the user
+separately approves it. Organizer evidence must return the same commit, hashes and image IDs.

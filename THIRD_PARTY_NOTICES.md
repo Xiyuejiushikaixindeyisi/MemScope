@@ -24,7 +24,7 @@ images pinned by OCI index digest. The MemOS image installs the fully pinned ups
 remains subject to its own license. The exact image references are recorded in
 `third_party/memos/SOURCE_LOCK.json`.
 
-## B09 delivery treatment
+## B09 historical and B10 active delivery treatment
 
 The formal B09 submission package repeats the MemOS Apache-2.0 license at
 `solution/LICENSES/MemOS-Apache-2.0.txt` and retains the source copy under
@@ -33,5 +33,13 @@ The formal B09 submission package repeats the MemOS Apache-2.0 license at
 Python packages and OCI images are resolved or pulled during build rather than copied from this
 development environment. Their pinned identities do not replace their upstream license terms.
 
-No root license has been selected for original MemScope source. This notice records third-party
-attribution only and does not grant a new license for original project code.
+B10 changes the organizer boundary: the development machine builds the final project images and
+places them, together with the fixed Neo4j and Qdrant images, in one offline TAR. The organizer only
+loads and runs that bundle. The B10 solution ZIP still includes the fixed MemOS source archive,
+source/hash locks and Apache-2.0 text so the image's third-party provenance remains reviewable.
+Python dependencies are installed into the images on the development machine from one explicitly
+selected HTTPS package index; the organizer performs no dependency resolution.
+
+No root license has been selected for original MemScope source. `LICENSE_STATUS.md` makes this status
+explicit. This notice records third-party attribution only and does not grant a new license for
+original project code.

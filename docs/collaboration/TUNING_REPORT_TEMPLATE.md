@@ -1,64 +1,72 @@
-# 真实环境调测与调优报告模板
+# 开发机真实调优与主办方评测报告模板
 
-> 不记录 Key、IAM token、完整敏感响应或原始私密对话。
+> B10 当前流程由开发机完成 baseline 和调优，主办方评审机只加载最终镜像、运行并评分。全程不记录
+> Key、IAM token、密码、正文、向量、gold 或 provider 完整响应。
 
-## 1. 身份与环境
+## 1. 候选与环境身份
 
-- 基准 ZIP SHA-256：`<required>`
-- 基准 Git commit：`<required>`
+- 分支 / 40 字符 commit：`<required>`
+- 基线 commit：`<required>`
 - Host / Docker / Compose：`<required>`
-- CPU / 内存 / 磁盘 / GPU：`<required>`
-- Python、MemOS、Neo4j、Qdrant 版本：`<required>`
-- 数据集与固定随机种子：`<required>`
+- CPU / 内存 /磁盘：`<required>`
+- 数据集 / 切片 / 随机种子：`<required>`
+- 非秘密 API/model/dimension 指纹：`<required>`
+- Python/MemOS/Neo4j/Qdrant 版本：`<required>`
 
-## 2. 网关能力探测
+## 2. API 能力探测
 
-| 能力 | 端点/model ID | 实测结论 | 限制/错误 |
+| 能力 | 端点/model | 实测结论 | 限制/错误 |
 |---|---|---|---|
 | Chat | `<fill>` | `<fill>` | `<fill>` |
-| Embedding | `<fill>` | 维度 `<fill>` | `<fill>` |
-| Rerank | `<fill>` | `<fill>` | `<fill>` |
-| tools / JSON | `<fill>` | `<fill>` | `<fill>` |
-| reasoning | `<fill>` | `<fill>` | `<fill>` |
-| timeout / 429 | `<fill>` | `<fill>` | `<fill>` |
+| Embedding | `<fill>` | dimension `<fill>` | `<fill>` |
+| Rerank（若使用） | `<fill>` | `<fill>` | `<fill>` |
+| JSON/tools/reasoning | `<fill>` | `<fill>` | `<fill>` |
+| timeout/429 | `<fill>` | `<fill>` | `<fill>` |
 
-## 3. Docker 二次验收
+## 3. 开发机 baseline
 
-记录构建、冷启动、Health、Add/Search Smoke、镜像体积、非 root、日志、资源、优雅停机、进程/daemon
-重启和持久化结果。扫描结果必须如实记录，批准豁免与“没有发现”分开表述。
-
-## 4. 基线
-
-| 指标 | Smoke | 单样本 | 数十题 | 1000 题 |
+| 指标 | Smoke | 小样本 | holdout | full |
 |---|---:|---:|---:|---:|
-| 正确/总数 |  |  |  |  |
-| Add P50/P95/P99 |  |  |  |  |
-| Search P50/P95/P99 |  |  |  |  |
-| 超时/429/5xx |  |  |  |  |
+| 正确/总数或正式代理指标 |  |  |  |  |
+| Add P50/P95/P99/max |  |  |  |  |
+| Search P50/P95/P99/max |  |  |  |  |
+| timeout/429/5xx |  |  |  |  |
 | 峰值 CPU/内存/磁盘 |  |  |  |  |
 
-按 LoCoMo 单跳、时序、多跳，以及 MemOps Remember/Update/Forget/Reflect/噪声切片记录错误分布。
-
-## 5. 单变量实验
+## 4. 单变量实验
 
 每个实验复制一节：
 
 ### EXP-`<id>`：`<hypothesis>`
 
-- 基线 candidate：`<id>`
+- 基准 candidate：`<required>`
 - 唯一主变量及前后值：`<required>`
 - 其它固定变量：`<required>`
 - 数据切片/随机种子：`<required>`
-- 正向翻转、负向翻转和未变化：`<required>`
+- 正向/负向翻转与未变化：`<required>`
 - 准确率、延迟、调用量、资源和失败率：`<required>`
 - 结论：`accept/reject/inconclusive`
-- 回退方式：`<required>`
+- 回退：`<required>`
 
-## 6. 最终候选
+## 5. 开发机冻结与最终构建
 
-- 选择的 candidate 及理由：`<required>`
-- 相对基线的累计变化：`<required>`
-- 最终脱敏配置：`<required>`
-- 已知风险和未关闭问题：`<required>`
-- 最终 ZIP 文件名、大小、SHA-256：`<required>`
-- 最终源码树或 patch 路径：`<required>`
+- 选择的候选及理由：`<required>`
+- 相对 baseline 累计变化：`<required>`
+- 最终非秘密配置：`<required>`
+- 已知风险：`<required>`
+- solution ZIP / image TAR / manifest SHA-256：`<required>`
+- 四张 image ID / custom revision labels：`<required>`
+- `build_candidate_delivery.py verify`：`<pass/fail>`
+
+## 6. 主办方返回证据
+
+- 入站 hash/image identity：`<pass/fail>`
+- 四服务/Health/Smoke：`<pass/fail + timing>`
+- 官方评测器与数据切片：`<required>`
+- 官方得分/失败统计：`<required or not produced>`
+- 重启/资源证据：`<pass/fail/not run>`
+- 环境差异和脱敏错误：`<required>`
+- 卷保留：`<required>`
+
+开发机结果与主办方结果分别标注，不得互相冒充。只有与同一 commit、ZIP/TAR hash 和 image ID 绑定
+的证据才能用于最终审批。

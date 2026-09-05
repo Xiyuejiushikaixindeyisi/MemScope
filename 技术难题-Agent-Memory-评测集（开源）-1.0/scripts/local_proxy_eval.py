@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import pathlib
 import re
 import time
@@ -23,21 +24,79 @@ import urllib.request
 import uuid
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from typing import Any, Iterable
+from dataclasses import field as dataclass_field
+from typing import TYPE_CHECKING, Any, cast
+from urllib.parse import urlsplit
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PROXY_NAME = "deterministic-extractive-proxy-v1"
+MAX_RESPONSE_BYTES = 2_000_000
 TOKEN_RE = re.compile(r"[a-z0-9]+", re.IGNORECASE)
 SENTENCE_RE = re.compile(r"(?<=[.!?])\s+|[\r\n]+")
 STOPWORDS = {
-    "a", "about", "an", "and", "are", "as", "at", "be", "been", "but",
-    "by", "can", "could", "did", "do", "does", "for", "from", "had",
-    "has", "have", "he", "her", "his", "how", "i", "if", "in", "is",
-    "it", "me", "my", "of", "on", "or", "our", "she", "should", "that",
-    "the", "their", "them", "they", "this", "to", "was", "we", "were",
-    "what", "when", "where", "which", "who", "why", "will", "with", "would",
-    "you", "your",
+    "a",
+    "about",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "been",
+    "but",
+    "by",
+    "can",
+    "could",
+    "did",
+    "do",
+    "does",
+    "for",
+    "from",
+    "had",
+    "has",
+    "have",
+    "he",
+    "her",
+    "his",
+    "how",
+    "i",
+    "if",
+    "in",
+    "is",
+    "it",
+    "me",
+    "my",
+    "of",
+    "on",
+    "or",
+    "our",
+    "she",
+    "should",
+    "that",
+    "the",
+    "their",
+    "them",
+    "they",
+    "this",
+    "to",
+    "was",
+    "we",
+    "were",
+    "what",
+    "when",
+    "where",
+    "which",
+    "who",
+    "why",
+    "will",
+    "with",
+    "would",
+    "you",
+    "your",
 }
 
 
@@ -47,9 +106,7 @@ def load_json(path: pathlib.Path) -> Any:
 
 def load_jsonl(path: pathlib.Path) -> list[dict[str, Any]]:
     return [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip()
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
     ]
 
 
@@ -59,6 +116,7 @@ def write_json(path: pathlib.Path, value: Any) -> None:
         json.dumps(value, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    path.chmod(0o600)
 
 
 def write_jsonl(path: pathlib.Path, rows: Iterable[dict[str, Any]]) -> None:
@@ -66,6 +124,25 @@ def write_jsonl(path: pathlib.Path, rows: Iterable[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8", newline="\n") as handle:
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    path.chmod(0o600)
+
+
+def prepare_sensitive_output(output_dir: pathlib.Path, eval_root: pathlib.Path) -> pathlib.Path:
+    if output_dir.is_symlink():
+        raise ValueError("--output-dir must not be a symbolic link")
+    output = output_dir.expanduser().resolve()
+    source = eval_root.expanduser().resolve()
+    try:
+        output.relative_to(source)
+    except ValueError:
+        pass
+    else:
+        raise ValueError("--output-dir must be outside the evaluation source tree")
+    output.mkdir(parents=True, exist_ok=True, mode=0o700)
+    output.chmod(0o700)
+    if output.is_symlink() or not output.is_dir():
+        raise ValueError("--output-dir must be a real directory")
+    return output
 
 
 def tokens(text: Any, *, drop_stopwords: bool = False) -> list[str]:
@@ -122,7 +199,9 @@ def segment_score(question: str, segment: dict[str, Any]) -> float:
     text_counts = Counter(text_tokens)
     overlap = sum((query_counts & text_counts).values())
     coverage = overlap / max(1, len(query_counts))
-    rarity_bonus = sum(1.0 / (1.0 + query_counts[token]) for token in text_counts if token in query_counts)
+    rarity_bonus = sum(
+        1.0 / (1.0 + query_counts[token]) for token in text_counts if token in query_counts
+    )
     rank_bonus = 1.0 / max(1, int(segment["memory_rank"]))
     number_bonus = 0.75 * len(
         {token for token in query_counts if token.isdigit()} & set(text_counts)
@@ -226,7 +305,12 @@ def proxy_judge(
     best = max(
         candidate_metrics,
         key=lambda row: (bool(row["exact"]), bool(row["gold_contained"]), row["token_f1"]),
-        default={"exact": False, "gold_contained": False, "token_f1": 0.0, "numeric_conflict": False},
+        default={
+            "exact": False,
+            "gold_contained": False,
+            "token_f1": 0.0,
+            "numeric_conflict": False,
+        },
     )
     base_correct = bool(best["exact"] or best["gold_contained"] or best["token_f1"] >= 0.72)
     if best.get("numeric_conflict"):
@@ -258,35 +342,114 @@ def proxy_judge(
 class HttpClient:
     base_url: str
     timeout: float
-    authorization: str | None = None
-    api_key: str | None = None
+    auth_mode: str = "none"
+    credential: str | None = None
+    min_interval_seconds: float = 0.0
+    max_rate_limit_retries: int = 4
+    initial_backoff_seconds: float = 1.0
+    max_backoff_seconds: float = 8.0
+    rate_limit_retries: int = dataclass_field(default=0, init=False)
+    _last_request_started: float = dataclass_field(default=0.0, init=False, repr=False)
 
-    def request(self, method: str, path: str, payload: Any | None = None) -> tuple[int, Any, float]:
+    def __post_init__(self) -> None:
+        origin = self.base_url.rstrip("/")
+        parsed = urlsplit(origin)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.netloc
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError("base URL must be an HTTP(S) origin without credentials or query")
+        if self.auth_mode not in {"none", "bearer", "token", "x-api-key"}:
+            raise ValueError("unsupported auth mode")
+        if self.auth_mode == "none" and self.credential:
+            raise ValueError("credential was supplied while auth mode is none")
+        if self.auth_mode != "none" and not self.credential:
+            raise ValueError("selected auth mode requires the configured credential environment")
+        if self.timeout <= 0 or self.min_interval_seconds < 0:
+            raise ValueError("timeouts and request intervals must be non-negative")
+        if self.max_rate_limit_retries < 0:
+            raise ValueError("rate-limit retries must be non-negative")
+        self.base_url = origin
+
+    def _throttle(self) -> None:
+        remaining = self.min_interval_seconds - (time.monotonic() - self._last_request_started)
+        if remaining > 0:
+            time.sleep(remaining)
+
+    def _authorization_headers(self) -> dict[str, str]:
+        if self.auth_mode == "bearer":
+            return {"Authorization": f"Bearer {self.credential}"}
+        if self.auth_mode == "token":
+            return {"Authorization": f"Token {self.credential}"}
+        if self.auth_mode == "x-api-key":
+            return {"X-Api-Key": str(self.credential)}
+        return {}
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        payload: Any | None = None,
+        *,
+        timeout: float | None = None,
+    ) -> tuple[int, Any, float]:
         url = f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
         body = None if payload is None else json.dumps(payload).encode("utf-8")
         headers = {"Accept": "application/json"}
         if body is not None:
             headers["Content-Type"] = "application/json"
-        if self.authorization:
-            headers["Authorization"] = self.authorization
-        if self.api_key:
-            headers["X-Api-Key"] = self.api_key
-        request = urllib.request.Request(url, data=body, headers=headers, method=method)
+        headers.update(self._authorization_headers())
+        request = urllib.request.Request(  # noqa: S310 -- base URL is restricted to HTTP(S).
+            url, data=body, headers=headers, method=method
+        )
         started = time.monotonic()
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                raw = response.read().decode("utf-8")
-                status = response.status
-        except urllib.error.HTTPError as exc:
-            raw = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"HTTP {exc.code} for {method} {url}: {raw}") from exc
-        except urllib.error.URLError as exc:
-            raise RuntimeError(f"request failed for {method} {url}: {exc}") from exc
+        request_timeout = self.timeout if timeout is None else min(self.timeout, timeout)
+        for attempt in range(self.max_rate_limit_retries + 1):
+            self._throttle()
+            self._last_request_started = time.monotonic()
+            try:
+                with urllib.request.urlopen(  # noqa: S310 -- validated HTTP(S) request.
+                    request, timeout=request_timeout
+                ) as response:
+                    raw_bytes = response.read(MAX_RESPONSE_BYTES + 1)
+                    status = response.status
+                break
+            except urllib.error.HTTPError as exc:
+                raw_bytes = exc.read(MAX_RESPONSE_BYTES + 1)
+                if exc.code == 429 and attempt < self.max_rate_limit_retries:
+                    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+                    try:
+                        requested_wait = float(retry_after) if retry_after is not None else 0.0
+                    except ValueError:
+                        requested_wait = 0.0
+                    backoff = min(
+                        self.max_backoff_seconds,
+                        max(requested_wait, self.initial_backoff_seconds * (2**attempt)),
+                    )
+                    self.rate_limit_retries += 1
+                    time.sleep(backoff)
+                    continue
+                raise RuntimeError(f"HTTP {exc.code} for {method} {path}") from exc
+            except urllib.error.URLError as exc:
+                raise RuntimeError(f"request transport failed for {method} {path}") from exc
+            except TimeoutError as exc:
+                raise RuntimeError(f"request timed out for {method} {path}") from exc
+        else:  # pragma: no cover - the bounded loop always returns or raises
+            raise RuntimeError(f"request retry state failed for {method} {path}")
         latency = time.monotonic() - started
+        if len(raw_bytes) > MAX_RESPONSE_BYTES:
+            raise RuntimeError(f"oversized response for {method} {path}")
         try:
+            raw = raw_bytes.decode("utf-8")
             decoded = json.loads(raw) if raw.strip() else None
         except json.JSONDecodeError as exc:
-            raise RuntimeError(f"non-JSON response for {method} {url}: {raw[:500]}") from exc
+            raise RuntimeError(f"non-JSON response for {method} {path}") from exc
+        except UnicodeDecodeError as exc:
+            raise RuntimeError(f"non-UTF-8 response for {method} {path}") from exc
         return status, decoded, latency
 
 
@@ -326,7 +489,7 @@ def validate_add_response(response: Any, request: dict[str, Any]) -> None:
 def validate_search_response(response: Any, top_k: int) -> list[dict[str, Any]]:
     if not isinstance(response, dict) or not isinstance(response.get("data"), list):
         raise ValueError(f"invalid Search response envelope: {response!r}")
-    data = response["data"]
+    data = cast("list[dict[str, Any]]", response["data"])
     if len(data) > top_k:
         raise ValueError(f"Search returned {len(data)} rows for top_k={top_k}")
     for index, item in enumerate(data):
@@ -340,13 +503,19 @@ def validate_search_response(response: Any, top_k: int) -> list[dict[str, Any]]:
 
 
 def run_service(args: argparse.Namespace) -> pathlib.Path:
+    output_dir = cast("pathlib.Path", args.output_dir)
+    credential = os.getenv(args.credential_env) if args.auth_mode != "none" else None
     client = HttpClient(
         args.base_url,
         args.timeout,
-        authorization=args.authorization,
-        api_key=args.api_key,
+        auth_mode=args.auth_mode,
+        credential=credential,
+        min_interval_seconds=args.min_interval_seconds,
+        max_rate_limit_retries=args.max_rate_limit_retries,
+        initial_backoff_seconds=args.initial_backoff_seconds,
+        max_backoff_seconds=args.max_backoff_seconds,
     )
-    health_status, _, _ = client.request("GET", args.health_path)
+    health_status, _, _ = client.request("GET", args.health_path, timeout=10)
     if not 200 <= health_status < 300:
         raise RuntimeError(f"health returned HTTP {health_status}")
 
@@ -365,12 +534,17 @@ def run_service(args: argparse.Namespace) -> pathlib.Path:
             session_id = f"{run_id}:{sample['sample_id']}:{session['session_id']}"
             for chunk_index, chunk in enumerate(chunk_messages(session["messages"])):
                 request = {
-                    "request_id": f"{run_id}:{sample['sample_id']}:{session['session_id']}:chunk-{chunk_index}",
+                    "request_id": (
+                        f"{run_id}:{sample['sample_id']}:{session['session_id']}:"
+                        f"chunk-{chunk_index}"
+                    ),
                     "user_id": user_id,
                     "session_id": session_id,
                     "messages": chunk,
                 }
-                status, response, latency = client.request("POST", args.add_path, request)
+                status, response, latency = client.request(
+                    "POST", args.add_path, request, timeout=119
+                )
                 if status != 200:
                     raise RuntimeError(f"Add returned HTTP {status}")
                 validate_add_response(response, request)
@@ -384,7 +558,9 @@ def run_service(args: argparse.Namespace) -> pathlib.Path:
             }
             if item.get("options"):
                 request["options"] = item["options"]
-            status, response, latency = client.request("POST", args.search_path, request)
+            status, response, latency = client.request(
+                "POST", args.search_path, request, timeout=59
+            )
             if status != 200:
                 raise RuntimeError(f"Search returned HTTP {status}")
             data = validate_search_response(response, args.top_k)
@@ -405,18 +581,23 @@ def run_service(args: argparse.Namespace) -> pathlib.Path:
                 }
             )
 
-    output = args.output_dir / "search_results.jsonl"
+    output = output_dir / "search_results.jsonl"
     write_jsonl(output, rows)
     write_json(
-        args.output_dir / "protocol_summary.json",
+        output_dir / "protocol_summary.json",
         {
             "official": False,
             "run_id": run_id,
             "samples": len(sample_paths),
             "questions": len(rows),
             "add_calls": len(add_latencies),
-            "mean_add_latency_seconds": sum(add_latencies) / len(add_latencies) if add_latencies else None,
-            "mean_search_latency_seconds": sum(search_latencies) / len(search_latencies) if search_latencies else None,
+            "rate_limit_retries": client.rate_limit_retries,
+            "mean_add_latency_seconds": sum(add_latencies) / len(add_latencies)
+            if add_latencies
+            else None,
+            "mean_search_latency_seconds": sum(search_latencies) / len(search_latencies)
+            if search_latencies
+            else None,
         },
     )
     return output
@@ -461,9 +642,15 @@ def score_results(input_path: pathlib.Path, output_dir: pathlib.Path) -> dict[st
         "warning": "This is a local proxy score and is not comparable to the organizer score.",
         "input": str(input_path),
         "overall": summarize_group(scored),
-        "by_benchmark": {key: summarize_group(value) for key, value in sorted(grouped["benchmark"].items())},
-        "by_operation_type": {key: summarize_group(value) for key, value in sorted(grouped["operation_type"].items())},
-        "by_eval_axis": {key: summarize_group(value) for key, value in sorted(grouped["eval_axis"].items())},
+        "by_benchmark": {
+            key: summarize_group(value) for key, value in sorted(grouped["benchmark"].items())
+        },
+        "by_operation_type": {
+            key: summarize_group(value) for key, value in sorted(grouped["operation_type"].items())
+        },
+        "by_eval_axis": {
+            key: summarize_group(value) for key, value in sorted(grouped["eval_axis"].items())
+        },
     }
     write_jsonl(output_dir / "proxy_scored.jsonl", scored)
     write_json(output_dir / "proxy_summary.json", summary)
@@ -476,11 +663,14 @@ def self_test() -> None:
         {"id": "m2", "content": "Melanie painted a sunrise in 2022."},
     ]
     answer = proxy_answer("When did Melanie paint a sunrise?", memories)
-    assert "2022" in answer["answer"]
+    if "2022" not in answer["answer"]:
+        raise RuntimeError("proxy self-test answer failed")
     judge = proxy_judge("When?", ["2022"], answer["answer"])
-    assert judge["score"] == 1
+    if judge["score"] != 1:
+        raise RuntimeError("proxy self-test judge failed")
     chunks = chunk_messages([{"content": "x"}] * 21)
-    assert [len(chunk) for chunk in chunks] == [20, 1]
+    if [len(chunk) for chunk in chunks] != [20, 1]:
+        raise RuntimeError("proxy self-test chunking failed")
     print(json.dumps({"self_test": "ok", "proxy_name": PROXY_NAME}))
 
 
@@ -492,19 +682,38 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--health-path", default="/health")
     parser.add_argument("--add-path", default="/add")
     parser.add_argument("--search-path", default="/search")
-    parser.add_argument("--authorization")
-    parser.add_argument("--api-key")
-    parser.add_argument("--timeout", type=float, default=180.0)
+    parser.add_argument(
+        "--auth-mode", choices=("none", "bearer", "token", "x-api-key"), default="none"
+    )
+    parser.add_argument("--credential-env", default="MEMSCOPE_EVAL_API_KEY")
+    parser.add_argument("--timeout", type=float, default=119.0)
+    parser.add_argument("--min-interval-seconds", type=float, default=0.0)
+    parser.add_argument("--max-rate-limit-retries", type=int, default=4)
+    parser.add_argument("--initial-backoff-seconds", type=float, default=1.0)
+    parser.add_argument("--max-backoff-seconds", type=float, default=8.0)
     parser.add_argument("--top-k", type=int, default=100)
     parser.add_argument("--max-samples", type=int)
     parser.add_argument("--run-id")
-    parser.add_argument("--output-dir", type=pathlib.Path, default=ROOT / "reports" / "proxy_eval")
+    parser.add_argument("--output-dir", type=pathlib.Path)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if not args.self_test and not args.input_results and not args.base_url:
-        parser.error("provide --base-url to run a service, or --input-results to score captured Search results")
+        parser.error(
+            "provide --base-url to run a service, or --input-results to score "
+            "captured Search results"
+        )
+    if not args.self_test and args.output_dir is None:
+        parser.error("--output-dir outside the evaluation source tree is required")
     if not 1 <= args.top_k <= 100:
         parser.error("--top-k must be between 1 and 100")
+    if args.timeout <= 0 or args.min_interval_seconds < 0:
+        parser.error("--timeout must be positive and --min-interval-seconds non-negative")
+    if args.max_rate_limit_retries < 0:
+        parser.error("--max-rate-limit-retries must be non-negative")
+    if args.initial_backoff_seconds <= 0 or args.max_backoff_seconds <= 0:
+        parser.error("backoff values must be positive")
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.credential_env) is None:
+        parser.error("--credential-env must be an environment-variable name")
     return args
 
 
@@ -513,10 +722,14 @@ def main() -> int:
     if args.self_test:
         self_test()
         return 0
+    if args.output_dir is None:
+        raise RuntimeError("validated output directory is unexpectedly absent")
+    args.output_dir = prepare_sensitive_output(args.output_dir, args.eval_root)
     input_path = args.input_results
     if args.base_url:
         input_path = run_service(args)
-    assert input_path is not None
+    if input_path is None:
+        raise RuntimeError("validated proxy input is unexpectedly absent")
     summary = score_results(input_path, args.output_dir)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 0

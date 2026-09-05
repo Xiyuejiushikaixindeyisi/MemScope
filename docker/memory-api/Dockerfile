@@ -1,11 +1,10 @@
 ARG PYTHON_IMAGE=python:3.11.16-slim-bookworm@sha256:528257d48c1da0dcecc2e725d1ae34498d60c965f1241e39cd6a85a8859bdf84
 ARG SOURCE_DATE_EPOCH=1787929140
+ARG SOURCE_REVISION=unknown
 
 FROM ${PYTHON_IMAGE} AS builder
 
-ARG PIP_INDEX_URL=https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-center/
-ARG PIP_EXTRA_INDEX_URL="https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-central-repo/simple/ https://cmc.centralrepo.rnd.huawei.com/artifactory/product_pypi/simple/"
-ARG PIP_TRUSTED_HOST=cmc.centralrepo.rnd.huawei.com
+ARG PIP_INDEX_URL=https://pypi.org/simple
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1
@@ -15,16 +14,18 @@ COPY docker/memory-api/requirements.txt ./requirements.txt
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN python -m venv /opt/venv \
-    && /opt/venv/bin/pip config set global.index-url "${PIP_INDEX_URL}" \
-    && /opt/venv/bin/pip config set global.extra-index-url "${PIP_EXTRA_INDEX_URL}" \
-    && /opt/venv/bin/pip config set global.trusted-host "${PIP_TRUSTED_HOST}" \
     && /opt/venv/bin/python -m pip install \
-        --no-cache-dir --no-compile \
+        --index-url "${PIP_INDEX_URL}" --no-cache-dir --no-compile \
         --requirement requirements.txt \
     && /opt/venv/bin/python -m pip install --no-cache-dir --no-compile --no-deps . \
     && find /opt/venv -type d -name __pycache__ -prune -exec rm -rf '{}' +
 
 FROM ${PYTHON_IMAGE} AS runtime
+
+ARG SOURCE_REVISION
+
+LABEL org.opencontainers.image.title="MemScope memory-api" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}"
 
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \

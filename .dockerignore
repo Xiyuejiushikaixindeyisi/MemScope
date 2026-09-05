@@ -6,6 +6,9 @@
 .env
 .env.*
 !.env.example
+compose.env
+deploy/*.env
+!deploy/*.env.example
 __pycache__
 *.py[cod]
 .pytest_cache
@@ -19,6 +22,9 @@ logs
 dist
 build
 *.egg-info
+artifacts
+*.zip
+*.tar
 docs
 official
 tests

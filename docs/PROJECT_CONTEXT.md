@@ -1,165 +1,106 @@
-# MemScope Project Context
+# MemScope project context
 
-> Current through B09 Gate 2 acceptance on 2026-09-04. B00–B09 are `Accepted/Frozen`; B08 uses a
-> named tuning-machine live-evidence transfer exception, and B09 final artifact generation is held.
-> B05/B06 real-model and Docker host-port/cgroup validation is transferred to a capable tuning
-> machine under explicit handoff conditions. The accepted B06 implementation commit is
-> `1507317b048fc06d25f020ded751f35fae2aeb6f`.
+> Current through B10 Gate 1 implementation on 2026-09-05. Gate 2, tuning, final artifacts, merge,
+> tag and release remain pending.
 
-## Objective
+## 1. Version facts
 
-MemScope is an independently deployable long-term memory service for the Agent Memory competition.
-The contestant service accepts conversation history through Add and returns ranked memory evidence
-through Search. The organizer owns final answer generation and judging.
+- Historical B00–B09 baseline: `main@4ed49dd06dbb38b3faa46de3c77e446ffcc07b96`.
+- Current B10 implementation start: `ca470eb475d3d3af15fef6bed5ebc5547d8c4bab`, including three
+  post-B09 deployment commits that were not a separately accepted Batch.
+- Active candidate branch: `batch/b10-baseline-closure`.
+- B00–B09 historical approvals are not rewritten by B10.
+- B08 was accepted under an explicit live-evidence transfer exception. Real exercise,
+  restart-persistence and resource observations were not claimed as passed.
+- No final ZIP, image bundle, tag or release exists at Gate 1.
 
-## Current accepted capabilities
+## 2. Implemented product baseline
 
-- B01 freezes the contest HTTP contract and strict response shapes.
-- B02 freezes the SQLite Raw Store, persistent idempotency, ordered raw messages and stable logical
-  user/Cube identity.
-- B03 freezes a provider-independent `MemoryGateway`, deterministic in-process Fake, independent
-  Mock Model API and `MemoryOperations` composition for no-key tests.
-- B04 freezes a single Compose entry with pinned MemOS `v2.0.32`, Neo4j and Qdrant, internal
-  networking, named volumes, dependency-gated health, resource ceilings, bounded logs and lifecycle
-  recovery checks.
-- B05 Gate 0 R1 freezes the Real Add design. The approved Gate 1 implementation adds the real MemOS
-  Add Gateway, durable receipts, same-user lanes, deadline propagation, guarded fixed-source
-  patches, public runtime composition and deterministic verification fixtures.
+MemScope exposes `GET /health`, `POST /add` and `POST /search` from one `memory-api` worker. Real Add
+and Search use fixed MemOS `v2.0.32`, Neo4j `5.26.6-community` and Qdrant `1.15.3`. Raw/Add identity
+and provider receipts are persisted in separate SQLite WAL files; graph/vector state is in Neo4j and
+Qdrant. One user maps to one deterministic Cube, allowing cross-session recall while enforcing
+cross-user isolation.
 
-The default `core` profile remains unavailable/503. The explicit `memos_add` profile now provides
-the accepted B06 Real Add + Search and complete readiness baseline: single-Cube Product Search,
-strict active/provenance filtering, stable exact deduplication and a 55-second Search deadline.
-Semantic quality and real model capability are transferred verification items, not claims made by
-the development machine.
+Add is synchronous, serialized per user, hard-deadlined at 115 seconds and not automatically retried.
+Search has a 55-second hard deadline, strict active/type/provenance filters and exact dedup. The
+baseline uses `fast + cosine_local`; BM25, full-text, VEC-CoT and external reranking are disabled.
+Public output is memory evidence, not an answer or Judge decision.
 
-The accepted B07 closure adds deterministic cross-layer evidence for completed-receipt Raw recovery,
-lost-response provenance reconciliation, partial-provenance fail-closed behavior and one provider
-attempt per external replay. It changes no production module or runtime contract and is frozen at
-candidate commit `e30fa91`.
+Known semantic limitations remain explicit: Update/Forget is natural-language only and is not fully
+guaranteed with scheduler/reorganizer disabled; graph/vector/SQLite writes are not one distributed
+transaction; exact dedup does not solve semantic contradiction; an empty valid extraction has a
+narrow crash/re-call ambiguity. B10 does not silently redesign these behaviors.
 
-The B08 deterministic candidate adds a standard-library three-phase public verifier plus ASGI system
-tests for concurrency, isolation, restart and typed failures. It changes no runtime implementation.
-It is recorded at candidate commit `44ce4a7` and is Accepted/Frozen under the tuning-machine
-live-evidence transfer exception. This acceptance does not claim a live-system pass; real
-exercise/restart/resource evidence remains due from the tuning machine.
+## 3. Current two-machine workflow
 
-## B04 accepted evidence
+The development machine owns Git, Python dependency installation, source deployment, tests,
+reachable OpenAI-compatible API probes, baseline evaluation, tuning, final image construction and
+final delivery generation. The organizer review machine only verifies artifacts, loads images,
+injects private runtime configuration, starts four services with Compose and runs Smoke/official
+evaluation. It does not build/pull images or install Python/uv/pip.
 
-The clean-room lifecycle verifier passed on Linux/amd64 under WSL2 rootless Docker Engine 29.7.2
-and Compose 5.4.0:
+The organizer facts supplied by the user are:
 
-- MemOS image: `sha256:d073319403213693a8fff8351d20ab55eb3049b6f7c3b9d3a4940afa74f60b41`;
-- cold start: 31.547 seconds; Compose restart recovery: 39.252 seconds;
-- aggregate MemOS/Neo4j/Qdrant readiness and MemOS-created Qdrant collection;
-- no host ports, internal-only network and named-volume persistence;
-- Qdrant stop detection/recovery, MemOS SIGKILL self-recovery and graceful exit code 0;
-- configured CPU/memory/PID ceilings and bounded JSON log rotation.
+- Chat: `http://aigateway.huawei.com/v1`, model `GLM-V5_1-DX`;
+- Embedding: the same base, model `bge-m3`, dimension 1024;
+- HTTP is allowed inside the Huawei organizer network;
+- a rerank endpoint/model exists, but exact wire compatibility has not been independently verified.
 
-User-approved B04 exceptions:
+The baseline therefore keeps `cosine_local` reranking. The current MemOS Chat/Embedding clients use
+OpenAI-compatible Bearer API-key auth. A different IAM header syntax requires an explicit protocol
+decision; example alternatives are never hardcoded as credentials.
 
-- MemOS image is about 985 MB and accepted against the project B04 limit of 1 GB.
-- Two no-cache builds had identical RootFS layers but different final OCI config/history metadata;
-  functional reproducibility is accepted because runtime content and behavior match.
-- Trivy found no embedded secrets, but pinned OS/Python dependencies retain known HIGH/CRITICAL
-  findings. This is a documented B04 security-debt waiver, not a claim of zero vulnerabilities.
-- WSL rootless evidence cannot authoritatively prove host cgroup enforcement or boot/daemon
-  auto-start; the final Linux deployment machine must retest those items.
+## 4. Deployment facts
 
-See `docs/batches/B04/HANDOFF.md` for the authoritative B04 handoff.
+`compose.yaml` is development-only and may build the two project images using exactly one explicit
+HTTPS Python package index. `.dockerignore` excludes private root/deploy env files and artifact
+formats from the build context.
 
-## Organizer and environment boundaries
+`compose.release.yaml` is organizer-only. It defines four containers and five named volumes, has no
+`build:` key and sets `pull_policy: never`. Only memory-api publishes a host port, default 8080.
+MemOS stays internal on port 8000. Default memory ceilings total 8.5 GiB, so 10 GiB host RAM is
+recommended.
 
-- Submission is a source `solution.zip`; the organizer builds it. It includes `INSTRUCTION.md`,
-  `SDD.md`, complete `code/` with dependency declarations, and optional Dockerfile/Compose.
-- No hosted database is provided. Add→Search is guaranteed only within one deployment lifecycle;
-  data may remain in container-local/configurable storage. B04's named-volume restart is an
-  operational quality check, not a competition dependency.
-- Health is unauthenticated and any 2xx indicates readiness. Public port/entry command is not
-  published; MemScope keeps the port configurable and currently defaults to 8000.
-- Add has a 1–120 second total budget and Search a 1–60 second total budget.
-- Formal `top_k=100`; no separate K bonus formula exists. Accuracy and response time take priority.
-- The Huawei AI Gateway base URLs and Bearer authentication are known. Chat, Embeddings, Responses
-  and rerank paths are advertised as compatible, but exact model capabilities must be probed.
-- Current expected models include `GLM-V5.2-DX`, `Qwen-V3.6-27B-bf16`, `bge-m3` and
-  `bge-reranker-v2-m3`; exact subscribed IDs and the actual Embedding dimension/limits remain
-  runtime facts, not assumptions.
-- Model-dependent tools/JSON/pass-through/reasoning fields require per-model probes.
-- Batch execution must handle concurrency and requests-per-minute 429 responses with throttling and
-  bounded exponential backoff.
-- Permission, package size and license limits for bundled open-source model weights remain pending.
-- The checked formal Markdown does not specify a `solution.zip` size limit; the reported 5 GB limit
-  remains unverified and must not be treated as a hard rule.
+The final image TAR is one offline transport bundle containing four images, not a single runtime
+container. `run_release.sh` validates SHA-256, private env permissions, image IDs and custom OCI
+revision labels before using `--no-build --pull never`. `verify_release.sh` checks four health
+states, Neo4j, Qdrant and real Add/Search from Python already inside the memory-api image.
 
-## Two-machine workflow
+## 5. Delivery identity and security
 
-The development machine owns Git, design, deterministic tests, B05/B06 Gate 0–2, initial SDD and
-the B09 tuning handoff. It cannot reach Huawei AI Gateway and must not claim real API or quality
-evidence.
-
-The tuning machine owns Huawei gateway capability probes, baseline/full evaluation, controlled
-tuning and the final submission ZIP. Docker revalidation and resource measurements are useful
-delivery evidence but must not consume time needed for accuracy tuning; the native deployment guide
-is the supported fallback when Docker is unavailable or unproductive.
-
-Every transfer is identified by Git commit and SHA-256. The tuning machine returns the final ZIP,
-source/config diff, sanitized model configuration, reports and Docker evidence for audit. Full rules
-and templates are under `docs/collaboration/`.
-
-### Active 48-hour execution memory
-
-The user declared roughly 48 hours remaining before code submission. Until submission, all agents
-must read `docs/collaboration/48H_DELIVERY_GUARDRAILS.md` and use this development path:
+After tuning and separate user approval, `build_candidate_delivery.py` creates outside the repository:
 
 ```text
-Python unit/contract tests
-  -> native memory-api or source bind mount
-  -> reuse running Neo4j/Qdrant/MemOS
-  -> freeze code
-  -> one final image build
+solution-<12-char-commit>.zip
+memscope-images-<12-char-commit>-linux-amd64.tar
+delivery-manifest.json
+SHA256SUMS
 ```
 
-Docker gets a 10-minute capability preflight and a 30-minute per-stage stop limit. Model, prompt,
-URL, key and threshold experiments do not rebuild images. Docker failure cannot stop a native
-baseline or tuning run. The Add tuning authority is
-`docs/batches/B05/ADD_DESIGN_AND_TUNING.md`.
+Final generation requires clean Git HEAD equal to the literal candidate commit. The manifest binds
+artifact hashes, Linux/amd64, four image IDs and custom revision labels. The ZIP uses an explicit
+allowlist, normalized metadata, path/link checks and member hashes. The fixed MemOS archive is
+expanded and secret-scanned; upstream fixture matches are accepted only through a hash- and
+path/classification-bound review.
 
-## Delivery stages
+No public license has been selected for original MemScope source. `LICENSE_STATUS.md` records this
+without inventing a grant. MemOS remains Apache-2.0 and its license/provenance are included.
 
-1. B00～B06 are accepted/frozen and provide the Real Add + Search candidate.
-2. B07 proves the frozen recovery boundary with composed deterministic tests and adds no production
-   reliability mechanism.
-3. After separate approval, B08 owns end-to-end, concurrency, restart, resource and segmented
-   performance verification without redesigning the architecture.
-4. After B08 acceptance, B09 freezes documentation, locks, licenses, clean-build/two-machine
-   evidence and the reproducible delivery candidate.
-5. The Huawei-network tuning machine performs real capability probes, baseline/full evaluation and
-   controlled tuning; only returned, checksummed evidence becomes a repository fact.
-6. Only a candidate with an identified source/configuration and returned audit evidence is treated
-   as the reproducible final submission candidate.
+Raw conversation data remains plaintext inside candidate volumes; the organizer must treat volumes
+as sensitive and retain/delete them under its evaluation policy. Logs and reports must not contain
+credentials, request bodies, memory contents, vectors, gold answers or complete provider responses.
 
-## Long-lived engineering constraints
+## 6. Gate state and next authority
 
-- Keep component responsibilities and dependency direction explicit.
-- Use small, stable interfaces at real change boundaries; do not prebuild unused abstractions.
-- Keep configuration typed, centralized, validated and safely summarized.
-- Treat isolation, idempotency, recovery, observability and failure semantics as first-class work.
-- Maintain deterministic no-key tests and separate Mock wiring evidence from semantic quality.
-- Optimize accuracy, robustness, latency, resources, explainability and reproducibility together.
-- Never hardcode reconstructed questions, gold answers, question IDs or proxy-Judge behavior.
-- Never store keys/tokens in source, Markdown, images, transfer ZIPs, reports or logs.
+B10 Gate 1 was approved and implementation is in progress. Gate 2 must review the diff, deterministic
+tests, Compose semantics, source preview reproducibility and residual risks before freezing the
+development/tuning start. Gate 2 does not authorize final artifact generation.
 
-## Next authorized state
+After Gate 2, the development machine obtains its reachable API configuration, deploys, runs a real
+baseline, performs controlled tuning and freezes a candidate. A separate user approval is required
+before the final ZIP/image set is built. Returned organizer evidence must identify the same commit,
+hashes and image IDs. Only another explicit user approval permits merge to `main`, tag or release.
 
-B05–B08 are frozen under their respective `HANDOFF.md` files. B07 Gate 2 was explicitly accepted on
-2026-09-04 at candidate commit `e30fa91`. B08 Gate 1 is approved and its deterministic public
-verifier/system-test candidate is complete without production changes. The user explicitly
-accepted/froze B08 Gate 2 on 2026-09-04 under the named tuning-machine live-evidence transfer
-exception. The missing `exercise`, restart-persistence and resource evidence remains a transferred
-obligation, not a passed claim. The user also entered B09 Gate 1; B09 implementation requires
-no product behavior change. The user then explicitly approved its plan for organizer instructions,
-lock/license audit, deterministic delivery packaging and two-machine identity closure; Gate 2
-remains a separate explicit decision. The implementation candidate is `fe246c0`; deterministic
-archive and quality evidence is recorded in `docs/batches/B09/HANDOFF.md`. The user entered Gate 2
-review and then explicitly accepted/froze B09. The same approval prohibited final handoff ZIP and
-out-of-band SHA-256 generation pending additional development/version consolidation. No final
-artifact or tag exists; further work requires a separate approved scope.
+See `docs/batches/B10/PLAN.md`, `docs/collaboration/TWO_MACHINE_WORKFLOW.md`,
+`ORGANIZER_QUICKSTART.md` and `ORGANIZER_AGENT_PROMPT.md` for the active procedure.

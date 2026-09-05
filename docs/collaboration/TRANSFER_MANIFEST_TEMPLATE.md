@@ -1,86 +1,77 @@
-# 调测交接与回传清单模板
+# B10 候选出站与主办方评测回传模板
 
-> 复制本模板到交接包或调测报告目录后填写；不得填写真实密钥。
+> 不得填写或附带 Key、IAM token、密码、Authorization header、请求正文、向量或 provider 完整响应。
 
-## A. 开发机出站清单
+## A. 开发机最终候选出站
 
 | 字段 | 值 |
 |---|---|
-| 交接日期/负责人 | `<required>` |
-| Git repository | `<required>` |
-| branch / commit | `<required>` |
-| `git status --short` | 必须为空，或逐项解释 |
+| 日期/负责人 | `<required>` |
+| 分支 / 40 字符 commit | `<required>` |
+| `git status --short` | 必须为空 |
+| 目标平台 | `linux/amd64` |
 | MemOS tag / commit | `v2.0.32` / `185ebdb925911b55c13b7efe666b74e2e292e484` |
-| ZIP 文件名 | `<required>` |
-| ZIP 字节数 | `<required>` |
-| ZIP SHA-256 | `<required>` |
-| 目标 OS / architecture | `<required or pending>` |
-| Docker / Compose 最低要求 | `<required>` |
-| 已验证测试 | `<commands + results>` |
-| 未验证项 | `<required>` |
+| solution ZIP / SHA-256 / bytes | `<required>` |
+| four-image TAR / SHA-256 / bytes | `<required>` |
+| manifest / SHA-256 | `<required>` |
+| 四张 image reference / ID | `<required>` |
+| 两张项目镜像 revision label | 必须等于候选 commit |
+| 开发机 API 配置指纹 | `<non-secret required>` |
+| baseline / tuning 结果 | `<required>` |
+| 已执行回归与容器验证 | `<commands + result>` |
+| 未验证项/风险 | `<required>` |
 
-### 必备内容
+### 出站硬门
 
-- [ ] `INSTRUCTION.md`
-- [ ] `SDD.md`
-- [ ] 完整源码和依赖锁
-- [ ] Docker/Compose 启动入口
-- [ ] `.env.example` 或等价的无密钥配置说明
-- [ ] `THIRD_PARTY_NOTICES.md` 与许可证
-- [ ] Smoke/能力探测脚本
-- [ ] 调优指南和真实环境补测项
-- [ ] 风险、回退方式和已知豁免
+- [ ] 用户已单独批准最终 artifact 生成；
+- [ ] `build_candidate_delivery.py verify` 通过；
+- [ ] `SHA256SUMS` 恰好覆盖 ZIP、image TAR 和 manifest；
+- [ ] ZIP 内 `RELEASE_LOCK.tsv` 与 manifest 四张镜像完全一致；
+- [ ] release Compose 恰好四服务、无 `build:`、全部 `pull_policy: never`；
+- [ ] 无 `.git`、cache、runtime data、私有 env 或凭据；
+- [ ] MemOS 固定源码 archive hash/展开秘密扫描通过；
+- [ ] 主办方 quickstart 和 agent prompt 与实际文件名/命令一致；
+- [ ] 没有把开发机分数写成主办方官方分数。
 
-### 洁净性
-
-- [ ] 无 `.git`、缓存、测试输出、运行数据库和日志
-- [ ] 无 API Key、IAM token、证书或内部敏感 URL 参数
-- [ ] 无未经许可的模型权重或参考代码
-- [ ] 新目录构建、启动、Health、Add/Search Smoke 均有结果
-
-## B. 调测机入站记录
+## B. 主办方入站、启动和自检
 
 | 字段 | 值 |
 |---|---|
-| 收包日期/负责人 | `<required>` |
-| 实收 ZIP SHA-256 | `<required>` |
-| 是否匹配出站记录 | `yes/no` |
+| 接收日期/负责人 | `<required>` |
+| 四件套 hash 是否全部匹配 | `yes/no` |
 | Host OS / architecture | `<required>` |
-| Docker / Compose | `<required>` |
-| CPU / memory / disk / GPU | `<required>` |
-| 可达镜像源/包源 | `<required>` |
-| 构建结果与耗时 | `<required>` |
-| 冷启动与 Health 耗时 | `<required>` |
+| Docker Engine / Compose | `<required>` |
+| CPU / memory / free disk | `<required>` |
+| 四张 load 后 image ID 是否匹配 | `yes/no` |
+| 项目镜像 revision 是否匹配 commit | `yes/no` |
+| Compose project / public URL | `<required>` |
+| 四服务 running/healthy | `<required>` |
+| Neo4j / Qdrant readiness | `<required>` |
+| Add/Search Smoke 与耗时 | `<sanitized required>` |
+| 跨用户 evidence | 必须为 0 |
 
-## C. 调测机回传清单
+## C. 主办方正式评测回传
 
 | 字段 | 值 |
 |---|---|
-| 基准 ZIP SHA-256 | `<required>` |
-| 最终 ZIP 文件名 | `<required>` |
-| 最终 ZIP 字节数 | `<required>` |
-| 最终 ZIP SHA-256 | `<required>` |
-| 最终配置标识 | `<required>` |
-| 基线结果 | `<required>` |
-| 最终结果 | `<required>` |
-| Docker 验收 | `<summary + evidence path>` |
-| 未关闭风险 | `<required>` |
+| 候选 commit / ZIP hash / image TAR hash | `<required>` |
+| 评测器名称与版本 | `<required>` |
+| 数据集/切片/随机种子 | `<required>` |
+| 主办方非秘密模型配置 | `<required>` |
+| 成功/失败/429/timeout 数 | `<required>` |
+| Add、Search P50/P95/P99/max | `<required>` |
+| 主办方定义的正式得分 | `<required or not produced>` |
+| 峰值 CPU / memory / disk | `<required>` |
+| 重启持久化 | `<pass/fail/not run>` |
+| 脱敏错误分类 | `<required>` |
+| 卷是否保留 | `<required>` |
 
-### 必须回传
-
-- [ ] 最终 ZIP
-- [ ] 最终源码树或相对基准 ZIP 的统一 diff/patch
-- [ ] 脱敏配置快照
-- [ ] `TUNING_REPORT.md`
-- [ ] 模型/API 能力探测报告
-- [ ] Docker/资源/Smoke 证据
-- [ ] 失败和豁免清单
+失败时不要求主办方修改或打包源码；保留容器/卷并回传最小脱敏证据即可。
 
 ## D. 开发机回收审计
 
-- [ ] 校验基准和最终 ZIP SHA-256
-- [ ] 审查源码、依赖、配置和许可证差异
-- [ ] 检查无密钥、无 gold/题号硬编码
-- [ ] 将可复现变更回写分支并运行本机 Gate
-- [ ] 在 Markdown 中记录最终候选与 Git commit 的对应关系
-- [ ] 若无法复现，明确记录“外部生成候选”及原因
+- [ ] 报告身份与出站 commit、ZIP、TAR、manifest、image ID 一致；
+- [ ] 开发机可复现配置/结果差异或明确标为环境差异；
+- [ ] 无 gold 泄漏、凭据、正文、向量或完整 provider response；
+- [ ] 失败若需代码修改，派生新候选并重新走回归/构建/评测；
+- [ ] 用户明确批准后才合入 main、tag、发布或提交最终候选。

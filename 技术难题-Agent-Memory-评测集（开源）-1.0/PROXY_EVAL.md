@@ -12,28 +12,48 @@
 
 Search 请求不包含 gold。gold 只在 Search 返回后交给本地 Proxy Judge。
 
+结果包含问题、gold 和返回 evidence，应作为敏感评测数据保存。`--output-dir` 必填，必须位于源码树
+之外；工具创建 0700 目录和 0600 文件。凭据只从指定环境变量读取，不接受命令行明文。客户端可做
+最小请求间隔控制，并仅对 429 做有界指数退避；这不改变服务内部“不自动重放 Add”的语义。
+
 ## 运行服务并评分
 
 ```bash
 python scripts/local_proxy_eval.py \
   --base-url http://127.0.0.1:8080 \
-  --output-dir reports/proxy_eval
+  --output-dir /secure/memscope-eval/proxy-baseline
 ```
+
+若被测服务启用了 Bearer shared key：
+
+```bash
+export MEMSCOPE_EVAL_API_KEY='<set through a secure shell mechanism>'
+python scripts/local_proxy_eval.py \
+  --base-url http://127.0.0.1:8080 \
+  --auth-mode bearer \
+  --credential-env MEMSCOPE_EVAL_API_KEY \
+  --min-interval-seconds 0.2 \
+  --max-rate-limit-retries 4 \
+  --output-dir /secure/memscope-eval/proxy-baseline
+```
+
+不要把真实值直接写在示例命令或 shell history 中；上面的值只是占位说明。
 
 只跑少量样本：
 
 ```bash
 python scripts/local_proxy_eval.py \
   --base-url http://127.0.0.1:8080 \
-  --max-samples 2
+  --max-samples 2 \
+  --output-dir /secure/memscope-eval/proxy-smoke
 ```
 
 对已经保存的 Search 结果重新评分：
 
 ```bash
 python scripts/local_proxy_eval.py \
-  --input-results reports/proxy_eval/search_results.jsonl \
-  --output-dir reports/proxy_eval_rescored
+  --input-results /secure/memscope-eval/proxy-baseline/search_results.jsonl \
+  --output-dir /secure/memscope-eval/proxy-rescored
 ```
 
 自测：

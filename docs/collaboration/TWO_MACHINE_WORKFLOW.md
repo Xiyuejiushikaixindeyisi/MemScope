@@ -1,179 +1,94 @@
-# 开发机与调测调优机协作规范
+# 开发机与主办方评审机协作规范
 
-> 状态：2026-09-03 用户评审通过
->
-> 适用范围：B05 起的核心开发、B09 交接、华为内网真实调测和最终提交候选
->
-> 距提交约 48 小时时，[48 小时交付止损规则](48H_DELIVERY_GUARDRAILS.md)优先于本文的一般性
-> Docker 证据要求。
+> B10 当前规则，2026-09-05 经用户在 Gate 1 批准。它取代此前“调测机安装依赖、构建镜像或生成
+> 最终 ZIP”的活动流程；旧 Batch 文档中的描述只保留为历史事实。
 
-## 1. 基本原则
-
-项目使用两台网络能力不同的机器，但只维护一条可审计的产品演进链：
+## 1. 当前单一演进链
 
 ```text
-开发机 Git commit
-  → 带版本与校验值的调测交接 ZIP
-  → 调测机真实部署、API 探测、基线和调优
-  → 最终提交 ZIP + 报告 + 配置/代码差异 + 校验值
-  → 人工回传开发机归档
+开发机候选分支/commit
+  -> 开发机部署服务并接入可达的 OpenAI-compatible API
+  -> baseline、单变量调优、回归和候选冻结
+  -> 开发机构建 solution ZIP + 四镜像离线 bundle + manifest + SHA256SUMS
+  -> 用户受控传递并注入主办方私有配置
+  -> 主办方评审机校验、docker load、Compose 启动、自检和正式评测
+  -> 脱敏结果回传开发机审计
+  -> 用户批准后才合入 main
 ```
 
-- Markdown 和 Git 是长期事实来源，聊天记忆只用于当轮协作。
-- 开发机不能访问华为内网，不得把 Mock 结果描述为真实模型或语义质量结果。
-- 调测机不能访问 GitHub，因此交接包必须自解释、非交互、可校验，不能把 GitHub 下载作为构建或
-  运行步骤。
-- 两台机器都不得在源码、Markdown、镜像层、ZIP、日志或命令历史样例中保存真实 Key/IAM token。
-- 调测机可以生成最终提交 ZIP，但必须把最终源码差异和证据回传，否则 GitHub 版本不能声称代表
-  最终参赛版本。
-
-开发和调测统一采用以下循环，禁止把镜像构建放入每次代码/参数迭代：
-
-```text
-Python 单元/契约测试
-        ↓
-memory-api 原生运行或源码 bind mount
-        ↓
-复用已经运行的 Neo4j/Qdrant/MemOS
-        ↓
-代码冻结
-        ↓
-一次最终镜像构建
-```
-
-开发用 bind mount 不能进入最终候选；最终镜像必须复制冻结源码。只有镜像依赖或 MemOS patchset
-改变时才定向重建相应服务，普通代码、prompt 和配置实验不执行完整 Compose build。
+开发机和主办方 API 可以不同，但都必须满足候选实际使用的 OpenAI-compatible Chat/Embedding
+协议。一个镜像 TAR 内含四张镜像只是传输形式；运行时仍是 `memory-api`、MemOS、Neo4j、Qdrant
+四个容器。
 
 ## 2. 开发机职责
 
-开发机是设计、源码和审计主线，负责：
+- 维护 Git、候选分支、设计、代码、锁、测试、文档和回退点；
+- 安装 Python 依赖，构建/运行开发服务，使用开发机可达 API 做能力探测和真实评测；
+- baseline 先于调优；单变量实验记录数据切片、配置指纹、得分、延迟、失败率和结论；
+- 在最终源码和非秘密运行配置确定后构建两张项目镜像，并把固定 Neo4j/Qdrant 镜像一起保存；
+- 生成并验证最终四件套，确保主办方无需 build、pull、Python、uv 或 pip；
+- 根据主办方脱敏报告定位问题。任何源码修复都回到开发机新候选，不能要求主办方现场 patch。
 
-1. 搭建可直接交给真实环境调测的 baseline/scaffold；
-2. 维护 Git 分支、固定依赖、测试、ADR、Batch 文档和交接文档；
-3. 在 B05、B06 分别执行 Gate 0、Gate 1、Gate 2，不自动跨 Batch；
-4. 使用 Mock/Fake/固定 fixture 验证契约、状态、不变量、失败路径和可复现性；
-5. B06 完成后生成与实际代码一致的初版 `SDD.md`；
-6. B09 后与用户讨论调优假设、算法创新和业界方案，形成调优指南；
-7. 生成供调测机使用的交接 ZIP。该 ZIP 可以包含许可证允许且已审计的参考代码，但不是正式提交物；
-8. 接收调测机回传材料并记录最终候选与 GitHub 版本之间的差异。
+模型 URL、Key、model ID、prompt 和阈值是运行/调优配置；普通变化不重建镜像。只有源码、依赖、
+Dockerfile 或固定 MemOS patchset 变化才重建受影响镜像。
 
-开发机不得声称已验证华为网关的 model ID、上下文、Embedding 维度、限流、JSON/tools 或真实效果，
-除非证据由调测机实测并回传。
+## 3. 主办方评审机职责
 
-## 3. B05/B06 的三道门禁
+- 提供 Linux x86_64、Docker Engine/Compose v2、磁盘/内存和可达的主办方模型 API；
+- 校验 `SHA256SUMS`，加载四镜像 bundle，使用源码目录外的 0600 私有 env 注入凭据；
+- 运行 `run_release.sh` 和 `verify_release.sh`，确认四服务 Health、真实 Add/Search 和隔离；
+- 把服务 URL 交给主办方官方评测器，按官方数据、并发和评分规则执行评测；
+- 回传 commit、hash、image ID、环境、脱敏耗时/错误/分数以及卷保留状态。
 
-### Gate 0：核心算法设计评审
+主办方评审机不安装项目 Python 依赖，不构建或拉取镜像，不修改源码，不生成另一个候选，也不承担
+核心调优。失败时保留容器和卷，不运行 `down -v` 或 prune。
 
-Gate 0 先回答“为什么这样做”，不得直接写核心业务代码。至少向用户提交：
+## 4. 用户职责
 
-- 评测问题分解、记忆不变量与失败模式；
-- 备选算法、取舍和拒绝理由；
-- 模块边界、替换点及未来创新空间；
-- 可能调优的 LLM、Embedding、reranker、prompt、chunk、召回、融合、截断和超时变量；
-- 离线可验证项与只能在华为内网验证项；
-- 质量、延迟、调用量、资源和失败率的评价方法；
-- 安全回退与防止针对公开 gold 过拟合的约束。
+- 通过安全渠道提供两台机器各自的凭据，并决定 IAM/Bearer 的准确鉴权方式；
+- 在两台机器之间物理或受控传递 ZIP、镜像 TAR、manifest、校验文件和报告；
+- 审批 Batch/Gate、整改范围、最终候选、最终 artifact 生成、合入 main 和对外发布；
+- 决定原始 MemScope 源码的许可证或其它合法分发依据。
 
-只有用户明确批准 Gate 0，才准备 Gate 1。
+凭据不进入 Git、ZIP、镜像层、命令行参数、报告或聊天。内部 HTTP 只在用户确认的可信网络配置中
+通过 `MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true` 显式启用。
 
-### Gate 1：实现方案评审
+## 5. 候选与合入规则
 
-Gate 1 冻结本 Batch 的文件范围、接口、数据模型、配置、状态转换、错误/超时/重试语义、测试矩阵、
-依赖和 Definition of Done。用户明确批准后才实施；实质偏离须重新评审。
+优化代码必须先在独立候选分支中完成。开发机回归和真实 baseline/tuning 通过、最终镜像绑定准确
+commit、主办方自检/正式评测返回可复核证据、用户明确批准后，才允许合入 `main`。不能因为镜像能
+启动就自动宣称源码正确、B08 live 证据闭合或获得官方分数。
 
-### Gate 2：开发机代码验收
+每次传递至少由以下身份共同定义：
 
-Gate 2 交付实现映射、完整测试、覆盖率、性能、故障证据、已知限制、Git commit 和
-`HANDOFF.md`。它只证明开发机范围内的正确性，不代替真实网关和真实评测集调测。
+- 40 字符 Git commit；
+- solution ZIP 和 image bundle SHA-256；
+- `delivery-manifest.json`；
+- 四张镜像 reference/image ID；
+- 两张项目镜像的 `org.opencontainers.image.revision`；
+- 脱敏运行时配置指纹和评测器/数据切片身份。
 
-真实环境调测是 Gate 2 之后的独立“调测验收”，不会反向把 B05/B06 未验证的假设写成既定事实。
+## 6. API 和评测纪律
 
-## 4. 调测调优机职责
+主办方当前非秘密事实为 Chat `GLM-V5_1-DX`、Embedding `bge-m3` dimension 1024、HTTP base
+`http://aigateway.huawei.com/v1`。标准 Embedding 一般使用 `input` 字段；用户早期示例中的
+`messages` 形式不作为候选的硬编码协议。外部 reranker 仅是已知可用端点，当前候选继续使用
+`cosine_local`，直到开发机单独验证适配器。
 
-调测机负责华为内网和接近主办方环境的真实证据：
+批处理 429 退避属于评测客户端；服务内部保持不自动重放 Add。Add ≥120 秒、Search ≥60 秒、跨用户
+evidence、错误成功、数据损坏、凭据暴露、image ID/commit 不一致都直接拒绝候选。
 
-1. 先限时预检环境；选择 Docker 或非 Docker 指南部署。Docker 可用时验证一键拉起、冷启动、
-   Health、体积、安全记录和依赖可获得性，不可用时不得阻塞真实 baseline；
-2. 探测 Chat、Embedding 和 rerank API 的精确 model ID、响应结构、维度、上下文/输出上限、
-   tools/JSON/reasoning 能力、timeout、429 维度和错误格式；
-3. 记录 CPU、内存、磁盘、进程、日志、延迟、调用量、错误率和重启恢复；
-4. 按 Smoke → 单样本 → 数十题 → 1000 题逐级运行，先冻结基线再做单变量调优；
-5. 结合用户经验和开发机调优指南完成参数或算法调优，保留每次实验的正负翻转和回退点；
-6. 生成可以直接提交的 `solution.zip`，并同时生成第 6 节规定的回传材料。
+## 7. 主办方入口
 
-调测机不能因为无法访问 GitHub而跳过许可证、源码版本和差异记录，也不能只回传一个无法解释的
-二进制 ZIP。
+最终包必须包含：
 
-## 5. 开发机向调测机交接
+- `INSTRUCTION.md`；
+- `ORGANIZER_QUICKSTART.md`；
+- `ORGANIZER_AGENT_PROMPT.md`；
+- `compose.release.yaml`；
+- `deploy/organizer.env.example`；
+- `scripts/run_release.sh`、`verify_release.sh`、`stop_release.sh`；
+- `RELEASE_LOCK.tsv`、源码 manifest、第三方通知和许可证。
 
-交接包必须包含或随包提供：
-
-- 源码基准 commit、分支、Dirty 状态和 MemOS 固定 commit；
-- ZIP 文件名、大小和 SHA-256；
-- `INSTRUCTION.md`、初版/当前 `SDD.md`、调优指南和已知风险；
-- 构建、启动、Health、Smoke、停止和清理命令；
-- 所有配置项、必填条件、安全默认值及脱敏示例；
-- Docker/基础镜像/依赖锁、第三方许可证和离线依赖说明；
-- 本机已经执行的测试及未执行项；
-- 真实环境必须补测的清单和结果记录模板。
-
-具体字段使用 `TRANSFER_MANIFEST_TEMPLATE.md`。正常环境下交接前从新目录完成一次构建/Smoke；
-若 Docker 时间盒到期，则完成配置校验与原生 Smoke，并把容器限制明确转交。交接 ZIP 不得携带
-`.git`、缓存、运行数据、密钥或未授权模型权重。
-
-## 6. 调测机向开发机回传
-
-调测结束后人工回传以下材料：
-
-- 最终提交 ZIP 及其 SHA-256；
-- 基准交接 ZIP 的 SHA-256；
-- 最终源码树或相对基准的统一 diff/patch；
-- 完整的非密钥配置快照；
-- `TUNING_REPORT.md`，含基线、每次实验、最终选择和回退理由；
-- Docker 构建、冷启动、Health、资源、重启和 Smoke 证据；
-- 模型 ID、Embedding 维度、网关能力和限流探测结果；
-- 失败日志的脱敏摘要及仍未关闭的风险。
-
-开发机收到后校验两个 ZIP 的 SHA-256，审查差异，并把报告和最终候选身份写入 Git。若无法回传
-源码差异，最终 ZIP 可以提交，但必须明确标注为“外部生成、GitHub 不可复现”的审计例外。
-
-## 7. 真实调优纪律
-
-- 调测机必须先执行 [48 小时交付止损规则](48H_DELIVERY_GUARDRAILS.md)：Docker 预检 10 分钟、
-  单阶段总预算 30 分钟，超时切换原生路径；模型/prompt/配置实验不得重复构建镜像。
-- 每轮实验从已记录的 baseline/candidate 派生，一次只改变一个主变量；必须记录随机种子和数据切片。
-- 调优优先级：契约/失败 → 超时和限流 → 数据隔离 → 召回覆盖 → rerank/截断 → 抽取质量 → 成本。
-- `top_k=100` 是正式请求参数，不存在独立 K 加分；应调优返回内容和顺序，而不是臆测 K 公式。
-- 不把公开 gold、题号或 Judge 行为硬编码进系统。
-- 模型切换、Embedding 维度变化、Schema/公共接口变化或新增服务必须回到相应设计评审。
-- 所有实验必须可回退；最终候选不得只存在于正在运行的容器或未导出的 volume 中。
-
-## 8. 新 Session 的人机协作要求
-
-每个新开发 Session 必须先检查分支、HEAD、工作区和上游依赖，读取 `docs/README.md`、
-`PROJECT_CONTEXT.md`、本规范及当前 Batch P0 文档。B05、B06 必须各自从 Gate 0 开始。
-
-AI 在实施时必须：
-
-- 先陈述事实、假设和待审批点，不用聊天记忆代替文件证据；
-- 未获门禁批准前不编写核心业务代码；
-- 不扩大用户授权的 Batch，不自动进入下一阶段；
-- 保存测试命令、结果、偏差、风险和 commit；
-- 遇到正式文档与用户整理稿冲突时标注来源并请求裁决；
-- 禁止提交或输出明文凭据。
-
-### 8.1 B06 固定协作顺序
-
-B06 按以下顺序推进，不合并阶段：
-
-1. 先执行 Pre-Gate Context Review，只读核验全局状态和准入条件；
-2. 用户确认前置理解通过后进入 Gate 0；
-3. 用户逐个提出设计点和参考，逐一核验、讨论、确认，再沉淀为调测机优先设计文档；
-4. 设计点结束后单独评审 Gate 0 的安全 baseline 优化；
-5. 只做一次最小修订并冻结 Gate 0 R1；
-6. 用户明确要求后进入 Gate 1；
-7. Gate 1 明确审批后才开发；
-8. 完成证据后进入 Gate 2，由用户验收。
-
-新 Session 的可复制首轮指令见
-[`docs/batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md`](../batches/B06/PRE_GATE_CONTEXT_REVIEW_PROMPT.md)。
+这些入口必须与最终文件名一致，并在没有 host Python/uv/pip、没有 registry pull、没有源码 build 的
+清洁评审机流程中验证。

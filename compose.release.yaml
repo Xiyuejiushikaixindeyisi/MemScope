@@ -1,4 +1,7 @@
-name: memscope-development
+name: memscope-release
+
+# Organizer runtime only. This file intentionally contains no `build:` keys.
+# Every image must be loaded from the delivered four-image bundle before startup.
 
 x-logging: &default-logging
   driver: json-file
@@ -8,18 +11,13 @@ x-logging: &default-logging
 
 services:
   memory-api:
-    image: memscope/memory-api:b10-development
-    build:
-      context: .
-      dockerfile: docker/memory-api/Dockerfile
-      args:
-        PIP_INDEX_URL: "${MEMSCOPE_PIP_INDEX_URL:-https://pypi.org/simple}"
-        SOURCE_REVISION: "${MEMSCOPE_SOURCE_REVISION:-development}"
+    image: memscope/memory-api:b10-release
+    pull_policy: never
     init: true
     restart: unless-stopped
     stop_grace_period: 30s
-    mem_limit: "${B05_MEMORY_API_MEMORY_LIMIT:-512m}"
-    cpus: "${B05_MEMORY_API_CPU_LIMIT:-1.0}"
+    mem_limit: "${MEMORY_API_MEMORY_LIMIT:-512m}"
+    cpus: "${MEMORY_API_CPU_LIMIT:-1.0}"
     pids_limit: 256
     logging: *default-logging
     depends_on:
@@ -70,15 +68,16 @@ services:
       - backend
 
   neo4j:
-    image: neo4j:5.26.6-community@sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893
+    image: neo4j:5.26.6-community
+    pull_policy: never
     restart: unless-stopped
     stop_grace_period: 30s
-    mem_limit: "${B04_NEO4J_MEMORY_LIMIT:-2g}"
-    cpus: "${B04_NEO4J_CPU_LIMIT:-2.0}"
+    mem_limit: "${NEO4J_MEMORY_LIMIT:-2g}"
+    cpus: "${NEO4J_CPU_LIMIT:-2.0}"
     pids_limit: 512
     logging: *default-logging
     environment:
-      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in the private env file}"
       NEO4J_dbms_usage__report_enabled: "false"
     healthcheck:
       test:
@@ -97,12 +96,13 @@ services:
       - backend
 
   qdrant:
-    image: qdrant/qdrant:v1.15.3@sha256:31407c0e8e32eb771b71718f1a4772e2ad47a07557917b21ac96792f40eb8007
+    image: qdrant/qdrant:v1.15.3
+    pull_policy: never
     init: true
     restart: unless-stopped
     stop_grace_period: 30s
-    mem_limit: "${B04_QDRANT_MEMORY_LIMIT:-2g}"
-    cpus: "${B04_QDRANT_CPU_LIMIT:-2.0}"
+    mem_limit: "${QDRANT_MEMORY_LIMIT:-2g}"
+    cpus: "${QDRANT_CPU_LIMIT:-2.0}"
     pids_limit: 512
     logging: *default-logging
     environment:
@@ -123,17 +123,12 @@ services:
       - backend
 
   memos:
-    image: memscope/memos:2.0.32-b10-development
-    build:
-      context: .
-      dockerfile: docker/memos/Dockerfile
-      args:
-        PIP_INDEX_URL: "${MEMSCOPE_PIP_INDEX_URL:-https://pypi.org/simple}"
-        SOURCE_REVISION: "${MEMSCOPE_SOURCE_REVISION:-development}"
+    image: memscope/memos:2.0.32-b10-release
+    pull_policy: never
     restart: unless-stopped
     stop_grace_period: 30s
-    mem_limit: "${B04_MEMOS_MEMORY_LIMIT:-4g}"
-    cpus: "${B04_MEMOS_CPU_LIMIT:-4.0}"
+    mem_limit: "${MEMOS_MEMORY_LIMIT:-4g}"
+    cpus: "${MEMOS_CPU_LIMIT:-4.0}"
     pids_limit: 512
     logging: *default-logging
     depends_on:
@@ -144,14 +139,14 @@ services:
         condition: service_healthy
         restart: true
     environment:
-      MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?set MEMSCOPE_MODEL_PROFILE to gateway or mock}"
+      MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?set MEMSCOPE_MODEL_PROFILE to gateway}"
       MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP: "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP:-false}"
       FILE_LOCAL_PATH: /var/lib/memos/files
       MEMOS_BASE_PATH: /var/lib/memos
       GRAPH_DB_BACKEND: neo4j-community
       NEO4J_URI: bolt://neo4j:7687
       NEO4J_USER: neo4j
-      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?set NEO4J_PASSWORD in the private env file}"
       NEO4J_DB_NAME: neo4j
       QDRANT_HOST: qdrant
       QDRANT_PORT: "6333"
@@ -202,9 +197,9 @@ services:
         - python
         - -c
         - >-
-          import json, urllib.request;
-          r=urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3);
-          assert r.status == 200 and json.load(r).get('status') == 'healthy'
+          import json,urllib.request;
+          r=urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3);
+          assert r.status==200 and json.load(r).get('status')=='healthy'
       interval: 3s
       timeout: 5s
       retries: 40

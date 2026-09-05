@@ -72,19 +72,18 @@ def test_container_image_digests_match_source_lock() -> None:
     assert "pip install --no-cache-dir --upgrade pip" not in dockerfile
 
 
-def test_memos_build_is_multistage_and_uses_configurable_internal_pypi() -> None:
+def test_memos_build_is_multistage_and_uses_one_explicit_package_index() -> None:
     compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
     dockerfile = (ROOT / "docker" / "memos" / "Dockerfile").read_text(encoding="utf-8")
 
-    assert "B04_PIP_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com" in compose
-    assert "B04_PIP_EXTRA_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com" in compose
-    assert "B04_PIP_TRUSTED_HOST:-cmc.centralrepo.rnd.huawei.com" in compose
-    assert "ARG PIP_INDEX_URL=https://cmc.centralrepo.rnd.huawei.com" in dockerfile
-    assert "ARG PIP_EXTRA_INDEX_URL=" in dockerfile
-    assert "ARG PIP_TRUSTED_HOST=cmc.centralrepo.rnd.huawei.com" in dockerfile
-    assert "pip config set global.index-url" in dockerfile
-    assert "pip config set global.extra-index-url" in dockerfile
-    assert "pip config set global.trusted-host" in dockerfile
+    assert "MEMSCOPE_PIP_INDEX_URL:-https://pypi.org/simple" in compose
+    assert "PIP_EXTRA_INDEX_URL" not in compose
+    assert "PIP_TRUSTED_HOST" not in compose
+    assert "ARG PIP_INDEX_URL=https://pypi.org/simple" in dockerfile
+    assert "ARG PIP_EXTRA_INDEX_URL=" not in dockerfile
+    assert "ARG PIP_TRUSTED_HOST=" not in dockerfile
+    assert '--index-url "${PIP_INDEX_URL}"' in dockerfile
+    assert "pip config set" not in dockerfile
     assert dockerfile.count("FROM ${PYTHON_IMAGE}") == 2
     assert "AS builder" in dockerfile
     assert "AS runtime" in dockerfile
