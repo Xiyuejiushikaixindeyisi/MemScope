@@ -116,7 +116,10 @@ def test_compose_requires_secrets_and_explicit_b05_model_configuration() -> None
         in compose
     )
     assert "MOS_EMBEDDER_BACKEND: universal_api" in compose
-    assert "MOS_RERANKER_BACKEND: cosine_local" in compose
+    assert 'MOS_RERANKER_BACKEND: "${MOS_RERANKER_BACKEND:-cosine_local}"' in compose
+    assert (
+        'MOS_FEEDBACK_RERANKER_BACKEND: "${MOS_FEEDBACK_RERANKER_BACKEND:-cosine_local}"' in compose
+    )
     assert "MEM_READER_TOKENIZER: word" in compose
     assert 'HF_HUB_OFFLINE: "1"' in compose
     assert 'TRANSFORMERS_OFFLINE: "1"' in compose

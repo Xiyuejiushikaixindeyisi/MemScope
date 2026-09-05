@@ -1,6 +1,6 @@
-# B10 Gate 1 implementation handoff
+# B10 Gate 1 handoff and Gate 2 model API integration
 
-> Status: Gate 1 implemented; Gate 2 review pending explicit user instruction
+> Status: Gate 1 implemented; Gate 2 model API patch implemented; formal baseline not started
 >
 > Gate 1 approved by explicit user message on 2026-09-05
 >
@@ -106,3 +106,26 @@ non-final.
 Gate 2 may accept the pre-tuning boundary only. It must not mark external live evidence complete, start
 tuning, create final artifacts, merge to `main` or publish anything without the subsequent explicit user
 decisions defined in `PLAN.md`.
+
+## 7. Gate 2 model API integration
+
+On 2026-09-05 the user approved the minimal development integration profile: Zhipu general API
+`glm-5.1` with thinking disabled, ordinary SiliconFlow `BAAI/bge-m3` without the `dimensions` request
+field while retaining a strict 1024-dimension storage contract, and local cosine reranking by default.
+
+The locked MemOS build patch now provides explicit GLM request controls, separates the embedding request
+shape from its response/storage dimension, and makes the existing HTTP BGE reranker authenticated,
+bounded, sanitized and fail-closed. Both Compose files expose the optional wiring but retain
+`cosine_local` defaults. `deploy/development-api.env.example` captures the approved development profile;
+the organizer template keeps provider-specific fields empty and retains the Huawei gateway profile.
+
+`scripts/preflight_model_apis.py` performs model-visibility checks by default. Its inference mode is
+explicit and bounded; its independent reranker option does not require changing the baseline Compose
+backend. See `docs/batches/B10/MODEL_API_GATE2.md` for the secure operating procedure.
+
+Gate 2 model-API patch evidence: 599 tests passed with 96.73% coverage; Ruff format/check and strict
+Mypy passed; the locked MemOS patch verified and compiled; both Compose files passed quiet interpolation;
+the real development credentials passed sanitized `/models` checks for Zhipu and SiliconFlow; and the
+83-entry delivery source allowlist passed its expanded secret scan. No additional inference request was
+made after the approved protocol probes. The development host still exposes no usable Docker daemon, so
+this step does not claim a rebuilt image or container-level service smoke.

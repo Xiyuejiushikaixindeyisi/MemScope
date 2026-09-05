@@ -1,16 +1,24 @@
 {
   "files": {
     "src/memos/api/config.py": {
-      "post_sha256": "4014ea54bb90eb7378385e37d76fbc01854e7b997cfa41b27323a80caeccba5e",
+      "post_sha256": "8727cfc1b749816211e1d808278b25a982464d1cdec26be5be12e4af5ad35fa5",
       "pre_sha256": "d544314dbf896d0e820c0539de31d6e838f7f613915a8b44f08adbb8945fec13"
     },
     "src/memos/api/handlers/add_handler.py": {
       "post_sha256": "d5e1ec610b20a90fbb77c09f7ac5dcc22387293973b1bb503615c2fecbe66c82",
       "pre_sha256": "4ee1e46862bfdafa9cee6eaa9ee9aea5660d1f480bd72faf30f8a1294e947774"
     },
+    "src/memos/configs/embedder.py": {
+      "post_sha256": "1886fd27e13765a37bb7831ab168862368a415283b4b528dff91cb26876036f1",
+      "pre_sha256": "bfefab9281c15b3cfca1b9f2eb7eef835fb1bbf8354fef1088bde354304d7312"
+    },
     "src/memos/configs/llm.py": {
       "post_sha256": "41f0bb0619f66abbd6f26ad2f30ffe59197862e0c51a8c648b89665104276ea8",
       "pre_sha256": "22c1fb95b89da32600ee1ea4fc0388b7b343abedab7c9778a11ce700730d6e33"
+    },
+    "src/memos/embedders/universal_api.py": {
+      "post_sha256": "3f3ba274e04de7b085db3d761f90616eca7bb58fcd857965e9ef71b7034df428",
+      "pre_sha256": "bfcc865cb3315631560bb9cc8c07040b37815da0ee9c439f960e2ce843c4a41f"
     },
     "src/memos/llms/openai.py": {
       "post_sha256": "e4460c43806d686262d506a3ff978a8b08e1b34356b48ce518ff22c47408d1e0",
@@ -43,6 +51,14 @@
     "src/memos/multi_mem_cube/single_cube.py": {
       "post_sha256": "b6e4f3ff80151eeff3ad36838b65632f2dbc6265f9d54a0d3fc0aa5b1c15d92c",
       "pre_sha256": "a43b3f2f1bd2cdb54df35a6d0fec7b848d24ec0ebca9b7dca74f226035ec835d"
+    },
+    "src/memos/reranker/factory.py": {
+      "post_sha256": "db495446df7c60a2223adf159e305118128159853b81f1a8a9ef1f81ab983aa4",
+      "pre_sha256": "b3348c41caf6b94e619a58f0468ece5e9e5203fd316b591cfb692c2efa3f4405"
+    },
+    "src/memos/reranker/http_bge.py": {
+      "post_sha256": "803e3a5aabcd54dde935a8c51111d23a8cfadc01d30d9fd448f81614e08a842f",
+      "pre_sha256": "8b276d1c1f5ea94af8b31e1e54b9a065349be73b89677f35880e0632de049d3f"
     }
   },
   "schema": "memscope.memos.patchset.v1"

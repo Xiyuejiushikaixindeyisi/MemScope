@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the B04+B05+B06 patchset to one exact extracted MemOS v2.0.32 tree."""
+"""Apply the locked MemScope patchset to one exact extracted MemOS v2.0.32 tree."""
 
 import argparse
 import hashlib
@@ -682,6 +682,75 @@ def _api_config(text: str) -> str:
     )
     text = _replace(
         text,
+        """        }
+
+        general_model = os.getenv("MEMREADER_GENERAL_MODEL")
+""",
+        """        }
+
+        thinking_type = os.getenv("MEMRADER_THINKING_TYPE", "").strip().lower()
+        if thinking_type and thinking_type not in {"enabled", "disabled"}:
+            raise ValueError("MEMRADER_THINKING_TYPE must be enabled or disabled")
+        response_format = os.getenv("MEMRADER_RESPONSE_FORMAT", "").strip().lower()
+        if response_format and response_format != "json_object":
+            raise ValueError("MEMRADER_RESPONSE_FORMAT must be json_object")
+        extra_body = {}
+        if thinking_type:
+            extra_body["thinking"] = {"type": thinking_type}
+        if response_format:
+            extra_body["response_format"] = {"type": response_format}
+        if extra_body:
+            config["extra_body"] = extra_body
+
+        general_model = os.getenv("MEMREADER_GENERAL_MODEL")
+""",
+        count=1,
+    )
+    text = _replace(
+        text,
+        '                    "embedding_dims": int(os.getenv("EMBEDDING_DIMENSION", "1024")),\n',
+        '                    "embedding_dims": int(os.getenv("EMBEDDING_DIMENSION", "1024")),\n'
+        '                    "send_dimensions": os.getenv(\n'
+        '                        "MOS_EMBEDDER_SEND_DIMENSIONS", "true"\n'
+        "                    ).lower()\n"
+        '                    == "true",\n',
+    )
+    text = _replace(
+        text,
+        """                    "url": os.getenv("MOS_RERANKER_URL", "localhost:8000/v1/rerank"),
+                    "model": os.getenv("MOS_RERANKER_MODEL", "bge-reranker-v2-m3"),
+                    "timeout": 10,
+""",
+        """                    "url": os.getenv("MOS_RERANKER_URL", "localhost:8000/v1/rerank"),
+                    "token": os.getenv("MOS_RERANKER_API_KEY", ""),
+                    "model": os.getenv("MOS_RERANKER_MODEL", "bge-reranker-v2-m3"),
+                    "timeout": int(os.getenv("MOS_RERANKER_TIMEOUT_SECONDS", "10")),
+                    "max_retries": int(os.getenv("MOS_RERANKER_MAX_RETRIES", "1")),
+                    "retry_backoff_seconds": float(
+                        os.getenv("MOS_RERANKER_RETRY_BACKOFF_SECONDS", "0.25")
+                    ),
+""",
+        count=1,
+    )
+    text = _replace(
+        text,
+        """                    "url": os.getenv("MOS_RERANKER_URL", "localhost:8000/v1/rerank"),
+                    "model": os.getenv("MOS_FEEDBACK_RERANKER_MODEL", "bge-reranker-v2-m3"),
+                    "timeout": 10,
+""",
+        """                    "url": os.getenv("MOS_RERANKER_URL", "localhost:8000/v1/rerank"),
+                    "token": os.getenv("MOS_RERANKER_API_KEY", ""),
+                    "model": os.getenv("MOS_FEEDBACK_RERANKER_MODEL", "bge-reranker-v2-m3"),
+                    "timeout": int(os.getenv("MOS_RERANKER_TIMEOUT_SECONDS", "10")),
+                    "max_retries": int(os.getenv("MOS_RERANKER_MAX_RETRIES", "1")),
+                    "retry_backoff_seconds": float(
+                        os.getenv("MOS_RERANKER_RETRY_BACKOFF_SECONDS", "0.25")
+                    ),
+""",
+        count=1,
+    )
+    text = _replace(
+        text,
         """                    "chat_chunker": reader_config,
                     "direct_markdown_hostnames": [
 """,
@@ -717,6 +786,358 @@ def _api_config(text: str) -> str:
     return text
 
 
+def _embedder_config(text: str) -> str:
+    return _replace(
+        text,
+        """    backup_client: bool = Field(
+        default=False,
+        description="Whether to use backup client",
+    )
+""",
+        """    send_dimensions: bool = Field(
+        default=True,
+        description="Whether to send the dimensions parameter to the provider",
+    )
+    backup_client: bool = Field(
+        default=False,
+        description="Whether to use backup client",
+    )
+""",
+    )
+
+
+def _universal_api_embedder(text: str) -> str:
+    text = _replace(
+        text,
+        """        embedding_dims = getattr(self.config, "embedding_dims", None)
+        kwargs = self._build_embedding_kwargs(model, texts, embedding_dims)
+
+        try:
+            response = client.embeddings.create(**kwargs, timeout=timeout)
+        except BadRequestError as error:
+            if embedding_dims is None or not self._is_dimensions_unsupported(error):
+                raise
+
+            logger.warning(
+                "Embedding provider rejected dimensions=%d; retrying without dimensions",
+                embedding_dims,
+            )
+            fallback_kwargs = self._build_embedding_kwargs(model, texts, None)
+            response = client.embeddings.create(**fallback_kwargs, timeout=timeout)
+
+        return [item.embedding for item in response.data]
+""",
+        """        embedding_dims = getattr(self.config, "embedding_dims", None)
+        request_embedding_dims = (
+            embedding_dims if self.config.send_dimensions else None
+        )
+        kwargs = self._build_embedding_kwargs(model, texts, request_embedding_dims)
+
+        try:
+            response = client.embeddings.create(**kwargs, timeout=timeout)
+        except BadRequestError as error:
+            if request_embedding_dims is None or not self._is_dimensions_unsupported(error):
+                raise
+
+            logger.warning(
+                "Embedding provider rejected configured dimensions; retrying without it"
+            )
+            fallback_kwargs = self._build_embedding_kwargs(model, texts, None)
+            response = client.embeddings.create(**fallback_kwargs, timeout=timeout)
+
+        vectors = [item.embedding for item in response.data]
+        if len(vectors) != len(texts):
+            raise ValueError("embedding response count mismatch")
+        if embedding_dims is not None and any(
+            not hasattr(vector, "__len__") or len(vector) != embedding_dims
+            for vector in vectors
+        ):
+            raise ValueError("embedding response dimension mismatch")
+        return vectors
+""",
+    )
+    text = _replace(
+        text,
+        """                        raise ValueError(
+                            f"Backup embeddings request ended with error: {e_backup}"
+                        ) from e_backup
+                else:
+                    raise ValueError(f"Embeddings request ended with error: {e}") from e
+""",
+        """                        raise ValueError("Backup embeddings request failed") from None
+                else:
+                    raise ValueError("Embeddings request failed") from None
+""",
+    )
+    text = _replace(
+        text,
+        "                    except Exception as e_backup:\n",
+        "                    except Exception:\n",
+    )
+    return text
+
+
+def _reranker_factory(text: str) -> str:
+    text = _replace(
+        text,
+        """        if backend in {"http_bge", "bge"}:
+            return HTTPBGEReranker(
+                reranker_url=c.get("url") or c.get("endpoint") or c.get("reranker_url"),
+                model=c.get("model", "bge-reranker-v2-m3"),
+                timeout=int(c.get("timeout", 10)),
+""",
+        """        if backend in {"http_bge", "bge"}:
+            return HTTPBGEReranker(
+                reranker_url=c.get("url") or c.get("endpoint") or c.get("reranker_url"),
+                token=c.get("token", ""),
+                model=c.get("model", "bge-reranker-v2-m3"),
+                timeout=int(c.get("timeout", 10)),
+                max_retries=int(c.get("max_retries", 1)),
+                retry_backoff_seconds=float(c.get("retry_backoff_seconds", 0.25)),
+""",
+    )
+    return text
+
+
+def _http_bge(text: str) -> str:
+    text = _replace(text, "import re\n", "import math\nimport re\nimport time\n")
+    text = _replace(
+        text,
+        """    - If the service fails or responds unexpectedly, this falls back to
+      returning the original items with 0.0 scores (best-effort).
+""",
+        """    - Provider, transport and response-schema failures are propagated so
+      callers cannot mistake an unavailable reranker for a successful ranking.
+""",
+    )
+    text = _replace(
+        text,
+        """        timeout: int = 10,
+        max_query_tokens: int | None = None,
+""",
+        """        timeout: int = 10,
+        max_retries: int = 1,
+        retry_backoff_seconds: float = 0.25,
+        max_query_tokens: int | None = None,
+""",
+    )
+    text = _replace(
+        text,
+        """        self.timeout = timeout
+        self.max_query_tokens = max_query_tokens
+""",
+        """        self.timeout = timeout
+        self.max_retries = min(max(0, int(max_retries)), 2)
+        self.retry_backoff_seconds = min(max(0.0, float(retry_backoff_seconds)), 1.0)
+        self.max_query_tokens = max_query_tokens
+""",
+    )
+    text = _replace(
+        text,
+        """        self.warn_unknown_filter_keys = bool(warn_unknown_filter_keys)
+        self._warned_missing_keys: set[str] = set()
+
+    @timed_with_status(
+""",
+        """        self.warn_unknown_filter_keys = bool(warn_unknown_filter_keys)
+        self._warned_missing_keys: set[str] = set()
+
+    @staticmethod
+    def _validated_score(value: Any) -> float:
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            raise ValueError("reranker relevance score is invalid")
+        score = float(value)
+        if not math.isfinite(score):
+            raise ValueError("reranker relevance score is invalid")
+        return score
+
+    @timed_with_status(
+""",
+    )
+    text = _replace(
+        text,
+        """    @timed_with_status(
+        log_prefix="model_timed_rerank",
+        log_extra_args={"model_name_or_path": "reranker"},
+        fallback=lambda exc, self, query, graph_results, top_k, *a, **kw: [
+            (item, 0.0) for item in graph_results[:top_k]
+        ],
+    )
+""",
+        """    @timed_with_status(
+        log_prefix="model_timed_rerank",
+        log_extra_args={"model_name_or_path": "reranker"},
+    )
+""",
+    )
+    text = _replace(
+        text,
+        """        if not graph_results:
+            return []
+""",
+        """        if top_k <= 0 or not graph_results:
+            return []
+""",
+    )
+    text = _replace(
+        text,
+        '        logger.info(f"[HTTPBGERerankerSample] query: {query} , documents: {documents[:5]}...")\n',
+        """        logger.info(
+            "Reranker request query_chars=%s document_count=%s",
+            len(query),
+            len(documents),
+        )
+""",
+    )
+    text = _replace(
+        text,
+        """        headers = {"Content-Type": "application/json", **self.headers_extra}
+        payload = {"model": self.model, "query": query, "documents": documents}
+
+        # Make the HTTP request to the reranker service
+        resp = requests.post(self.reranker_url, headers=headers, json=payload, timeout=self.timeout)
+        resp.raise_for_status()
+        data = resp.json()
+""",
+        """        headers = {"Content-Type": "application/json", **self.headers_extra}
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        payload = {
+            "model": self.model,
+            "query": query,
+            "documents": documents,
+            "top_n": min(top_k, len(documents)),
+            "return_documents": False,
+        }
+
+        retryable_statuses = {429, 503, 504}
+        for attempt in range(self.max_retries + 1):
+            try:
+                resp = requests.post(
+                    self.reranker_url,
+                    headers=headers,
+                    json=payload,
+                    timeout=self.timeout,
+                )
+            except requests.Timeout:
+                if attempt >= self.max_retries:
+                    raise TimeoutError("reranker request timed out") from None
+                logger.warning("Reranker request timed out; retrying attempt=%s", attempt + 2)
+                time.sleep(self.retry_backoff_seconds * (attempt + 1))
+                continue
+            except requests.RequestException:
+                if attempt >= self.max_retries:
+                    raise ConnectionError("reranker request failed") from None
+                logger.warning("Reranker transport failed; retrying attempt=%s", attempt + 2)
+                time.sleep(self.retry_backoff_seconds * (attempt + 1))
+                continue
+
+            if resp.status_code in retryable_statuses and attempt < self.max_retries:
+                logger.warning(
+                    "Reranker retryable HTTP status=%s attempt=%s",
+                    resp.status_code,
+                    attempt + 2,
+                )
+                time.sleep(self.retry_backoff_seconds * (attempt + 1))
+                continue
+            if resp.status_code >= 400:
+                raise RuntimeError(
+                    f"reranker request failed with HTTP {resp.status_code}"
+                ) from None
+            break
+
+        try:
+            data = resp.json()
+        except ValueError:
+            raise ValueError("invalid reranker JSON response") from None
+        if not isinstance(data, dict):
+            raise ValueError("unexpected reranker response schema")
+        trace_id = resp.headers.get("x-siliconcloud-trace-id", "absent")
+        logger.info(
+            "Reranker request succeeded status=%s document_count=%s trace_id=%s",
+            resp.status_code,
+            len(documents),
+            trace_id,
+        )
+""",
+    )
+    text = _replace(
+        text,
+        """            rows = data.get("results", [])
+            for r in rows:
+                idx = r.get("index")
+                # The returned index refers to 'documents' (i.e., our 'pairs' order),
+                # so we must map it back to the original graph_results index.
+                if isinstance(idx, int) and 0 <= idx < len(graph_results):
+                    raw_score = float(r.get("relevance_score", r.get("score", 0.0)))
+                    item = graph_results[idx]
+                    # generic boost
+                    score = self._apply_boost_generic(item, raw_score, search_priority)
+                    scored_items.append((item, score))
+
+            scored_items.sort(key=lambda x: x[1], reverse=True)
+            return scored_items[: min(top_k, len(scored_items))]
+""",
+        """            rows = data.get("results")
+            if not isinstance(rows, list) or not rows:
+                raise ValueError("unexpected reranker response schema")
+            seen_indices: set[int] = set()
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise ValueError("unexpected reranker response schema")
+                idx = row.get("index")
+                if (
+                    isinstance(idx, bool)
+                    or not isinstance(idx, int)
+                    or not 0 <= idx < len(graph_results)
+                    or idx in seen_indices
+                ):
+                    raise ValueError("unexpected reranker response schema")
+                seen_indices.add(idx)
+                raw_score = self._validated_score(row.get("relevance_score"))
+                item = graph_results[idx]
+                score = self._apply_boost_generic(item, raw_score, search_priority)
+                scored_items.append((item, score))
+
+            scored_items.sort(key=lambda x: x[1], reverse=True)
+            return scored_items[: min(top_k, len(scored_items))]
+""",
+    )
+    text = _replace(
+        text,
+        """            rows = data.get("data", [])
+            # Build a list of scores aligned with our 'documents' (pairs)
+            score_list = [float(r.get("score", 0.0)) for r in rows]
+
+            if len(score_list) < len(graph_results):
+                score_list += [0.0] * (len(graph_results) - len(score_list))
+            elif len(score_list) > len(graph_results):
+                score_list = score_list[: len(graph_results)]
+""",
+        """            rows = data.get("data")
+            if (
+                not isinstance(rows, list)
+                or len(rows) != len(graph_results)
+                or not all(isinstance(row, dict) for row in rows)
+            ):
+                raise ValueError("unexpected reranker response schema")
+            score_list = [self._validated_score(row.get("score")) for row in rows]
+""",
+    )
+    text = _replace(
+        text,
+        """        else:
+            # Unexpected response schema: return a 0.0-scored fallback of the first top_k valid docs
+            # Note: we use 'pairs' to keep alignment with valid (string) docs.
+            return [(item, 0.0) for item in graph_results[:top_k]]
+""",
+        """        else:
+            raise ValueError("unexpected reranker response schema")
+""",
+    )
+    return text
+
+
 def _rabbitmq(text: str) -> str:
     return _replace(
         text,
@@ -734,6 +1155,10 @@ PATCHES: dict[str, Callable[[str], str]] = {
     "src/memos/memories/textual/tree_text_memory/organize/manager.py": _manager,
     "src/memos/llms/openai.py": _openai,
     "src/memos/configs/llm.py": _llm_config,
+    "src/memos/configs/embedder.py": _embedder_config,
+    "src/memos/embedders/universal_api.py": _universal_api_embedder,
+    "src/memos/reranker/factory.py": _reranker_factory,
+    "src/memos/reranker/http_bge.py": _http_bge,
     "src/memos/api/handlers/add_handler.py": _add_handler,
     "src/memos/api/config.py": _api_config,
     "src/memos/mem_scheduler/webservice_modules/rabbitmq_service.py": _rabbitmq,
