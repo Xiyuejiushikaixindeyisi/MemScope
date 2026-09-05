@@ -36,7 +36,9 @@ trusted-host 绕过。基础镜像和第三方镜像保持 digest 锁；主办�
 
 主办方只执行 hash 校验、解包、私有配置、`docker load`、image ID/revision 核对、Compose
 `--no-build --pull never` 启动、Smoke 和官方评测。不提供 native/Python 构建兜底，因为该机器被
-定义为评审机而不是开发机。评审机失败返回证据，修复回到开发机。
+定义为评审机而不是开发机。上述步骤不访问公网、registry、package index 或源码站点；仅允许访问
+主办方预先提供的内网模型 API，官方评测器和数据集必须已在本机可用。评审机失败返回证据，修复
+回到开发机。
 
 ## 4. 立即停止条件
 

@@ -20,6 +20,11 @@ organizer review machine only verifies the delivered set, loads prebuilt images,
 configuration, starts four services with Compose, runs the supplied smoke and hands the endpoint to the
 official evaluator.
 
+The organizer path is public-Internet-independent: it performs no registry, package-index, source-host or
+dependency download. Its sole runtime network dependency is the configured organizer-intranet Chat/Embedding
+API, and its official evaluator is assumed to be locally supplied. A completely disconnected host can load
+and start the containers but cannot complete real Add/Search without an available compatible model endpoint.
+
 The release topology is four containers: `memory-api`, MemOS, Neo4j and Qdrant. The single offline image
 TAR is only a transport bundle. `compose.release.yaml` has no `build:` key, applies `pull_policy: never` to
 all four services and publishes only `memory-api`.
@@ -48,10 +53,10 @@ opt-in. External `/v1/reranker` remains disabled; the baseline uses local cosine
 
 | Check | Result |
 |---|---|
-| Full pytest with branch-aware coverage | 583 passed in 15.36 s; 96.73%, threshold 95% |
+| Full pytest with branch-aware coverage | 584 passed in 14.84 s; 96.73%, threshold 95% |
 | Restricted-sandbox unit/contract subset | 455 passed in 3.37 s |
 | B08 local-socket verifier outside the restricted socket sandbox | 4 passed in 1.08 s |
-| B10 delivery/release-script tests after platform hardening | 12 passed in 0.39 s |
+| B10 delivery/release-script/offline-path tests | 13 passed in 0.52 s |
 | Ruff format/check | passed |
 | Mypy, production/tests/B10 builder/public proxy evaluator | passed |
 | Bash syntax for release scripts | passed |

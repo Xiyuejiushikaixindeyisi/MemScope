@@ -93,6 +93,8 @@ solution/
 
 - B10 当前交付是源码 ZIP、一个包含四张镜像的 Linux/amd64 离线 TAR、JSON manifest 和
   `SHA256SUMS`；离线 TAR 是传输 bundle，不是单容器。
+- 主办方路径不依赖公网、registry、package index 或源码站点；唯一运行时网络依赖是已配置的
+  主办方内网 Chat/Embedding API，官方评测器和数据集由主办方本地提供。
 - 开发机负责依赖安装、服务部署、可达 API 基线/调优和最终镜像构建。主办方评审机只校验、
   `docker load`、注入私有配置、用 Compose 启动四个服务并执行正式评测，不安装 Python 依赖，
   不构建或拉取镜像。

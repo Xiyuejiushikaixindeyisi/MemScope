@@ -41,6 +41,29 @@ def test_release_compose_is_four_service_load_only_topology() -> None:
     assert "deploy/*.env" in dockerignore
 
 
+def test_organizer_entrypoints_need_no_public_download_path() -> None:
+    entrypoints = "\n".join(
+        path.read_text(encoding="utf-8") for path in (RUN_SCRIPT, VERIFY_SCRIPT, STOP_SCRIPT)
+    )
+    for forbidden_command in (
+        "docker pull ",
+        "docker build ",
+        "docker compose build",
+        "pip install",
+        "uv sync",
+        "curl ",
+        "wget ",
+    ):
+        assert forbidden_command not in entrypoints
+    assert 'docker load --input "${IMAGE_BUNDLE}"' in entrypoints
+    assert "--no-build --pull never" in entrypoints
+
+    quickstart = (ROOT / "ORGANIZER_QUICKSTART.md").read_text(encoding="utf-8")
+    assert "不依赖公网、镜像仓库、PyPI、源码站点" in quickstart
+    assert "唯一需要的网络" in quickstart
+    assert "model_api_unreachable" in quickstart
+
+
 def _write_executable(path: Path, source: str) -> None:
     path.write_text(source, encoding="utf-8")
     path.chmod(0o755)

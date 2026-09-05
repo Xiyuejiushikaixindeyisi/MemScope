@@ -12,7 +12,8 @@
 必须遵守以下边界：
 
 1. 不安装或升级 Python、uv、pip、系统包或项目依赖。
-2. 不执行 `docker build`、`docker compose build`，不从 registry 拉取镜像；所有镜像来自交付 TAR。
+2. 不访问公网、镜像仓库、PyPI 或源码站点；不执行 `docker build`、`docker compose build`，不从
+   registry 拉取镜像；所有镜像来自交付 TAR。唯一允许的运行时网络是主办方已提供的内网模型 API。
 3. 不修改源码、Dockerfile、Compose、镜像、manifest、lock 或校验文件。
 4. 不在终端、日志、报告或对话中输出 API Key、IAM token、密码、Authorization header、私有 env
    内容、请求正文、记忆内容、向量或 provider 完整响应。
@@ -76,6 +77,9 @@ Add 小于 120 秒，Search 小于 60 秒，Add replay 一致，跨用户 Search
 然后使用主办方已经提供的正式评测命令、数据集、并发和评分规则执行评测。若官方评测入口未提供，
 报告 `official_evaluator_missing` 并等待主办方补充；不要自行实现替代 Judge。批处理遇到 429 时在
 评测客户端做有界退避，不要让服务内部自动重放 Add。
+
+如果容器能够启动但主办方内网 Chat/Embedding API 不可达，报告 `model_api_unreachable`。不要尝试
+访问公网寻找替代模型、安装本地模型或修改候选；这种状态不算离线评测通过。
 
 八、评测完成后执行以下命令停止容器但保留卷：
 

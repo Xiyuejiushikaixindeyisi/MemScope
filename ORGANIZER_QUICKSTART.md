@@ -3,6 +3,12 @@
 本指南面向主办方评审机。评审机只校验并加载镜像、填写运行时配置、用 Docker Compose 启动四个
 服务并执行评测；不安装 Python 依赖，不构建镜像，也不从公网或内网镜像仓库拉取镜像。
 
+这里的“不联网/离线运行”是指不依赖公网、镜像仓库、PyPI、源码站点或任何在线安装。交付的 ZIP
+和镜像 TAR 包含启动所需的源码、配置模板、脚本及四张运行镜像。真实 Add/Search 唯一需要的网络
+是主办方已经具备的 OpenAI-compatible Chat/Embedding 内网 API；正式评测器也必须由主办方预先
+提供在本机。若连内网模型 API 也完全不可达，四容器仍可加载和启动，但不能完成真实评测，必须
+报告 `model_api_unreachable`，不能宣称离线评测通过。
+
 ## 1. 交付物和运行形态
 
 开发机最终提供同一目录中的四个文件：
@@ -30,6 +36,8 @@ SHA256SUMS
 - 建议至少 10 GiB 内存；默认四服务内存上限合计 8.5 GiB；
 - 足够容纳镜像 TAR、解包内容、四张镜像和评测数据的磁盘空间；
 - MemOS 容器能够访问主办方 Chat/Embedding API；
+- 不要求访问公网、Docker registry、Python package index 或源码站点；
+- 主办方官方评测器及其数据集/命令已在评审机本地可用；
 - 宿主机只需常规 shell 工具、`unzip` 和 `sha256sum`，不需要 Python、uv 或 pip。
 
 ## 3. 校验和解包
@@ -79,7 +87,7 @@ chmod 0600 /secure/memscope-organizer.env
 
 脚本会再次校验完整交付集、执行 `docker load`、核对四张镜像 ID 和两张自建镜像的源码 revision，
 然后执行 Compose `config --quiet` 和 `up --no-build --pull never --wait`。它不会安装依赖、构建、
-拉取或删除卷。
+拉取、访问软件源或删除卷。
 
 若镜像已加载且只需重启，可增加 `--skip-load`；镜像 ID 仍会被核对。
 

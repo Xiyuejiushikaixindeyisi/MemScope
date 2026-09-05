@@ -20,7 +20,9 @@ verify hashes -> load four-image bundle -> inject private config
 ```
 
 The image TAR is one offline transport bundle, not one runtime container. The organizer does not
-install Python/uv/pip, build images or pull images. Start with
+need public Internet, install Python/uv/pip, build images or pull images. Its only runtime network
+dependency is the pre-existing organizer Chat/Embedding intranet API; the official evaluator must
+already be local. Start with
 [`INSTRUCTION.md`](INSTRUCTION.md), [`ORGANIZER_QUICKSTART.md`](ORGANIZER_QUICKSTART.md), or the
 directly reusable [`ORGANIZER_AGENT_PROMPT.md`](ORGANIZER_AGENT_PROMPT.md).
 

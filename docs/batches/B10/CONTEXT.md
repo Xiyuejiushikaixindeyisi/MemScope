@@ -26,6 +26,8 @@ The development machine now owns source deployment, dependency installation, rea
 testing, baseline evaluation, tuning, final image construction and final ZIP generation. The
 organizer review machine is a load-and-run target only. It receives prebuilt Linux/amd64 images and
 runtime configuration instructions; it does not install Python dependencies or build/pull images.
+It requires no public Internet, registry, package index or source host. Its only runtime network
+dependency is the configured organizer-intranet model API; the official evaluator is local input.
 
 Development and organizer APIs may differ while both remain OpenAI compatible. The organizer's
 confirmed non-secret profile is Chat `GLM-V5_1-DX`, Embedding `bge-m3` dimension 1024 and Huawei

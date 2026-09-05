@@ -16,6 +16,9 @@ organizer review machine
 ```
 
 “Four-image offline bundle” describes transport. It does not change the runtime into one container.
+Offline organizer operation means no public Internet, registry, package-index or source-host access;
+the configured organizer intranet model API is the sole runtime network dependency, and the official
+evaluator is assumed to be locally available.
 
 ## 2. Authorized implementation
 
@@ -65,7 +68,7 @@ organizer review machine
 - Two source ZIP previews produced in `/tmp` are byte-identical and verify successfully. They are
   explicitly named previews and are not final artifacts or final checksums.
 - The final delivery procedure is demonstrably executable on a clean organizer host with no project
-  Python/uv/pip and only organizer model-network access.
+  Python/uv/pip, no public Internet/download access and only organizer model-network access.
 - The organizer agent prompt is executable from blank context, never requests secret output, invokes
   the official evaluator rather than inventing scoring, and preserves volumes on failure.
 

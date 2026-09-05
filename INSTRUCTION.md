@@ -48,6 +48,14 @@ Required host software is Linux x86_64, Docker Engine, Docker Compose v2, Bash, 
 `sha256sum`. At least 10 GiB RAM is recommended because the default service ceilings total 8.5 GiB.
 The organizer does not install Python/uv/pip, build an image or pull an image.
 
+“Offline” in this delivery contract means the organizer needs no public Internet, image registry,
+Python package index, source host or dependency download. The four runtime images and all startup
+files arrive in the delivered ZIP/TAR set. The only runtime network dependency is the organizer's
+already-available OpenAI-compatible Chat/Embedding API (Huawei intranet for the supplied profile).
+The official evaluator must likewise already exist on the organizer machine. With absolutely no
+network path to any configured model API, the containers can start, but real Add/Search evaluation
+cannot complete; that state must be reported as `model_api_unreachable`, not as an offline pass.
+
 From the directory containing all four delivered files:
 
 ```bash
@@ -79,6 +87,7 @@ cd solution
 
 The script validates hashes and private-file permissions, runs `docker load`, verifies all image
 IDs/revision labels, runs Compose `config --quiet`, and starts with `--no-build --pull never --wait`.
+None of these deployment steps contacts a registry or package source.
 
 Before official evaluation, run the real model smoke:
 
