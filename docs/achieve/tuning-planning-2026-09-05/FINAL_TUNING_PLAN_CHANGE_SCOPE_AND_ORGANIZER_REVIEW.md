@@ -2,7 +2,7 @@
 
 > 状态：供审批；本 session 只产出方案，不运行测试、Docker、模型或评测  
 > 日期：2026-09-05  
-> 关联：[24H_TUNING_APPROVAL_PLAN.md](24H_TUNING_APPROVAL_PLAN.md) · [主办方澄清复核](ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)
+> 关联：[24H_TUNING_APPROVAL_PLAN.md](24H_TUNING_APPROVAL_PLAN.md) · [主办方澄清复核](../../../ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)
 
 ## 1. 直接结论
 

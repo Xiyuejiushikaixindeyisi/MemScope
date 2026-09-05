@@ -21,6 +21,10 @@
   均未完成。
 - 当前规则由开发机部署、真实评测、调优和构建最终镜像；主办方评审机只校验、加载、注入配置、
   Compose 启动和评测。旧 Batch 的“调测机构建/安装”描述只作为历史事实。
+- 2026-09-05 已批准最终多 session 调优链；当前唯一执行准绳为
+  [`FINAL_TUNING_EXECUTION_APPROVAL_PLAN.md`](../FINAL_TUNING_EXECUTION_APPROVAL_PLAN.md)。此前 24H、
+  双 Session、代码范围和交互建模方案已归档到
+  [`achieve/tuning-planning-2026-09-05/`](achieve/tuning-planning-2026-09-05/README.md)。
 
 ## 权威性顺序
 
@@ -41,6 +45,8 @@
 | 目的 | 必读文档 |
 |---|---|
 | 恢复当前项目状态 | `PROJECT_CONTEXT.md`、`CODEMAP.md` |
+| 执行当前调优或启动下一 agent-session | `../FINAL_TUNING_EXECUTION_APPROVAL_PLAN.md`、直接前序的 `SESSION_SUMMARY.md`/`RESULT.json`/`HANDOFF.md` |
+| 查阅已被替代的调优方案 | `achieve/tuning-planning-2026-09-05/README.md`；只作历史追溯 |
 | 开始一个 Batch | `MEMOS_BASELINE_IMPLEMENTATION_PLAN.md` 第 18～19 节、该 Batch 的 `CONTEXT.md`、`PLAN.md` |
 | 依赖已验收 Batch | 对应 `HANDOFF.md`、公共接口和 ADR；不要重新加载全部历史实现 |
 | 核对比赛要求 | `acceptance/CONTEST_ACCEPTANCE_CHECKLIST.md` 及其中引用的正式材料 |

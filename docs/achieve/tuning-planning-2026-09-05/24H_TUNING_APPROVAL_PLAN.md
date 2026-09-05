@@ -1,5 +1,7 @@
 # MemScope 赛前 24 小时调优审批清单
 
+> **归档说明：最终执行与审批以 [FINAL_TUNING_EXECUTION_APPROVAL_PLAN.md](../../../FINAL_TUNING_EXECUTION_APPROVAL_PLAN.md) 为唯一准绳；本文保留详细背景和时间盒推导。**
+
 > 状态：本 session 只产出方案；M1/M2/M3 方法学已批准；具体实验仍待逐条审批，不自动执行任何实验、测试或构建  
 > 基准：当前工作分支 `batch/b10-baseline-closure`；rootful 运行镜像绑定 `756902c`；实机证据记录于 `c925fc9`；比赛基准提交 `ca470eb`  
 > 更新日期：2026-09-05  
@@ -7,8 +9,8 @@
 
 双 Session 的具体执行与汇合方案见：[DUAL_SESSION_TUNING_APPROVAL_PLAN.md](DUAL_SESSION_TUNING_APPROVAL_PLAN.md)。
 调优项之间的交互和数学参数选型见：[TUNING_INTERACTIONS_AND_MODELING.md](TUNING_INTERACTIONS_AND_MODELING.md)。
-T00 观测项与冻结五样本见：[T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md](T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md)。
-主办方澄清的规则边界、技术核验及其调优影响见：[ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md](ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)。
+T00 观测项与冻结五样本见：[T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md](../../../T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md)。
+主办方澄清的规则边界、技术核验及其调优影响见：[ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md](../../../ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)。
 最终方案的代码/配置改动边界见：[FINAL_TUNING_PLAN_CHANGE_SCOPE_AND_ORGANIZER_REVIEW.md](FINAL_TUNING_PLAN_CHANGE_SCOPE_AND_ORGANIZER_REVIEW.md)。
 
 最新决策覆盖本文较早版本中的冲突表述：T02 内部 `0.92` 锁定；不测试 MMR；不做自动 prompt 搜索；T03/T06 prompt 调优降为最低优先级。默认先完成 T00 和 `T01+T05` / `T02+T05` Search 路线。
@@ -416,7 +418,7 @@ Search success / P50 / P95 / max：
 
 ## 10. 方案依据与可信度
 
-仓库内的一手约束优先于外部经验：本计划直接继承 [B05 Add 设计与调优](docs/batches/B05/ADD_DESIGN_AND_TUNING.md)、[B06 Search 设计与调优](docs/batches/B06/SEARCH_DESIGN_AND_TUNING.md)、[B10 交接记录](docs/batches/B10/HANDOFF.md)、[B10 模型 API Gate 2](docs/batches/B10/MODEL_API_GATE2.md) 和 [项目上下文](docs/PROJECT_CONTEXT.md) 中已冻结的边界。
+仓库内的一手约束优先于外部经验：本计划直接继承 [B05 Add 设计与调优](../../batches/B05/ADD_DESIGN_AND_TUNING.md)、[B06 Search 设计与调优](../../batches/B06/SEARCH_DESIGN_AND_TUNING.md)、[B10 交接记录](../../batches/B10/HANDOFF.md)、[B10 模型 API Gate 2](../../batches/B10/MODEL_API_GATE2.md) 和 [项目上下文](../../PROJECT_CONTEXT.md) 中已冻结的边界。
 
 这些资料支持“先诊断、再做小范围检索/记忆调优”的方向，但不替代 MemScope 自己的 baseline：
 

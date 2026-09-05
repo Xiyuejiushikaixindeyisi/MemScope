@@ -3,9 +3,9 @@
 > 状态：本 session 只产出方案；M1/M2/M3 方法学已批准；不因此自动授权运行实验或测试  
 > 日期：2026-09-05  
 > 范围：T01～T06；T07 已拒绝；T02 内部 `0.92`、MMR 和自动 prompt 搜索不批准  
-> T00 数据与可观测性规范：[T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md](T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md)
+> T00 数据与可观测性规范：[T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md](../../../T00_BASELINE_OBSERVABILITY_AND_FIVE_SAMPLE_PLAN.md)
 
-主办方关于时间证据、Add 总结和内网凭证的规则边界与技术核验见：[ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md](ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)。
+主办方关于时间证据、Add 总结和内网凭证的规则边界与技术核验见：[ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md](../../../ORGANIZER_CLARIFICATIONS_AND_TUNING_IMPACT.md)。
 
 ## 1. 直接结论
 
@@ -43,10 +43,10 @@ T03 / T04 / T06
 
 代码依据：
 
-- memory-api 将 relativity/dedup/rerank 作为同一请求的参数发送：[memos.py](src/memscope/memory_gateway/memos.py)。
-- `sim/mmr` 先触发三倍 top-k，随后执行 threshold、dedup 和最终处理：[search_handler.py](.vendor-src/MemOS/src/memos/api/handlers/search_handler.py)。
-- T05 实际在底层 `_maybe_rerank()` 执行，分数在 `_sort_and_trim()` 写入 relativity：[searcher.py](.vendor-src/MemOS/src/memos/memories/textual/tree_text_memory/retrieve/searcher.py)。
-- T04 决定窗口，fine 模式按窗口串行调用 LLM；T03 只从每个窗口的 prompt 删除 example：[simple_struct.py](.vendor-src/MemOS/src/memos/mem_reader/simple_struct.py)。
+- memory-api 将 relativity/dedup/rerank 作为同一请求的参数发送：[memos.py](../../../src/memscope/memory_gateway/memos.py)。
+- `sim/mmr` 先触发三倍 top-k，随后执行 threshold、dedup 和最终处理：[search_handler.py](../../../.vendor-src/MemOS/src/memos/api/handlers/search_handler.py)。
+- T05 实际在底层 `_maybe_rerank()` 执行，分数在 `_sort_and_trim()` 写入 relativity：[searcher.py](../../../.vendor-src/MemOS/src/memos/memories/textual/tree_text_memory/retrieve/searcher.py)。
+- T04 决定窗口，fine 模式按窗口串行调用 LLM；T03 只从每个窗口的 prompt 删除 example：[simple_struct.py](../../../.vendor-src/MemOS/src/memos/mem_reader/simple_struct.py)。
 
 注意：`search_handler.py` 最后调用的 `rerank_knowledge_mem()` 当前没有再次调用传入的 reranker，只按已有 relativity 排序；T05 的真实作用点是更早的 Searcher，而不是最终 formatter。
 
