@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "name": "memscope-t00-stratified-five-v1",
+  "status": "approved_dataset_design_pending_execution",
+  "created_at": "2026-09-05",
+  "purpose": "T00 baseline, error attribution, and T01/T02/T05 search-only tuning",
+  "selection_policy": {
+    "sample_count": 5,
+    "strata": [
+      "LoCoMo",
+      "Remember",
+      "Update",
+      "Forget",
+      "Reflect"
+    ],
+    "full_conversation": true,
+    "all_search_items": true,
+    "public_top_k": 100,
+    "difficulty_policy": "Preserve full longitudinal histories and choose high-burden official samples; do not shorten histories or remove distractors.",
+    "weighting": {
+      "LoCoMo": 0.5,
+      "Remember": 0.132,
+      "Update": 0.098,
+      "Forget": 0.115,
+      "Reflect": 0.155
+    }
+  },
+  "source_lock": {
+    "path": "技术难题-Agent-Memory-评测集（开源）-1.0/SOURCE_LOCK.json",
+    "sha256": "0e71dc5dfb02226262659af911866884d7798bd612a2c67b1858e605da79cd8f"
+  },
+  "samples": [
+    {
+      "stratum": "LoCoMo",
+      "sample_id": "locomo_conv-41",
+      "path": "技术难题-Agent-Memory-评测集（开源）-1.0/official/samples/locomo_conv-41.json",
+      "sha256": "3a0cad90340704b49167a91be471562525400b829ef136295cc67ae69124e6a7",
+      "sessions": 32,
+      "messages": 663,
+      "protocol_add_chunks": 46,
+      "search_items": 106,
+      "difficulty": {
+        "single_hop": 23,
+        "temporal": 26,
+        "multi_hop": 57,
+        "basis": "Deepest official LoCoMo sample by session count; retains all three scored reasoning types and a large multi-hop set."
+      }
+    },
+    {
+      "stratum": "Remember",
+      "sample_id": "memops_B01_remember",
+      "path": "技术难题-Agent-Memory-评测集（开源）-1.0/official/samples/memops_B01_remember.json",
+      "sha256": "a3850c0af51bd8dcaf339e7687ba1a2172d7f443bc7f282f530eb7373f87c82f",
+      "sessions": 50,
+      "messages": 540,
+      "protocol_add_chunks": 51,
+      "search_items": 6,
+      "difficulty": {
+        "must_include": 37,
+        "harmful_extra": 14,
+        "rubric_burden": 51,
+        "basis": "Highest must-include plus harmful-extra burden among official Remember samples."
+      }
+    },
+    {
+      "stratum": "Update",
+      "sample_id": "memops_A16_update",
+      "path": "技术难题-Agent-Memory-评测集（开源）-1.0/official/samples/memops_A16_update.json",
+      "sha256": "ba2308443e6a987ae9e1887ecfa45a8591780bfd38406572804b041383a30e02",
+      "sessions": 50,
+      "messages": 506,
+      "protocol_add_chunks": 50,
+      "search_items": 4,
+      "difficulty": {
+        "must_include": 13,
+        "harmful_extra": 11,
+        "rubric_burden": 24,
+        "basis": "Highest must-include plus harmful-extra burden among official Update samples; includes tentative, reverted, and cross-person distractor states."
+      }
+    },
+    {
+      "stratum": "Forget",
+      "sample_id": "memops_A05_forget",
+      "path": "技术难题-Agent-Memory-评测集（开源）-1.0/official/samples/memops_A05_forget.json",
+      "sha256": "ff5682581bf9397bea5563ba0e377038deb29008b877f709aeac3785530c016c",
+      "sessions": 50,
+      "messages": 506,
+      "protocol_add_chunks": 51,
+      "search_items": 5,
+      "difficulty": {
+        "must_include": 30,
+        "harmful_extra": 9,
+        "rubric_burden": 39,
+        "basis": "Highest must-include plus harmful-extra burden among official Forget samples; tests selective forgetting without over-forgetting related state."
+      }
+    },
+    {
+      "stratum": "Reflect",
+      "sample_id": "memops_A02_reflect",
+      "path": "技术难题-Agent-Memory-评测集（开源）-1.0/official/samples/memops_A02_reflect.json",
+      "sha256": "678a111e32fd9bfc568a2aca0d473786abe94db4f7777744654a3f63c10adb8f",
+      "sessions": 50,
+      "messages": 540,
+      "protocol_add_chunks": 52,
+      "search_items": 5,
+      "difficulty": {
+        "must_include": 25,
+        "harmful_extra": 9,
+        "rubric_burden": 34,
+        "basis": "Highest must-include plus harmful-extra burden among official Reflect samples; requires an evidence-grounded stable preference inference."
+      }
+    }
+  ],
+  "totals": {
+    "samples": 5,
+    "sessions": 232,
+    "messages": 2755,
+    "protocol_add_chunks": 250,
+    "search_items": 126,
+    "memops_must_include": 105,
+    "memops_harmful_extra": 43
+  }
+}
