@@ -3,7 +3,9 @@ ARG SOURCE_DATE_EPOCH=1787929140
 
 FROM ${PYTHON_IMAGE} AS builder
 
-ARG PIP_INDEX_URL=https://pypi.org/simple
+ARG PIP_INDEX_URL=https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-center/
+ARG PIP_EXTRA_INDEX_URL="https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-central-repo/simple/ https://cmc.centralrepo.rnd.huawei.com/artifactory/product_pypi/simple/"
+ARG PIP_TRUSTED_HOST=cmc.centralrepo.rnd.huawei.com
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1
@@ -13,8 +15,11 @@ COPY docker/memory-api/requirements.txt ./requirements.txt
 COPY pyproject.toml README.md ./
 COPY src ./src
 RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip config set global.index-url "${PIP_INDEX_URL}" \
+    && /opt/venv/bin/pip config set global.extra-index-url "${PIP_EXTRA_INDEX_URL}" \
+    && /opt/venv/bin/pip config set global.trusted-host "${PIP_TRUSTED_HOST}" \
     && /opt/venv/bin/python -m pip install \
-        --no-cache-dir --no-compile --index-url "${PIP_INDEX_URL}" \
+        --no-cache-dir --no-compile \
         --requirement requirements.txt \
     && /opt/venv/bin/python -m pip install --no-cache-dir --no-compile --no-deps . \
     && find /opt/venv -type d -name __pycache__ -prune -exec rm -rf '{}' +

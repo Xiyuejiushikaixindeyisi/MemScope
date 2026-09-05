@@ -4,7 +4,9 @@ ARG SOURCE_DATE_EPOCH=1787929140
 FROM ${PYTHON_IMAGE} AS builder
 
 ARG MEMOS_ARCHIVE=MemoryOS-v2.0.32-185ebdb.tar.gz
-ARG PIP_INDEX_URL=https://pypi.org/simple
+ARG PIP_INDEX_URL=https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-center/
+ARG PIP_EXTRA_INDEX_URL="https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-central-repo/simple/ https://cmc.centralrepo.rnd.huawei.com/artifactory/product_pypi/simple/"
+ARG PIP_TRUSTED_HOST=cmc.centralrepo.rnd.huawei.com
 ARG SOURCE_DATE_EPOCH
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -26,10 +28,12 @@ RUN sha256sum --check SHA256SUMS \
     && python /opt/vendor/apply_patchset.py --source /opt/memos \
     && install --mode=0755 memos-entrypoint.sh /opt/memos/memos-entrypoint.sh \
     && python -m venv /opt/venv \
+    && /opt/venv/bin/pip config set global.index-url "${PIP_INDEX_URL}" \
+    && /opt/venv/bin/pip config set global.extra-index-url "${PIP_EXTRA_INDEX_URL}" \
+    && /opt/venv/bin/pip config set global.trusted-host "${PIP_TRUSTED_HOST}" \
     && /opt/venv/bin/python -m pip install \
         --no-cache-dir \
         --no-compile \
-        --index-url "${PIP_INDEX_URL}" \
         --constraint /opt/vendor/constraints.txt \
         --requirement /opt/memos/docker/requirements.txt \
     && find /opt/venv -type d -name __pycache__ -prune -exec rm -rf '{}' + \

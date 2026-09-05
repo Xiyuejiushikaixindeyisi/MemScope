@@ -13,7 +13,9 @@ services:
       context: .
       dockerfile: docker/memory-api/Dockerfile
       args:
-        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://pypi.org/simple}"
+        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-center/}"
+        PIP_EXTRA_INDEX_URL: "${B04_PIP_EXTRA_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-central-repo/simple/ https://cmc.centralrepo.rnd.huawei.com/artifactory/product_pypi/simple/}"
+        PIP_TRUSTED_HOST: "${B04_PIP_TRUSTED_HOST:-cmc.centralrepo.rnd.huawei.com}"
     init: true
     restart: unless-stopped
     stop_grace_period: 30s
@@ -127,7 +129,9 @@ services:
       context: .
       dockerfile: docker/memos/Dockerfile
       args:
-        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://pypi.org/simple}"
+        PIP_INDEX_URL: "${B04_PIP_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-center/}"
+        PIP_EXTRA_INDEX_URL: "${B04_PIP_EXTRA_INDEX_URL:-https://cmc.centralrepo.rnd.huawei.com/artifactory/pypi-central-repo/simple/ https://cmc.centralrepo.rnd.huawei.com/artifactory/product_pypi/simple/}"
+        PIP_TRUSTED_HOST: "${B04_PIP_TRUSTED_HOST:-cmc.centralrepo.rnd.huawei.com}"
     restart: unless-stopped
     stop_grace_period: 30s
     mem_limit: "${B04_MEMOS_MEMORY_LIMIT:-4g}"
