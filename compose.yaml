@@ -63,11 +63,12 @@ services:
       retries: 20
       start_period: 5s
     ports:
-      - "${MEMSCOPE_PUBLIC_PORT:-8080}:8080"
+      - "127.0.0.1:${MEMSCOPE_PUBLIC_PORT:-8080}:8080"
     volumes:
       - memscope_data:/var/lib/memscope
     networks:
       - backend
+      - ingress
 
   neo4j:
     image: neo4j:5.26.6-community@sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893
@@ -80,6 +81,9 @@ services:
     environment:
       NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in an env file}"
       NEO4J_dbms_usage__report_enabled: "false"
+      NEO4J_server_memory_heap_initial__size: "${B04_NEO4J_HEAP_INITIAL_SIZE:-512m}"
+      NEO4J_server_memory_heap_max__size: "${B04_NEO4J_HEAP_MAX_SIZE:-512m}"
+      NEO4J_server_memory_pagecache_size: "${B04_NEO4J_PAGECACHE_SIZE:-512m}"
     healthcheck:
       test:
         - CMD-SHELL
@@ -229,6 +233,10 @@ services:
 networks:
   backend:
     internal: true
+  ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
   model-egress:
 
 volumes:

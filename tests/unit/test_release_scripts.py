@@ -37,6 +37,12 @@ def test_release_compose_is_four_service_load_only_topology() -> None:
     assert compose.count("pull_policy: never") == 4
     assert "memscope/memory-api:b10-release" in compose
     assert "memscope/memos:2.0.32-b10-release" in compose
+    assert '127.0.0.1:${MEMSCOPE_PUBLIC_PORT:-8080}:8080' in compose
+    assert "      - ingress" in compose
+    assert 'com.docker.network.bridge.enable_ip_masquerade: "false"' in compose
+    assert 'NEO4J_server_memory_heap_initial__size: "${NEO4J_HEAP_INITIAL_SIZE:-512m}"' in compose
+    assert 'NEO4J_server_memory_heap_max__size: "${NEO4J_HEAP_MAX_SIZE:-512m}"' in compose
+    assert 'NEO4J_server_memory_pagecache_size: "${NEO4J_PAGECACHE_SIZE:-512m}"' in compose
 
     dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")
     assert "compose.env" in dockerignore

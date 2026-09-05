@@ -53,8 +53,11 @@ def test_compose_has_only_approved_services_and_five_named_volumes() -> None:
     assert service_names == ["memory-api", "neo4j", "qdrant", "memos"]
     memory_api, private_services = service_block.split("\n  neo4j:\n", maxsplit=1)
     assert "ports:" in memory_api
+    assert '127.0.0.1:${MEMSCOPE_PUBLIC_PORT:-8080}:8080' in memory_api
+    assert "      - ingress" in memory_api
     assert "ports:" not in private_services
     assert "internal: true" in compose
+    assert 'com.docker.network.bridge.enable_ip_masquerade: "false"' in compose
     for volume in ("memscope_data", "memos_data", "neo4j_data", "neo4j_logs", "qdrant_data"):
         assert f"  {volume}:" in compose
 
@@ -110,6 +113,15 @@ def test_compose_requires_secrets_and_explicit_b05_model_configuration() -> None
     assert "neo4j/12345678" not in compose
     assert "      NEO4J_PASSWORD:" not in neo4j_service
     assert "$${NEO4J_AUTH#neo4j/}" in neo4j_service
+    assert (
+        'NEO4J_server_memory_heap_initial__size: "${B04_NEO4J_HEAP_INITIAL_SIZE:-512m}"'
+        in neo4j_service
+    )
+    assert 'NEO4J_server_memory_heap_max__size: "${B04_NEO4J_HEAP_MAX_SIZE:-512m}"' in neo4j_service
+    assert (
+        'NEO4J_server_memory_pagecache_size: "${B04_NEO4J_PAGECACHE_SIZE:-512m}"'
+        in neo4j_service
+    )
     assert 'MEMSCOPE_MODEL_PROFILE: "${MEMSCOPE_MODEL_PROFILE:?' in compose
     assert (
         'MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP: "${MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP:-false}"'
