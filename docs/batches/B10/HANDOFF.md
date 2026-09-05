@@ -1,6 +1,6 @@
 # B10 Gate 1 handoff and Gate 2 model API integration
 
-> Status: Gate 1 implemented; Gate 2 model API patch implemented; formal baseline not started
+> Status: Gate 1 implemented; Gate 2 rootful development deployment and live smoke passed; formal baseline awaits scope approval
 >
 > Gate 1 approved by explicit user message on 2026-09-05
 >
@@ -58,7 +58,7 @@ opt-in. External `/v1/reranker` remains disabled; the baseline uses local cosine
 
 | Check | Result |
 |---|---|
-| Full pytest with branch-aware coverage | 603 passed in 14.85 s; 96.73%, threshold 95% |
+| Full pytest with branch-aware coverage | 603 passed in 11.58 s; 96.73%, threshold 95% |
 | Restricted-sandbox unit/contract subset | 455 passed in 3.37 s |
 | B08 local-socket verifier outside the restricted socket sandbox | 4 passed in 1.08 s |
 | B10 delivery/release/deploy/rootful-path tests | 28 passed in 1.39 s |
@@ -74,15 +74,43 @@ SQLite worker threads. The same B08 file produced two `socket()` permission erro
 sandbox and passed 4/4 when only that restriction was removed; this is classified as an environment
 restriction, not a product failure.
 
-## 4. Evidence not claimed
+## 4. Rootful development-machine evidence
 
-An exploratory rootless daemon was able to build the two project images and complete an internal-container
-Add/Search smoke, but it could not publish the host port or enforce the configured cgroup limits. The user
-has now made rootful Docker mandatory on both machines, so that exploratory run is diagnostic only and is
-not accepted as deployment or baseline evidence. Therefore B10 does not yet claim:
+The development machine now has an authoritative rootful Docker 29.7.2 daemon using the `overlayfs`
+storage driver, systemd cgroups and `/run/docker.sock`; its security options do not contain `rootless`.
+The locked Python, Neo4j and Qdrant base images were transferred from the existing local cache and their
+complete SHA-256 image IDs were checked before the project build. The project build used the single
+credential-free Huawei Cloud PyPI mirror approved for this development run.
 
-- an authoritative rootful build, save, load or host-published start for the exact current commit;
-- container Health, host-port, resource or restart-persistence evidence for that exact set;
+The first rootful start exposed two runtime defects that the earlier rootless diagnostic could not reveal:
+
+- Neo4j rejected its host-derived automatic heap/page-cache estimate because it exceeded the 2 GiB
+  container limit. Both Compose files now use Neo4j's own 2 GiB recommendation: 512 MiB initial heap,
+  512 MiB maximum heap and 512 MiB page cache.
+- Docker 29 accepted but did not realize a port mapping for a container attached only to an internal
+  bridge. `memory-api` now also joins a dedicated ingress bridge with outbound masquerading disabled,
+  while the published port is restricted to `127.0.0.1`. The backend remains internal and only MemOS
+  joins the model-egress network.
+
+Commit `756902cebeee9e04990164885fd6706df32dfef9` was then rebuilt as Linux/amd64 images and started with
+`--no-build --pull never`:
+
+| Service | Image ID / runtime result |
+|---|---|
+| `memory-api` | `sha256:50f689d6479e4021c92e48695ff386b637cfdedfedd4e6c4940654410e1adce8`; healthy; 512 MiB, 1 CPU, 256 PIDs; `127.0.0.1:8080` published |
+| MemOS | `sha256:07e37e7bc1abf6778b6d002044d0313836fa7e082e4dabe127df2ccce669f5c4`; healthy; 4 GiB, 4 CPUs, 512 PIDs |
+| Neo4j | locked `sha256:eef89955a0ff6ce578ec5fb264333818bb2f56e169bcb8dda5bcadad1fc48893`; healthy; 2 GiB, 2 CPUs, 512 PIDs |
+| Qdrant | locked `sha256:31407c0e8e32eb771b71718f1a4772e2ad47a07557917b21ac96792f40eb8007`; healthy; 2 GiB, 2 CPUs, 512 PIDs |
+
+The sanitized real smoke tied to that exact custom-image pair passed: Health 0.008 s, Add 10.445 s,
+idempotent replay 0.003 s, same-user Search 0.229 s, cross-user isolated Search 0.136 s, with two evidence
+items returned. It used Zhipu `glm-5.1` with thinking disabled and ordinary SiliconFlow `BAAI/bge-m3`;
+the external reranker remained disabled.
+
+The following evidence is still not claimed:
+
+- a final four-image save/load round trip or deployment on the organizer host;
+- restart-persistence verification for this exact image set;
 - any call to the inaccessible organizer Huawei API;
 - a semantic baseline, tuning gain, official score or organizer-runtime pass.
 
@@ -129,9 +157,9 @@ the organizer template keeps provider-specific fields empty and retains the Huaw
 explicit and bounded; its independent reranker option does not require changing the baseline Compose
 backend. See `docs/batches/B10/MODEL_API_GATE2.md` for the secure operating procedure.
 
-Gate 2 model-API patch evidence: 599 tests passed with 96.73% coverage; Ruff format/check and strict
-Mypy passed; the locked MemOS patch verified and compiled; both Compose files passed quiet interpolation;
+Gate 2 model-API patch evidence: the current 603-test suite passed with 96.73% coverage; Ruff format/check
+and strict Mypy passed; the locked MemOS patch verified and compiled; both Compose files passed quiet interpolation;
 the real development credentials passed sanitized `/models` checks for Zhipu and SiliconFlow; and the
-83-entry delivery source allowlist passed its expanded secret scan. No additional inference request was
-made after the approved protocol probes. The development host still exposes no usable Docker daemon, so
-this step does not claim a rebuilt image or container-level service smoke.
+85-entry delivery source allowlist passed its expanded secret scan. The rootful build and sanitized live
+service smoke are recorded in section 4. Formal baseline execution remains held for an explicit choice of
+evaluation scope because it creates materially more model traffic than the protocol smoke.
