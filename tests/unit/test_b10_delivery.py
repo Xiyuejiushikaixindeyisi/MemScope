@@ -72,6 +72,7 @@ def _source_tree(root: Path) -> Path:
     _write(root, "scripts/run_release.sh", b"#!/bin/sh\nexit 0\n").chmod(0o755)
     _write(root, "scripts/verify_release.sh", b"#!/bin/sh\nexit 0\n").chmod(0o755)
     _write(root, "scripts/stop_release.sh", b"#!/bin/sh\nexit 0\n").chmod(0o755)
+    _write(root, "scripts/lib/rootful_docker.sh", b"#!/bin/sh\nexit 0\n").chmod(0o755)
     _write_memos_archive(root)
     _write(root, ".env", b"API_KEY=this-file-must-not-be-selected\n")
     _write(root, "deploy/private.env", b"API_KEY=this-file-must-not-be-selected\n")
@@ -95,6 +96,48 @@ def _images() -> list[dict[str, Any]]:
     ]
 
 
+def test_delivery_builder_selects_rootful_sudo_without_rootless_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    commands: list[list[str]] = []
+    executables = {
+        "docker": "/usr/bin/docker",
+        "env": "/usr/bin/env",
+        "sudo": "/usr/bin/sudo",
+    }
+
+    monkeypatch.setattr(builder.os, "geteuid", lambda: 1000)
+    monkeypatch.setattr(builder.shutil, "which", executables.get)
+
+    def fake_run(command: list[str], **_: Any) -> str:
+        commands.append(command)
+        return '["name=rootless"]' if command[0] == "/usr/bin/docker" else "[]"
+
+    monkeypatch.setattr(builder, "_run", fake_run)
+
+    assert builder._docker_command() == [
+        "/usr/bin/env",
+        "-u",
+        "DOCKER_HOST",
+        "-u",
+        "DOCKER_CONTEXT",
+        "/usr/bin/sudo",
+        "-n",
+        "--",
+        "/usr/bin/docker",
+    ]
+    assert len(commands) == 2
+
+
+def test_delivery_builder_rejects_running_whole_process_as_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(builder.os, "geteuid", lambda: 0)
+
+    with pytest.raises(builder.DeliveryError, match="ordinary operator"):
+        builder._docker_command()
+
+
 def test_solution_zip_is_deterministic_complete_and_verifiable(tmp_path: Path) -> None:
     source = _source_tree(tmp_path / "source")
     first = tmp_path / "first.zip"
@@ -114,6 +157,7 @@ def test_solution_zip_is_deterministic_complete_and_verifiable(tmp_path: Path) -
         lock = package.read("solution/RELEASE_LOCK.tsv").decode()
     assert "solution/ORGANIZER_AGENT_PROMPT.md" in names
     assert "solution/scripts/run_release.sh" in names
+    assert "solution/scripts/lib/rootful_docker.sh" in names
     assert "solution/code/src/fixture.txt" in names
     assert "solution/code/third_party/memos/MemoryOS-v2.0.32-185ebdb.tar.gz" in names
     assert "memory-api\tmemscope/memory-api:b10-release" in lock
@@ -166,7 +210,13 @@ def test_delivery_verifier_rejects_tampered_checksum(tmp_path: Path) -> None:
         "candidate_commit": _COMMIT,
         "target_platform": "linux/amd64",
         "service_count": 4,
-        "runtime_policy": {"build": False, "pull": False, "host_python": False},
+        "runtime_policy": {
+            "build": False,
+            "pull": False,
+            "host_python": False,
+            "rootful_docker": True,
+            "operator_home_only": True,
+        },
         "claims": {"official_score": False, "organizer_runtime_pass": False},
         "artifacts": artifacts,
         "images": _images(),

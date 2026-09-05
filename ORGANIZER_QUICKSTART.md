@@ -3,6 +3,11 @@
 本指南面向主办方评审机。评审机只校验并加载镜像、填写运行时配置、用 Docker Compose 启动四个
 服务并执行评测；不安装 Python 依赖，不构建镜像，也不从公网或内网镜像仓库拉取镜像。
 
+主办方所有交付文件、ZIP 解包内容、私有配置、脚本工作目录、评测输入输出和脱敏报告都必须位于
+执行用户自己的 `$HOME` 下，不得放在 `/root`、`/secure` 或文件系统根目录下的其它工作目录。
+Docker Engine 必须是 rootful；脚本仍由普通用户运行，只在 Docker 客户端没有直接访问 rootful
+daemon 的权限时使用 `sudo -n docker`。不要执行 `sudo ./scripts/run_release.sh`。
+
 这里的“不联网/离线运行”是指不依赖公网、镜像仓库、PyPI、源码站点或任何在线安装。交付的 ZIP
 和镜像 TAR 包含启动所需的源码、配置模板、脚本及四张运行镜像。真实 Add/Search 唯一需要的网络
 是主办方已经具备的 OpenAI-compatible Chat/Embedding 内网 API；正式评测器也必须由主办方预先
@@ -32,7 +37,7 @@ SHA256SUMS
 ## 2. 主机前提
 
 - Linux x86_64（amd64）；
-- 可用的 Docker Engine 和 Docker Compose v2；
+- 可用的 rootful Docker Engine 和 Docker Compose v2；不接受 rootless daemon；
 - 建议至少 10 GiB 内存；默认四服务内存上限合计 8.5 GiB；
 - 足够容纳镜像 TAR、解包内容、四张镜像和评测数据的磁盘空间；
 - MemOS 容器能够访问主办方 Chat/Embedding API；
@@ -40,9 +45,22 @@ SHA256SUMS
 - 主办方官方评测器及其数据集/命令已在评审机本地可用；
 - 宿主机只需常规 shell 工具、`unzip` 和 `sha256sum`，不需要 Python、uv 或 pip。
 
+先以普通用户准备固定目录，并刷新一次 `sudo` 凭据。若该用户已经能直接访问 rootful Docker，
+`sudo -v` 之后的脚本仍会优先直接连接同一个 rootful daemon：
+
+```bash
+install -d -m 0700 \
+  "$HOME/memscope-organizer" \
+  "$HOME/.config/memscope" \
+  "$HOME/memscope-evaluation"
+sudo -v
+```
+
+`sudo -v` 只用于后续 Docker 命令提权；不要切换到 root shell，也不要改变 `HOME`。
+
 ## 3. 校验和解包
 
-在四个交付文件所在目录执行：
+把四个交付文件放到 `$HOME/memscope-organizer/<candidate>/`，然后在该目录执行：
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -55,12 +73,12 @@ cd solution
 
 ## 4. 私有运行时配置
 
-配置文件必须放在解包目录之外，并且只允许当前用户读取：
+配置文件必须放在解包目录之外、仍位于当前用户的 `$HOME` 内，并且只允许当前用户读取：
 
 ```bash
 umask 077
-cp deploy/organizer.env.example /secure/memscope-organizer.env
-chmod 0600 /secure/memscope-organizer.env
+cp deploy/organizer.env.example "$HOME/.config/memscope/organizer.env"
+chmod 0600 "$HOME/.config/memscope/organizer.env"
 ```
 
 编辑该文件，只替换秘密占位符。不要把真实 Key、IAM token 或 Neo4j 密码写回 ZIP、源码、命令行、
@@ -82,12 +100,13 @@ chmod 0600 /secure/memscope-organizer.env
 ./scripts/run_release.sh \
   --image-bundle ../memscope-images-<candidate>-linux-amd64.tar \
   --sha256-file ../SHA256SUMS \
-  --env-file /secure/memscope-organizer.env
+  --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 脚本会再次校验完整交付集、执行 `docker load`、核对四张镜像 ID 和两张自建镜像的源码 revision，
 然后执行 Compose `config --quiet` 和 `up --no-build --pull never --wait`。它不会安装依赖、构建、
-拉取、访问软件源或删除卷。
+拉取、访问软件源或删除卷。脚本拒绝 rootless daemon 和 `$HOME` 之外的 solution、env、image TAR、
+lock 或 checksum 路径；若直接 Docker 权限不可用，会使用已由 `sudo -v` 授权的 `sudo -n docker`。
 
 若镜像已加载且只需重启，可增加 `--skip-load`；镜像 ID 仍会被核对。
 
@@ -95,7 +114,7 @@ chmod 0600 /secure/memscope-organizer.env
 
 ```bash
 ./scripts/verify_release.sh \
-  --env-file /secure/memscope-organizer.env
+  --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 验证脚本检查四容器 Health、Neo4j 查询、Qdrant `/readyz`，再从 `memory-api` 容器内执行一次真实
@@ -121,6 +140,8 @@ http://127.0.0.1:8080
 
 正式评分逻辑和数据集由主办方评测器提供；交付包不伪造 Answer/Judge，也不得把 gold answer 传给
 `/search`。批量评测器需要自行执行速率控制，并对 429 做有界退避；服务内部不会自动重放 Add。
+评测器的输入、输出、临时文件和脱敏报告统一放在
+`$HOME/memscope-evaluation/<candidate>/`，不得写入 `/root` 或系统目录。
 
 ## 8. 停止、保留和失败处理
 
@@ -128,7 +149,7 @@ http://127.0.0.1:8080
 
 ```bash
 ./scripts/stop_release.sh \
-  --env-file /secure/memscope-organizer.env
+  --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 禁止执行 `docker compose down -v`、`docker system prune` 或删除候选卷。失败时保留容器和卷，只记录

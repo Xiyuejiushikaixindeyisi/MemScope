@@ -5,6 +5,13 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SOLUTION_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly COMPOSE_FILE="${SOLUTION_ROOT}/compose.release.yaml"
 readonly DEFAULT_LOCK_FILE="${SOLUTION_ROOT}/RELEASE_LOCK.tsv"
+readonly ROOTFUL_DOCKER_LIB="${SCRIPT_DIR}/lib/rootful_docker.sh"
+[[ -r "${ROOTFUL_DOCKER_LIB}" ]] || {
+    printf 'ERROR: rootful Docker helper is missing: %s\n' "${ROOTFUL_DOCKER_LIB}" >&2
+    exit 1
+}
+# shellcheck source=scripts/lib/rootful_docker.sh
+source "${ROOTFUL_DOCKER_LIB}"
 
 ENV_FILE=""
 IMAGE_BUNDLE=""
@@ -13,7 +20,6 @@ SHA256_FILE=""
 PROJECT_NAME="memscope-organizer"
 WAIT_TIMEOUT_SECONDS="300"
 SKIP_LOAD="false"
-COMPOSE_COMMAND=()
 
 usage() {
     cat <<'EOF'
@@ -30,8 +36,9 @@ Options:
   --skip-load           Reuse already loaded images after verifying their IDs
   -h, --help            Show this help
 
-The host needs Linux x86_64, Docker Engine and Docker Compose v2. This script never
-uses Python/pip/uv, builds an image, pulls an image or removes a persistent volume.
+Run this script as the ordinary operator from a solution directory under $HOME.
+It selects a rootful Docker daemon, elevating Docker commands only when needed.
+It never uses Python/pip/uv, builds/pulls an image or removes a persistent volume.
 EOF
 }
 
@@ -160,17 +167,17 @@ verify_image_lock() {
         [[ "${expected_id}" =~ ^sha256:[0-9a-f]{64}$ ]] \
             || die "release image lock contains an invalid image ID"
         seen["${role}"]=1
-        actual_id="$(docker image inspect --format '{{.Id}}' "${reference}" 2>/dev/null || true)"
+        actual_id="$("${MEMSCOPE_DOCKER_COMMAND[@]}" image inspect --format '{{.Id}}' "${reference}" 2>/dev/null || true)"
         [[ "${actual_id}" == "${expected_id}" ]] \
             || die "loaded image ID does not match RELEASE_LOCK.tsv for ${role}"
-        actual_platform="$(docker image inspect --format '{{.Os}}/{{.Architecture}}' \
+        actual_platform="$("${MEMSCOPE_DOCKER_COMMAND[@]}" image inspect --format '{{.Os}}/{{.Architecture}}' \
             "${reference}" 2>/dev/null || true)"
         [[ "${actual_platform}" == "linux/amd64" ]] \
             || die "loaded image platform is not linux/amd64 for ${role}"
         if [[ "${revision}" != "-" ]]; then
             [[ "${revision}" =~ ^[0-9a-f]{40}$ ]] \
                 || die "release image lock contains an invalid source revision"
-            actual_revision="$(docker image inspect \
+            actual_revision="$("${MEMSCOPE_DOCKER_COMMAND[@]}" image inspect \
                 --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' \
                 "${reference}" 2>/dev/null || true)"
             [[ "${actual_revision}" == "${revision}" ]] \
@@ -185,7 +192,7 @@ verify_image_lock() {
 }
 
 compose() {
-    "${COMPOSE_COMMAND[@]}" \
+    "${MEMSCOPE_COMPOSE_COMMAND[@]}" \
         --project-directory "${SOLUTION_ROOT}" \
         --file "${COMPOSE_FILE}" \
         --env-file "${ENV_FILE}" \
@@ -215,16 +222,17 @@ done
 [[ "${PROJECT_NAME}" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || die "invalid Compose project name"
 [[ "${WAIT_TIMEOUT_SECONDS}" =~ ^[1-9][0-9]*$ ]] || die "--wait-timeout must be positive"
 
-require_command docker
 require_command grep
+require_command realpath
 require_command sha256sum
 require_command stat
-docker info >/dev/null 2>&1 || die "Docker daemon is unavailable or permission was denied"
-docker compose version >/dev/null 2>&1 || die "Docker Compose v2 is required"
-compose_version="$(docker compose version --short 2>/dev/null || true)"
-[[ "${compose_version}" =~ ^v?([0-9]+)\. ]] || die "could not determine Docker Compose version"
-(( BASH_REMATCH[1] >= 2 )) || die "Docker Compose v2 or newer is required"
-COMPOSE_COMMAND=(docker compose)
+memscope_assert_unprivileged_operator
+memscope_require_home_path "${SOLUTION_ROOT}" "solution directory"
+memscope_require_home_path "${ENV_FILE}" "private env file"
+memscope_require_home_path "${LOCK_FILE}" "release lock"
+[[ -z "${SHA256_FILE}" ]] || memscope_require_home_path "${SHA256_FILE}" "SHA256SUMS file"
+[[ -z "${IMAGE_BUNDLE}" ]] || memscope_require_home_path "${IMAGE_BUNDLE}" "image bundle"
+memscope_initialize_rootful_docker
 
 if [[ -r /proc/meminfo ]]; then
     total_memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
@@ -240,7 +248,7 @@ if [[ "${SKIP_LOAD}" != "true" ]]; then
     [[ -f "${IMAGE_BUNDLE}" && ! -L "${IMAGE_BUNDLE}" ]] \
         || die "image bundle is missing or unsafe: ${IMAGE_BUNDLE}"
     step "Loading the four-image offline bundle"
-    docker load --input "${IMAGE_BUNDLE}"
+    "${MEMSCOPE_DOCKER_COMMAND[@]}" load --input "${IMAGE_BUNDLE}"
 fi
 
 step "Verifying all four loaded image IDs and source labels"

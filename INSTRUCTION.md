@@ -48,6 +48,13 @@ Required host software is Linux x86_64, Docker Engine, Docker Compose v2, Bash, 
 `sha256sum`. At least 10 GiB RAM is recommended because the default service ceilings total 8.5 GiB.
 The organizer does not install Python/uv/pip, build an image or pull an image.
 
+The Docker Engine must be rootful on both development and organizer machines. Run the operator
+scripts as the ordinary user; they use direct access to the rootful daemon when available and fall
+back to non-interactive `sudo` for Docker commands only. Never run a complete script with `sudo`.
+On the organizer machine, the delivery, extracted solution, private configuration, evaluation
+inputs/outputs and reports must all remain below that ordinary user's `$HOME`; do not use `/root`,
+`/secure` or another top-level system working directory.
+
 “Offline” in this delivery contract means the organizer needs no public Internet, image registry,
 Python package index, source host or dependency download. The four runtime images and all startup
 files arrive in the delivered ZIP/TAR set. The only runtime network dependency is the organizer's
@@ -56,7 +63,8 @@ The official evaluator must likewise already exist on the organizer machine. Wit
 network path to any configured model API, the containers can start, but real Add/Search evaluation
 cannot complete; that state must be reported as `model_api_unreachable`, not as an offline pass.
 
-From the directory containing all four delivered files:
+Place all four delivered files in `$HOME/memscope-organizer/<candidate>/`, then run as the ordinary
+user (use `sudo -v` once before the operator script if direct rootful-Docker access is unavailable):
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -67,8 +75,9 @@ Create a private runtime configuration outside the extracted source and replace 
 
 ```bash
 umask 077
-cp solution/deploy/organizer.env.example /secure/memscope-organizer.env
-chmod 0600 /secure/memscope-organizer.env
+install -d -m 0700 "$HOME/.config/memscope" "$HOME/memscope-evaluation/<candidate>"
+cp solution/deploy/organizer.env.example "$HOME/.config/memscope/organizer.env"
+chmod 0600 "$HOME/.config/memscope/organizer.env"
 ```
 
 Never put a real Key, IAM token or Neo4j password in source, Compose YAML, an image layer, a command
@@ -82,7 +91,7 @@ cd solution
 ./scripts/run_release.sh \
   --image-bundle ../memscope-images-<candidate>-linux-amd64.tar \
   --sha256-file ../SHA256SUMS \
-  --env-file /secure/memscope-organizer.env
+  --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 The script validates hashes and private-file permissions, runs `docker load`, verifies all image
@@ -92,7 +101,7 @@ None of these deployment steps contacts a registry or package source.
 Before official evaluation, run the real model smoke:
 
 ```bash
-./scripts/verify_release.sh --env-file /secure/memscope-organizer.env
+./scripts/verify_release.sh --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 The verifier checks four healthy containers, Neo4j and Qdrant readiness, Add replay, cross-session
@@ -104,11 +113,13 @@ Point the organizer's official evaluator at the printed origin, normally
 `http://127.0.0.1:8080`. Do not pass gold answers to `/search` and do not replace the official Judge
 with a package-local implementation. The evaluation client owns batch throttling and bounded 429
 backoff; the service does not automatically replay Add.
+Keep the evaluator's datasets, temporary files, outputs and sanitized report under
+`$HOME/memscope-evaluation/<candidate>/`.
 
 Stop containers and preserve all named volumes with:
 
 ```bash
-./scripts/stop_release.sh --env-file /secure/memscope-organizer.env
+./scripts/stop_release.sh --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 Never run `down -v`, `docker system prune`, a build or a pull on the organizer machine. Complete
@@ -140,7 +151,8 @@ image construction. The development Compose entry remains `compose.yaml`:
 
 ```bash
 uv sync --frozen
-./scripts/deploy_linux.sh --env-file /secure/memscope-development.env
+sudo -v
+./scripts/deploy_linux.sh --env-file "$HOME/.config/memscope/development.env"
 ```
 
 Builds use exactly one explicit HTTPS Python package index. Override the default only with a
@@ -162,14 +174,14 @@ checksums outside the repository:
 ```bash
 python3 scripts/build_candidate_delivery.py build \
   --source-root . \
-  --output-dir /secure/memscope-final \
+  --output-dir "$HOME/memscope-final/<candidate>" \
   --candidate-commit <40-character-commit> \
   --build-images \
   --pull-upstream \
   --package-index https://approved.example/simple
 
 python3 scripts/build_candidate_delivery.py verify \
-  --delivery-dir /secure/memscope-final
+  --delivery-dir "$HOME/memscope-final/<candidate>"
 ```
 
 `--pull-upstream` is an explicit development-machine action and fetches only the digest-pinned

@@ -6,12 +6,18 @@ readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly DEFAULT_ENV_FILE="${MEMSCOPE_CONFIG_DIR:-${REPO_ROOT}}/compose.env"
 readonly DEFAULT_PROJECT_NAME="memscope"
 readonly REQUIRED_UV_VERSION="0.12.9"
+readonly ROOTFUL_DOCKER_LIB="${SCRIPT_DIR}/lib/rootful_docker.sh"
+[[ -r "${ROOTFUL_DOCKER_LIB}" ]] || {
+    printf 'ERROR: rootful Docker helper is missing: %s\n' "${ROOTFUL_DOCKER_LIB}" >&2
+    exit 1
+}
+# shellcheck source=scripts/lib/rootful_docker.sh
+source "${ROOTFUL_DOCKER_LIB}"
 
 ENV_FILE="${DEFAULT_ENV_FILE}"
 PROJECT_NAME="${DEFAULT_PROJECT_NAME}"
 MODE="deploy"
 WAIT_TIMEOUT_SECONDS="300"
-COMPOSE_COMMAND=()
 
 usage() {
     cat <<'EOF'
@@ -37,7 +43,9 @@ The default mode performs:
   detached startup with health waiting
   public health verification
 
-The script never creates credentials and never removes persistent volumes.
+Run this script as the ordinary operator against a rootful Docker daemon. It
+elevates Docker commands only when needed. The script never creates credentials
+and never removes persistent volumes.
 EOF
 }
 
@@ -173,7 +181,7 @@ validate_secret_file() {
 }
 
 compose() {
-    "${COMPOSE_COMMAND[@]}" \
+    "${MEMSCOPE_COMPOSE_COMMAND[@]}" \
         --project-directory "${REPO_ROOT}" \
         --file "${REPO_ROOT}/compose.yaml" \
         --env-file "${ENV_FILE}" \
@@ -243,7 +251,6 @@ done
 [[ "${WAIT_TIMEOUT_SECONDS}" =~ ^[1-9][0-9]*$ ]] || die "--wait-timeout must be a positive integer"
 
 require_command uv
-require_command docker
 require_command install
 require_command realpath
 require_command sha256sum
@@ -251,19 +258,8 @@ require_command stat
 
 actual_uv_version="$(uv --version | awk '{print $2}')"
 [[ "${actual_uv_version}" == "${REQUIRED_UV_VERSION}" ]] || die "uv ${REQUIRED_UV_VERSION} is required; found ${actual_uv_version:-unknown}"
-docker info >/dev/null 2>&1 || die "Docker daemon is unavailable or the current user lacks permission"
-if docker compose version >/dev/null 2>&1; then
-    COMPOSE_COMMAND=(docker compose)
-elif command -v docker-compose >/dev/null 2>&1 && docker-compose version >/dev/null 2>&1; then
-    COMPOSE_COMMAND=(docker-compose)
-else
-    die "Docker Compose is required; neither 'docker compose' nor 'docker-compose' is available"
-fi
-compose_version="$("${COMPOSE_COMMAND[@]}" version --short 2>/dev/null || true)"
-if [[ ! "${compose_version}" =~ ^v?([0-9]+)\. ]]; then
-    die "could not determine the Docker Compose version"
-fi
-(( BASH_REMATCH[1] >= 2 )) || die "Docker Compose v2 or newer is required; found ${compose_version}"
+memscope_assert_unprivileged_operator
+memscope_initialize_rootful_docker
 
 if [[ -r /proc/meminfo ]]; then
     total_memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"

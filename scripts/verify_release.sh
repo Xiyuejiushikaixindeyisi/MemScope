@@ -4,6 +4,13 @@ set -Eeuo pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SOLUTION_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly COMPOSE_FILE="${SOLUTION_ROOT}/compose.release.yaml"
+readonly ROOTFUL_DOCKER_LIB="${SCRIPT_DIR}/lib/rootful_docker.sh"
+[[ -r "${ROOTFUL_DOCKER_LIB}" ]] || {
+    printf 'ERROR: rootful Docker helper is missing: %s\n' "${ROOTFUL_DOCKER_LIB}" >&2
+    exit 1
+}
+# shellcheck source=scripts/lib/rootful_docker.sh
+source "${ROOTFUL_DOCKER_LIB}"
 PUBLIC_VERIFIER="${SOLUTION_ROOT}/code/scripts/verify_b06_candidate.py"
 if [[ ! -f "${PUBLIC_VERIFIER}" ]]; then
     PUBLIC_VERIFIER="${SCRIPT_DIR}/verify_b06_candidate.py"
@@ -35,7 +42,7 @@ step() {
 }
 
 compose() {
-    docker compose \
+    "${MEMSCOPE_COMPOSE_COMMAND[@]}" \
         --project-directory "${SOLUTION_ROOT}" \
         --file "${COMPOSE_FILE}" \
         --env-file "${ENV_FILE}" \
@@ -55,9 +62,11 @@ done
 [[ -n "${ENV_FILE}" && -f "${ENV_FILE}" && ! -L "${ENV_FILE}" ]] \
     || die "a regular private --env-file is required"
 [[ "${PROJECT_NAME}" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || die "invalid Compose project name"
-command -v docker >/dev/null 2>&1 || die "required command not found: docker"
-docker info >/dev/null 2>&1 || die "Docker daemon is unavailable or permission was denied"
-docker compose version >/dev/null 2>&1 || die "Docker Compose v2 is required"
+command -v realpath >/dev/null 2>&1 || die "required command not found: realpath"
+memscope_assert_unprivileged_operator
+memscope_require_home_path "${SOLUTION_ROOT}" "solution directory"
+memscope_require_home_path "${ENV_FILE}" "private env file"
+memscope_initialize_rootful_docker
 [[ -f "${PUBLIC_VERIFIER}" && ! -L "${PUBLIC_VERIFIER}" ]] \
     || die "public verifier is missing from solution/code"
 
@@ -67,8 +76,8 @@ step "Checking all four container health states"
 for service in memory-api memos neo4j qdrant; do
     container_id="$(compose ps --quiet "${service}")"
     [[ -n "${container_id}" ]] || die "service container is missing: ${service}"
-    running="$(docker inspect --format '{{.State.Running}}' "${container_id}")"
-    health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}missing{{end}}' "${container_id}")"
+    running="$("${MEMSCOPE_DOCKER_COMMAND[@]}" inspect --format '{{.State.Running}}' "${container_id}")"
+    health="$("${MEMSCOPE_DOCKER_COMMAND[@]}" inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}missing{{end}}' "${container_id}")"
     [[ "${running}" == "true" && "${health}" == "healthy" ]] \
         || die "service is not running and healthy: ${service}"
     printf '%s: healthy\n' "${service}"

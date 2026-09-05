@@ -21,7 +21,7 @@ Search 请求不包含 gold。gold 只在 Search 返回后交给本地 Proxy Jud
 ```bash
 python scripts/local_proxy_eval.py \
   --base-url http://127.0.0.1:8080 \
-  --output-dir /secure/memscope-eval/proxy-baseline
+  --output-dir "$HOME/memscope-evaluation/development/proxy-baseline"
 ```
 
 若被测服务启用了 Bearer shared key：
@@ -34,7 +34,7 @@ python scripts/local_proxy_eval.py \
   --credential-env MEMSCOPE_EVAL_API_KEY \
   --min-interval-seconds 0.2 \
   --max-rate-limit-retries 4 \
-  --output-dir /secure/memscope-eval/proxy-baseline
+  --output-dir "$HOME/memscope-evaluation/development/proxy-baseline"
 ```
 
 不要把真实值直接写在示例命令或 shell history 中；上面的值只是占位说明。
@@ -45,15 +45,15 @@ python scripts/local_proxy_eval.py \
 python scripts/local_proxy_eval.py \
   --base-url http://127.0.0.1:8080 \
   --max-samples 2 \
-  --output-dir /secure/memscope-eval/proxy-smoke
+  --output-dir "$HOME/memscope-evaluation/development/proxy-smoke"
 ```
 
 对已经保存的 Search 结果重新评分：
 
 ```bash
 python scripts/local_proxy_eval.py \
-  --input-results /secure/memscope-eval/proxy-baseline/search_results.jsonl \
-  --output-dir /secure/memscope-eval/proxy-rescored
+  --input-results "$HOME/memscope-evaluation/development/proxy-baseline/search_results.jsonl" \
+  --output-dir "$HOME/memscope-evaluation/development/proxy-rescored"
 ```
 
 自测：

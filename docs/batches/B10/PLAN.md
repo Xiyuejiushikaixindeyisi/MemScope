@@ -12,7 +12,8 @@ source ZIP” assumption with this current boundary:
 development machine
   deploys/tests/evaluates/tunes -> freezes source/config -> builds ZIP + four-image bundle
 organizer review machine
-  verifies hashes -> docker load -> injects runtime config -> Compose starts four services -> evaluates
+  ordinary-user HOME -> verifies hashes -> rootful docker load -> injects runtime config
+  -> Compose starts four services -> evaluates
 ```
 
 “Four-image offline bundle” describes transport. It does not change the runtime into one container.
@@ -29,7 +30,8 @@ evaluator is assumed to be locally available.
    the external reranker disabled pending a separately tested adapter.
 4. Add host-Python-free organizer scripts to load/identity-check images, start with
    `--no-build --pull never`, verify infrastructure plus a real Add/Search smoke, and stop without
-   deleting volumes.
+   deleting volumes. The scripts run as the ordinary user, reject rootless Docker, elevate only
+   Docker commands when required, and reject organizer artifact/config paths outside `$HOME`.
 5. Add `ORGANIZER_QUICKSTART.md` and a blank-context `ORGANIZER_AGENT_PROMPT.md` that cover loading,
    private configuration, one-command Compose startup, official evaluation handoff and safe failure.
 6. Add a candidate builder that creates, only after tuning and explicit approval:
@@ -67,8 +69,9 @@ evaluator is assumed to be locally available.
   from product failures.
 - Two source ZIP previews produced in `/tmp` are byte-identical and verify successfully. They are
   explicitly named previews and are not final artifacts or final checksums.
-- The final delivery procedure is demonstrably executable on a clean organizer host with no project
-  Python/uv/pip, no public Internet/download access and only organizer model-network access.
+- The final delivery procedure is demonstrably executable from the ordinary operator's `$HOME` on a
+  clean organizer host with rootful Docker, no project Python/uv/pip, no public Internet/download
+  access and only organizer model-network access.
 - The organizer agent prompt is executable from blank context, never requests secret output, invokes
   the official evaluator rather than inventing scoring, and preserves volumes on failure.
 

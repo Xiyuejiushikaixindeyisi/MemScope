@@ -26,6 +26,10 @@ already be local. Start with
 [`INSTRUCTION.md`](INSTRUCTION.md), [`ORGANIZER_QUICKSTART.md`](ORGANIZER_QUICKSTART.md), or the
 directly reusable [`ORGANIZER_AGENT_PROMPT.md`](ORGANIZER_AGENT_PROMPT.md).
 
+Both machines use a rootful Docker daemon. Operator scripts run as the ordinary user and elevate
+Docker commands only when required. On the organizer machine, delivery files, extraction, private
+configuration and evaluation outputs all stay under that user's `$HOME`, never `/root` or `/secure`.
+
 ## Development
 
 The locked toolchain is CPython 3.11.16 and uv 0.12.9:
@@ -41,7 +45,8 @@ uv run pytest
 Development Compose may install packages and build the two project images:
 
 ```bash
-./scripts/deploy_linux.sh --env-file /secure/memscope-development.env
+sudo -v
+./scripts/deploy_linux.sh --env-file "$HOME/.config/memscope/development.env"
 ```
 
 `compose.yaml` is development-only. Builds use exactly one explicit HTTPS package index; private env
@@ -58,9 +63,9 @@ The final release will contain a source ZIP, one four-image Linux/amd64 TAR, JSO
 ./scripts/run_release.sh \
   --image-bundle ../memscope-images-<candidate>-linux-amd64.tar \
   --sha256-file ../SHA256SUMS \
-  --env-file /secure/memscope-organizer.env
+  --env-file "$HOME/.config/memscope/organizer.env"
 
-./scripts/verify_release.sh --env-file /secure/memscope-organizer.env
+./scripts/verify_release.sh --env-file "$HOME/.config/memscope/organizer.env"
 ```
 
 The public origin defaults to `http://127.0.0.1:8080`; MemOS uses internal port 8000. Stop without

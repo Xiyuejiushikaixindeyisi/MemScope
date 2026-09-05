@@ -65,6 +65,9 @@ printf 'docker %s\\n' "$*" >> {log!s}
 if [[ "${{FAKE_DOCKER_COMPOSE_UNAVAILABLE:-0}}" == "1" && "$*" == "compose version" ]]; then
     exit 1
 fi
+if [[ "$*" == "info --format {{{{json .SecurityOptions}}}}" ]]; then
+    printf '%s\\n' "${{FAKE_DOCKER_SECURITY_OPTIONS:-[]}}"
+fi
 if [[ "$*" == "compose version --short" ]]; then
     printf '%s\\n' "${{FAKE_COMPOSE_VERSION:-2.40.0}}"
 fi
@@ -162,7 +165,7 @@ def test_rejects_internal_http_without_explicit_opt_in(tmp_path: Path) -> None:
     assert "HTTP model endpoints require MEMSCOPE_ALLOW_INSECURE_MODEL_HTTP=true" in result.stderr
 
 
-def test_falls_back_to_standalone_docker_compose(tmp_path: Path) -> None:
+def test_rejects_missing_compose_v2_plugin(tmp_path: Path) -> None:
     env_file = tmp_path / "memscope.env"
     _write_env(env_file)
 
@@ -174,10 +177,8 @@ def test_falls_back_to_standalone_docker_compose(tmp_path: Path) -> None:
         environment_overrides={"FAKE_DOCKER_COMPOSE_UNAVAILABLE": "1"},
     )
 
-    assert result.returncode == 0, result.stderr
-    commands = (tmp_path / "commands.log").read_text(encoding="utf-8")
-    assert "docker-compose --project-directory" in commands
-    assert "docker-compose version" in commands
+    assert result.returncode != 0
+    assert "Docker Compose v2 is required" in result.stderr
 
 
 def test_rejects_legacy_compose_v1(tmp_path: Path) -> None:

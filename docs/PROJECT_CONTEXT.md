@@ -40,6 +40,11 @@ final delivery generation. The organizer review machine only verifies artifacts,
 injects private runtime configuration, starts four services with Compose and runs Smoke/official
 evaluation. It does not build/pull images or install Python/uv/pip.
 
+Both machines require a rootful Docker daemon. Operational scripts run as the ordinary user and
+elevate Docker calls only when necessary. On the organizer machine all delivered files, extraction,
+private configuration, script work, evaluation input/output and reports stay under that user's
+`$HOME`; `/root` and system-level working directories are outside the supported path.
+
 The organizer facts supplied by the user are:
 
 - Chat: `http://aigateway.huawei.com/v1`, model `GLM-V5_1-DX`;
@@ -61,6 +66,10 @@ formats from the build context.
 `build:` key and sets `pull_policy: never`. Only memory-api publishes a host port, default 8080.
 MemOS stays internal on port 8000. Default memory ceilings total 8.5 GiB, so 10 GiB host RAM is
 recommended.
+
+The organizer entrypoints reject rootless Docker and host paths outside the ordinary operator's
+`$HOME`. They may use `sudo -n docker` after an operator `sudo -v`, but the scripts themselves must
+not be launched with `sudo`.
 
 The final image TAR is one offline transport bundle containing four images, not a single runtime
 container. `run_release.sh` validates SHA-256, private env permissions, image IDs and custom OCI

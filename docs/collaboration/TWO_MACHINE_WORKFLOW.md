@@ -20,10 +20,16 @@
 协议。一个镜像 TAR 内含四张镜像只是传输形式；运行时仍是 `memory-api`、MemOS、Neo4j、Qdrant
 四个容器。
 
+两台机器都使用 rootful Docker daemon。所有运维脚本由普通用户启动，只在 Docker 客户端需要时对
+单条 Docker 命令使用 `sudo`；不得用 `sudo` 运行整套脚本。主办方机器的交付文件、ZIP 解包、私有
+配置、脚本工作目录、评测输入输出和报告全部位于该普通用户的 `$HOME`，不得使用 `/root`、
+`/secure` 或其它系统顶层目录。
+
 ## 2. 开发机职责
 
 - 维护 Git、候选分支、设计、代码、锁、测试、文档和回退点；
 - 安装 Python 依赖，构建/运行开发服务，使用开发机可达 API 做能力探测和真实评测；
+- 使用 rootful Docker 构建和运行容器；脚本仍由普通用户运行，仅 Docker 操作按需提权；
 - baseline 先于调优；单变量实验记录数据切片、配置指纹、得分、延迟、失败率和结论；
 - 在最终源码和非秘密运行配置确定后构建两张项目镜像，并把固定 Neo4j/Qdrant 镜像一起保存；
 - 生成并验证最终四件套，确保主办方无需 build、pull、Python、uv 或 pip；
@@ -34,7 +40,9 @@ Dockerfile 或固定 MemOS patchset 变化才重建受影响镜像。
 
 ## 3. 主办方评审机职责
 
-- 提供 Linux x86_64、Docker Engine/Compose v2、磁盘/内存和可达的主办方模型 API；
+- 提供 Linux x86_64、rootful Docker Engine/Compose v2、磁盘/内存和可达的主办方模型 API；
+- 在执行用户 `$HOME` 下准备交付、解包、私有配置、脚本、评测和报告目录，禁止把工作目录放到
+  `/root` 或系统顶层目录；
 - 校验 `SHA256SUMS`，加载四镜像 bundle，使用源码目录外的 0600 私有 env 注入凭据；
 - 运行 `run_release.sh` 和 `verify_release.sh`，确认四服务 Health、真实 Add/Search 和隔离；
 - 把服务 URL 交给主办方官方评测器，按官方数据、并发和评分规则执行评测；
@@ -92,5 +100,5 @@ evidence、错误成功、数据损坏、凭据暴露、image ID/commit 不一�
 - `scripts/run_release.sh`、`verify_release.sh`、`stop_release.sh`；
 - `RELEASE_LOCK.tsv`、源码 manifest、第三方通知和许可证。
 
-这些入口必须与最终文件名一致，并在没有 host Python/uv/pip、没有 registry pull、没有源码 build 的
-清洁评审机流程中验证。
+这些入口必须与最终文件名一致，并在普通用户 `$HOME`、rootful Docker、没有 host Python/uv/pip、
+没有 registry pull、没有源码 build 的清洁评审机流程中验证。

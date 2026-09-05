@@ -20,6 +20,11 @@ organizer review machine only verifies the delivered set, loads prebuilt images,
 configuration, starts four services with Compose, runs the supplied smoke and hands the endpoint to the
 official evaluator.
 
+Both machines require a rootful Docker daemon. Scripts are launched by the ordinary operator and elevate
+Docker commands only when necessary. On the organizer machine the delivery set, extraction, private env,
+script work, evaluation data/output and report all stay under that operator's `$HOME`; `/root`, `/secure`
+and other system-level work directories are unsupported.
+
 The organizer path is public-Internet-independent: it performs no registry, package-index, source-host or
 dependency download. Its sole runtime network dependency is the configured organizer-intranet Chat/Embedding
 API, and its official evaluator is assumed to be locally supplied. A completely disconnected host can load
@@ -38,7 +43,7 @@ all four services and publishes only `memory-api`.
   digests and the two custom OCI source-revision labels.
 - `scripts/run_release.sh` requires Linux x86_64, Docker/Compose v2 and a mode-0600 private env; it verifies
   delivery hashes, runs `docker load`, checks image IDs/platform/revisions and starts with
-  `--no-build --pull never --wait`.
+  `--no-build --pull never --wait`. It rejects rootless Docker and organizer host paths outside `$HOME`.
 - `scripts/verify_release.sh` uses Python already inside the delivered container, not host Python, for a
   sanitized real Health/Add/replay/Search/cross-user smoke.
 - `scripts/stop_release.sh` stops containers without deleting named volumes.
@@ -53,16 +58,16 @@ opt-in. External `/v1/reranker` remains disabled; the baseline uses local cosine
 
 | Check | Result |
 |---|---|
-| Full pytest with branch-aware coverage | 584 passed in 14.84 s; 96.73%, threshold 95% |
+| Full pytest with branch-aware coverage | 603 passed in 14.85 s; 96.73%, threshold 95% |
 | Restricted-sandbox unit/contract subset | 455 passed in 3.37 s |
 | B08 local-socket verifier outside the restricted socket sandbox | 4 passed in 1.08 s |
-| B10 delivery/release-script/offline-path tests | 13 passed in 0.52 s |
+| B10 delivery/release/deploy/rootful-path tests | 28 passed in 1.39 s |
 | Ruff format/check | passed |
 | Mypy, production/tests/B10 builder/public proxy evaluator | passed |
 | Bash syntax for release scripts | passed |
 | Release Compose with non-secret test values | parsed; exactly four services |
 | Fixed MemOS archive SHA-256 and patch preimages | passed |
-| Actual source allowlist and expanded MemOS secret scan | 81 selected entries; passed |
+| Actual source allowlist and expanded MemOS secret scan | 85 selected entries; passed |
 
 The full test run needed the local-only sandbox exception because existing tests bind `127.0.0.1` and use
 SQLite worker threads. The same B08 file produced two `socket()` permission errors inside the restricted
@@ -71,13 +76,14 @@ restriction, not a product failure.
 
 ## 4. Evidence not claimed
 
-The available development environment has no running Docker daemon. Both the default socket and the
-rootless `/run/user/1000/docker.sock` path were checked; the latter does not exist outside the sandbox.
-Therefore Gate 1 does not claim:
+An exploratory rootless daemon was able to build the two project images and complete an internal-container
+Add/Search smoke, but it could not publish the host port or enforce the configured cgroup limits. The user
+has now made rootful Docker mandatory on both machines, so that exploratory run is diagnostic only and is
+not accepted as deployment or baseline evidence. Therefore B10 does not yet claim:
 
-- a real build, save, load or start of the B10 four-image set;
+- an authoritative rootful build, save, load or host-published start for the exact current commit;
 - container Health, host-port, resource or restart-persistence evidence for that exact set;
-- a call to either the development API or the inaccessible organizer Huawei API;
+- any call to the inaccessible organizer Huawei API;
 - a semantic baseline, tuning gain, official score or organizer-runtime pass.
 
 No final ZIP, image TAR, manifest, checksum, release, tag, push or merge was produced.

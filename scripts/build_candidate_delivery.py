@@ -64,6 +64,7 @@ _DIRECT_FILES = {
     "scripts/run_release.sh": "solution/scripts/run_release.sh",
     "scripts/verify_release.sh": "solution/scripts/verify_release.sh",
     "scripts/stop_release.sh": "solution/scripts/stop_release.sh",
+    "scripts/lib/rootful_docker.sh": "solution/scripts/lib/rootful_docker.sh",
     "third_party/memos/LICENSE": "solution/LICENSES/MemOS-Apache-2.0.txt",
 }
 _CODE_ROOT_FILES = (
@@ -447,17 +448,44 @@ def _validate_package_index(value: str) -> str:
     return value
 
 
-def _docker_executable() -> str:
+def _docker_command() -> list[str]:
+    if os.geteuid() == 0:
+        raise DeliveryError(
+            "run the delivery builder as the ordinary operator; "
+            "only Docker commands may be elevated"
+        )
     docker = shutil.which("docker")
     if docker is None:
         raise DeliveryError("Docker executable is required for final delivery")
-    return docker
+
+    candidates = [[docker]]
+    sudo = shutil.which("sudo")
+    env = shutil.which("env")
+    if sudo is not None and env is not None:
+        candidates.append(
+            [env, "-u", "DOCKER_HOST", "-u", "DOCKER_CONTEXT", sudo, "-n", "--", docker]
+        )
+    for candidate in candidates:
+        try:
+            security_options = _run(
+                [*candidate, "info", "--format", "{{json .SecurityOptions}}"],
+                cwd=Path.cwd(),
+                timeout=15,
+            )
+        except DeliveryError:
+            continue
+        if security_options.strip() and "rootless" not in security_options.lower():
+            return candidate
+    raise DeliveryError(
+        "a rootful Docker daemon is required; run 'sudo -v', ensure the system Docker "
+        "service is active, and retry as the ordinary user"
+    )
 
 
 def _build_custom_images(root: Path, commit: str, package_index: str) -> None:
-    docker = _docker_executable()
+    docker = _docker_command()
     common = [
-        docker,
+        *docker,
         "build",
         "--build-arg",
         f"SOURCE_REVISION={commit}",
@@ -477,20 +505,20 @@ def _build_custom_images(root: Path, commit: str, package_index: str) -> None:
 
 
 def _prepare_upstream_images(root: Path, *, pull: bool) -> None:
-    docker = _docker_executable()
+    docker = _docker_command()
     for pinned, tag in ((NEO4J_PIN, NEO4J_IMAGE), (QDRANT_PIN, QDRANT_IMAGE)):
         if pull:
-            _run([docker, "pull", pinned], cwd=root, timeout=900)
-            _run([docker, "tag", pinned, tag], cwd=root, timeout=30)
+            _run([*docker, "pull", pinned], cwd=root, timeout=900)
+            _run([*docker, "tag", pinned, tag], cwd=root, timeout=30)
         else:
-            _run([docker, "image", "inspect", tag], cwd=root, timeout=30)
+            _run([*docker, "image", "inspect", tag], cwd=root, timeout=30)
 
 
 def _inspect_images(root: Path, commit: str) -> list[dict[str, Any]]:
-    docker = _docker_executable()
+    docker = _docker_command()
     records: list[dict[str, Any]] = []
     for role, reference, custom in _IMAGE_ROLES:
-        raw = _run([docker, "image", "inspect", reference], cwd=root, timeout=30)
+        raw = _run([*docker, "image", "inspect", reference], cwd=root, timeout=30)
         try:
             values = json.loads(raw)
             document = values[0]
@@ -583,9 +611,9 @@ def build_delivery(
         os.close(image_fd)
         image_temp = Path(image_name)
         temporary_paths.append(image_temp)
-        docker = _docker_executable()
+        docker = _docker_command()
         _run(
-            [docker, "save", "--output", str(image_temp), *[item[1] for item in _IMAGE_ROLES]],
+            [*docker, "save", "--output", str(image_temp), *[item[1] for item in _IMAGE_ROLES]],
             cwd=source_root,
             timeout=1800,
         )
@@ -621,7 +649,13 @@ def build_delivery(
             "candidate_commit": commit,
             "target_platform": "linux/amd64",
             "service_count": 4,
-            "runtime_policy": {"build": False, "pull": False, "host_python": False},
+            "runtime_policy": {
+                "build": False,
+                "pull": False,
+                "host_python": False,
+                "rootful_docker": True,
+                "operator_home_only": True,
+            },
             "claims": {"official_score": False, "organizer_runtime_pass": False},
             "artifacts": artifacts,
             "images": images,
@@ -801,7 +835,13 @@ def verify_delivery(directory: Path) -> dict[str, Any]:
         or len(artifacts) != 2
     ):
         raise DeliveryError("delivery image or artifact records are invalid")
-    if manifest.get("runtime_policy") != {"build": False, "pull": False, "host_python": False}:
+    if manifest.get("runtime_policy") != {
+        "build": False,
+        "pull": False,
+        "host_python": False,
+        "rootful_docker": True,
+        "operator_home_only": True,
+    }:
         raise DeliveryError("delivery runtime policy is invalid")
     if manifest.get("claims") != {"official_score": False, "organizer_runtime_pass": False}:
         raise DeliveryError("delivery claims are invalid")
